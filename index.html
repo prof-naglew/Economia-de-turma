@@ -335,7 +335,7 @@
 
       const horarioInicial = encontrarHorarioAtivoAgora();
       const session = {
-        modo: 'aluno',
+        modo: 'professor',
         abaProfessor: 'turma',
         turmaAtualId: horarioInicial ? horarioInicial.turmaId : (db.turmas[0]?.id || 1),
         escolhendoTurma: !horarioInicial,
@@ -663,31 +663,105 @@
 
 
 
+      const BIO_KEY = 'economia_turma_bio_id';
+
+      function bufferToBase64(buf) {
+        return btoa(String.fromCharCode(...new Uint8Array(buf)));
+      }
+
+      function base64ToBuffer(b64) {
+        const bin = atob(b64);
+        const bytes = new Uint8Array(bin.length);
+        for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+        return bytes.buffer;
+      }
+
+      async function cadastrarBiometriaWeb() {
+        if (!window.PublicKeyCredential || !navigator.credentials) {
+          throw new Error('Navegador sem suporte a biometria web');
+        }
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+        const userId = new Uint8Array(16);
+        crypto.getRandomValues(userId);
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: 'Economia da Turma' },
+            user: { id: userId, name: 'professor', displayName: 'Professor' },
+            pubKeyCredParams: [{ type: 'public-key', alg: -7 }, { type: 'public-key', alg: -257 }],
+            authenticatorSelection: { authenticatorAttachment: 'platform', userVerification: 'required' },
+            timeout: 60000
+          }
+        });
+        if (cred && cred.rawId) {
+          try { localStorage.setItem(BIO_KEY, bufferToBase64(cred.rawId)); } catch (e) {}
+          return true;
+        }
+        return false;
+      }
+
+      async function verificarBiometriaWeb() {
+        let savedId = null;
+        try { savedId = localStorage.getItem(BIO_KEY); } catch (e) {}
+        if (!savedId) return false;
+        const challenge = new Uint8Array(32);
+        crypto.getRandomValues(challenge);
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            allowCredentials: [{ type: 'public-key', id: base64ToBuffer(savedId) }],
+            userVerification: 'required',
+            timeout: 60000
+          }
+        });
+        return Boolean(assertion);
+      }
+
+      function concluirEntradaProfessor() {
+        session.modo = 'professor';
+        session.abaProfessor = 'turma';
+        session.alunoAtivoId = null;
+        const h = encontrarHorarioAtivoAgora();
+        if (h) {
+          session.turmaAtualId = h.turmaId;
+          session.escolhendoTurma = false;
+        } else {
+          session.escolhendoTurma = true;
+        }
+        fecharModal();
+        toast('Digital confirmada!', 'sucesso');
+        render();
+      }
+
       function pedirPinProfessor() {
+        let bioCadastrada = false;
+        try { bioCadastrada = Boolean(localStorage.getItem(BIO_KEY)); } catch (e) {}
+
         abrirModal(`
           <div class="flex items-center justify-between mb-3">
             <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Acesso do Professor</span></h3>
             <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
           </div>
-          <p class="text-xs text-gray-400 mb-4">Acesso exclusivo pela sua digital (no navegador web, toque abaixo para simular a leitura biométrica).</p>
-          <button id="btn-simular-digital" class="w-full glass-gold-btn font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2">${svgIcon('shield', 'w-5 h-5')} <span>Entrar com Digital</span></button>
+          <p class="text-xs text-gray-400 mb-4">${bioCadastrada ? 'Confirme com a sua digital para voltar ao Modo Professor.' : 'Cadastre a digital deste aparelho (funciona no seu link github.io) ou entre na prévia.'}</p>
+          <button id="btn-usar-digital" class="w-full glass-gold-btn font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2 mb-2.5">${svgIcon('shield', 'w-5 h-5')} <span>${bioCadastrada ? 'Desbloquear com Digital' : 'Cadastrar Digital e Entrar'}</span></button>
+          <button id="btn-simular-digital" class="w-full glass-pill text-gray-300 text-xs font-semibold py-2.5 rounded-xl">Entrar sem leitor (prévia / fallback)</button>
         `);
         document.getElementById('btn-fechar-modal').onclick = fecharModal;
-        document.getElementById('btn-simular-digital').onclick = () => {
-          session.modo = 'professor';
-          session.abaProfessor = 'turma';
-          session.alunoAtivoId = null;
-          const h = encontrarHorarioAtivoAgora();
-          if (h) {
-            session.turmaAtualId = h.turmaId;
-            session.escolhendoTurma = false;
-          } else {
-            session.escolhendoTurma = true;
+        document.getElementById('btn-usar-digital').onclick = async () => {
+          try {
+            if (!bioCadastrada) {
+              const ok = await cadastrarBiometriaWeb();
+              if (ok) concluirEntradaProfessor();
+            } else {
+              const ok = await verificarBiometriaWeb();
+              if (ok) concluirEntradaProfessor();
+            }
+          } catch (err) {
+            toast('Leitor biométrico indisponível aqui. Use o botão abaixo.', 'erro');
           }
-          fecharModal();
-          toast('Digital confirmada!', 'sucesso');
-          render();
         };
+        document.getElementById('btn-simular-digital').onclick = concluirEntradaProfessor;
       }
 
       // --- Renderizadores ---
