@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Economia da Turma — IPs</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #07070B;
+      color: #F5F5F7;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+    /* Orbes de luz ambiente para o efeito Liquid Glass */
+    .ambient-bg {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .orb-purple {
+      position: absolute;
+      width: 420px;
+      height: 420px;
+      top: -120px;
+      left: -100px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(138, 43, 226, 0.38) 0%, rgba(106, 27, 154, 0.08) 55%, transparent 75%);
+      filter: blur(28px);
+    }
+    .orb-gold {
+      position: absolute;
+      width: 340px;
+      height: 340px;
+      bottom: 8%;
+      right: -110px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(255, 214, 0, 0.20) 0%, rgba(255, 214, 0, 0.04) 55%, transparent 75%);
+      filter: blur(32px);
+    }
+    .orb-deep {
+      position: absolute;
+      width: 380px;
+      height: 380px;
+      top: 42%;
+      left: 25%;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(88, 28, 135, 0.24) 0%, transparent 70%);
+      filter: blur(40px);
+    }
+
+    /* Superfícies Liquid Glass */
+    .glass-card {
+      background: linear-gradient(145deg, rgba(34, 30, 46, 0.58), rgba(16, 15, 22, 0.68));
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 32px rgba(0, 0, 0, 0.45);
+    }
+    .glass-header {
+      background: linear-gradient(180deg, rgba(28, 18, 44, 0.72), rgba(14, 12, 22, 0.62));
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    }
+    .glass-nav {
+      background: linear-gradient(180deg, rgba(22, 20, 30, 0.72), rgba(10, 10, 14, 0.86));
+      backdrop-filter: blur(26px) saturate(190%);
+      -webkit-backdrop-filter: blur(26px) saturate(190%);
+      border-top: 1px solid rgba(255, 255, 255, 0.13);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    }
+    .glass-pill {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+    .glass-accent-purple {
+      background: linear-gradient(135deg, rgba(126, 87, 194, 0.48), rgba(56, 0, 107, 0.62));
+      backdrop-filter: blur(22px) saturate(180%);
+      -webkit-backdrop-filter: blur(22px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 16px 36px rgba(56, 0, 107, 0.45);
+    }
+    .glass-gold-btn {
+      background: linear-gradient(135deg, #FFE44D, #FFD600);
+      color: #09090D;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65), 0 8px 22px rgba(255, 214, 0, 0.25);
+    }
+    .text-amarelo { color: #FFD600; }
+    .border-card { border-color: rgba(255, 255, 255, 0.13); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+  <div class="ambient-bg">
+    <div class="orb-purple"></div>
+    <div class="orb-deep"></div>
+    <div class="orb-gold"></div>
+  </div>
+
+  <div id="app" class="relative z-10 flex-1 flex flex-col max-w-5xl w-full mx-auto pb-24"></div>
+
+  <!-- Toast -->
+  <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none w-[90%] max-w-md flex flex-col gap-2"></div>
+
+  <!-- Modal -->
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+    <div id="modal-content" class="glass-card rounded-3xl w-full max-w-md max-h-[88vh] overflow-y-auto p-5 shadow-2xl"></div>
+  </div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = 'economia_turma_v1';
+
+      // Ícones em silhueta monocromática (SVG puro)
+      const SVG_PATHS = {
+        users: '<path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5s-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"/>',
+        user: '<path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/>',
+        gift: '<path d="M20 6h-2.18c.11-.31.18-.65.18-1a2.996 2.996 0 0 0-5.5-1.65l-.5.67-.5-.68C10.96 2.54 10.05 2 9 2 7.34 2 6 3.34 6 5c0 .35.07.69.18 1H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-5-2c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zM9 4c.55 0 1 .45 1 1s-.45 1-1 1-1-.45-1-1 .45-1 1-1zm11 15H4v-2h16v2zm0-5H4V8h5.08L7 10.83 8.62 12 11 8.76l1-1.36 1 1.36L15.38 12 17 10.83 14.92 8H20v6z"/>',
+        briefcase: '<path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>',
+        store: '<path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1.003 1.003 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>',
+        history: '<path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/>',
+        settings: '<path d="M19.14 12.94c.04-.31.06-.63.06-.94 0-.31-.02-.63-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94l-2.03 1.58a.49.49 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>',
+        bolt: '<path d="M11 21h-1l1-7H7.5c-.58 0-.57-.32-.38-.66.19-.34.05-.08.07-.12C8.48 10.94 10.42 7.54 13 3h1l-1 7h3.5c.49 0 .56.33.47.51l-.07.15C12.96 17.55 11 21 11 21z"/>',
+        shield: '<path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>',
+        lock: '<path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/>',
+        star: '<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>',
+        rocket: '<path d="M12 2.5s4.5 2.04 4.5 10.5c0 2.49-1.04 5.57-1.6 7H9.1c-.56-1.43-1.6-4.51-1.6-7C7.5 4.54 12 2.5 12 2.5zm0 8.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm-5.5 3.5L4 17v3l3.2-1.2M17.5 14.5L20 17v3l-3.2-1.2"/>',
+        book: '<path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>',
+        music: '<path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>',
+        sparkles: '<path d="M19 9l1.25-2.75L23 5l-2.75-1.25L19 1l-1.25 2.75L15 5l2.75 1.25L19 9zm-7.5.5L9 4 6.5 9.5 1 12l5.5 2.5L9 20l2.5-5.5L17 12l-5.5-2.5zM19 15l-1.25 2.75L15 19l2.75 1.25L19 23l1.25-2.75L23 19l-2.75-1.25L19 15z"/>',
+        award: '<path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94.63 1.5 1.98 2.63 3.61 2.96V19H7v2h10v-2h-4v-3.1c1.63-.33 2.98-1.46 3.61-2.96C19.08 12.63 21 10.55 21 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.82C5.84 10.4 5 9.3 5 8zm14 0c0 1.3-.84 2.4-2 2.82V7h2v1z"/>',
+        crown: '<path d="M5 16L3 5l5.5 5L12 4l3.5 6L21 5l-2 11H5zm14 3c0 .6-.4 1-1 1H6c-.6 0-1-.4-1-1v-1h14v1z"/>',
+        flame: '<path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67z"/>',
+        compass: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm2.19 12.19L6 18l3.81-8.19L18 6l-3.81 8.19z"/>',
+        heart: '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+        bulb: '<path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/>',
+        tag: '<path d="M21.41 11.58l-9-9C12.05 2.22 11.55 2 11 2H4c-1.1 0-2 .9-2 2v7c0 .55.22 1.05.59 1.42l9 9c.36.36.86.58 1.41.58.55 0 1.05-.22 1.41-.59l7-7c.37-.36.59-.86.59-1.41 0-.55-.23-1.06-.59-1.42zM5.5 7C4.67 7 4 6.33 4 5.5S4.67 4 5.5 4 7 4.67 7 5.5 6.33 7 5.5 7z"/>',
+        backpack: '<path d="M17 4.14V2h-3v2h-4V2H7v2.14C5.28 4.59 4 6.14 4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8c0-1.86-1.28-3.41-3-3.86zM16 14H8v-2h8v2z"/>',
+        coin: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-1h-2v-2h4v-1h-3c-.55 0-1-.45-1-1V9c0-.55.45-1 1-1h1V7h2v1h2v2h-4v1h3c.55 0 1 .45 1 1v3c0 .55-.45 1-1 1h-1v1z"/>',
+        download: '<path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/>',
+        check: '<path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>',
+        calendar: '<path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-1.99.9-1.99 2L3 20c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zm0-12H5V6h14v2z"/>',
+        arrowLeft: '<path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>',
+        pencil: '<path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1.003 1.003 0 0 0 0-1.42l-2.34-2.34a1.003 1.003 0 0 0-1.42 0l-1.83 1.83 3.75 3.75 1.84-1.82z"/>',
+        clock: '<path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>',
+        target: '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm0-14c-3.31 0-6 2.69-6 6s2.69 6 6 6 6-2.69 6-6-2.69-6-6-6zm0 10c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm0-6a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>',
+        puzzle: '<path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5a2.5 2.5 0 0 0-5 0V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5a2.5 2.5 0 0 0 0-5z"/>',
+        leaf: '<path d="M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66.95-2.3c.48.17.98.3 1.34.3C19 20 22 3 22 3c-1 2-8 2.25-13 3.25S2 11.5 2 13.5s1.75 3.75 1.75 3.75C7 8 17 8 17 8z"/>',
+        flag: '<path d="M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z"/>',
+        trash: '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>'
+      };
+
+      const ICONES_ATIVIDADES = [
+        'bolt', 'book', 'heart', 'sparkles', 'star',
+        'award', 'crown', 'flame', 'rocket', 'compass',
+        'bulb', 'music', 'tag', 'shield', 'check',
+        'pencil', 'clock', 'target', 'puzzle', 'leaf'
+      ];
+
+      function svgIcon(name, sizeClass = 'w-5 h-5') {
+        const d = SVG_PATHS[name] || SVG_PATHS.star;
+        return `<svg viewBox="0 0 24 24" fill="currentColor" class="${sizeClass} shrink-0" aria-hidden="true">${d}</svg>`;
+      }
+
+      const AVATARES = [
+        { id: 'fox', icon: 'flame', label: 'Chama' },
+        { id: 'owl', icon: 'crown', label: 'Coroa' },
+        { id: 'rocket', icon: 'rocket', label: 'Foguete' },
+        { id: 'dino', icon: 'bolt', label: 'Raio' },
+        { id: 'star', icon: 'star', label: 'Estrela' },
+        { id: 'cat', icon: 'heart', label: 'Coração' },
+        { id: 'lion', icon: 'award', label: 'Troféu' },
+        { id: 'panda', icon: 'compass', label: 'Bússola' },
+        { id: 'alien', icon: 'sparkles', label: 'Brilho' },
+        { id: 'bolt', icon: 'shield', label: 'Escudo' },
+        { id: 'unicorn', icon: 'music', label: 'Música' },
+        { id: 'robot', icon: 'bulb', label: 'Ideia' }
+      ];
+
+      function avatarPorId(id) {
+        return AVATARES.find(a => a.id === id) || AVATARES[0];
+      }
+
+      function renderAvatar(id, sizeClass = 'w-6 h-6') {
+        const av = avatarPorId(id);
+        return svgIcon(av.icon, sizeClass);
+      }
+
+      function renderRegraIcone(iconeStr, sizeClass = 'w-5 h-5') {
+        if (SVG_PATHS[iconeStr]) return svgIcon(iconeStr, sizeClass);
+        return svgIcon('star', sizeClass);
+      }
+
+      function hojeISO() {
+        const d = new Date();
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+
+      function formatarDataCurta(yyyyMmDd) {
+        const [y, m, d] = yyyyMmDd.split('-');
+        return `${d}/${m}/${y}`;
+      }
+
+      function formatarDataHora(iso) {
+        const d = new Date(iso);
+        const day = String(d.getDate()).padStart(2, '0');
+        const mon = String(d.getMonth() + 1).padStart(2, '0');
+        const h = String(d.getHours()).padStart(2, '0');
+        const min = String(d.getMinutes()).padStart(2, '0');
+        return `${day}/${mon} ${h}:${min}`;
+      }
+
+      function criarEstadoInicial() {
+        const now = new Date().toISOString();
+        return {
+          config: {
+            moedaSingular: 'IP',
+            moedaPlural: 'IPs',
+            pinProfessor: '1234',
+            inatividadeSegundos: 45,
+            limiteDiarioMonitor: 10
+          },
+          turmas: [
+            { id: 1, nome: '6º Ano A', ativa: true },
+            { id: 2, nome: '7º Ano A', ativa: true },
+            { id: 3, nome: '8º Ano A', ativa: true }
+          ],
+          horariosAula: [
+            { id: 1, turmaId: 1, diaSemana: 1, inicio: '07:30', fim: '09:10' },
+            { id: 2, turmaId: 2, diaSemana: 1, inicio: '09:30', fim: '11:10' },
+            { id: 3, turmaId: 3, diaSemana: 2, inicio: '07:30', fim: '09:10' }
+          ],
+          usuarios: [
+            { id: 1, turmaId: null, apelido: 'Professor', avatarId: 'owl', papel: 'professor', pin: '1234', saldo: 0 },
+            { id: 2, turmaId: 1, apelido: 'Ana L.', avatarId: 'fox', papel: 'monitor', pin: '1111', saldo: 14 },
+            { id: 3, turmaId: 1, apelido: 'Lucas M.', avatarId: 'rocket', papel: 'aluno', pin: '', saldo: 9 },
+            { id: 4, turmaId: 1, apelido: 'Sofia R.', avatarId: 'unicorn', papel: 'aluno', pin: '', saldo: 18 },
+            { id: 5, turmaId: 2, apelido: 'Pedro H.', avatarId: 'dino', papel: 'aluno', pin: '', saldo: 7 },
+            { id: 6, turmaId: 3, apelido: 'Julia C.', avatarId: 'star', papel: 'monitor', pin: '2222', saldo: 12 }
+          ],
+          regras: [
+            { id: 1, titulo: 'Participação em aula', valor: 2, icone: 'bolt', monitorPode: true },
+            { id: 2, titulo: 'Tarefa completa', valor: 3, icone: 'book', monitorPode: false },
+            { id: 3, titulo: 'Ajudou um colega', valor: 2, icone: 'heart', monitorPode: true },
+            { id: 4, titulo: 'Organização da sala', valor: 1, icone: 'sparkles', monitorPode: true }
+          ],
+          cargos: [
+            { id: 1, turmaId: 1, titulo: 'Monitor de Quadro', salario: 5, usuarioId: 2, ultimoPagamento: null },
+            { id: 2, turmaId: 1, titulo: 'Guardião dos Materiais', salario: 4, usuarioId: 3, ultimoPagamento: null }
+          ],
+          itensMercadinho: [
+            { id: 1, nome: 'Escolher música da aula', categoria: 'Privilégio', preco: 8, icone: 'music', estoque: null, ativo: true },
+            { id: 2, nome: 'Sentar em dupla', categoria: 'Privilégio', preco: 12, icone: 'users', estoque: 5, ativo: true },
+            { id: 3, nome: 'Adesivo especial', categoria: 'Item físico', preco: 6, icone: 'tag', estoque: 15, ativo: true },
+            { id: 4, nome: 'Dica extra na atividade', categoria: 'Acadêmico', preco: 20, icone: 'bulb', estoque: 3, ativo: true }
+          ],
+          transacoes: [
+            { id: 1, turmaId: 1, origemId: 1, destinoId: 4, valor: 3, tipo: 'ganho', motivo: 'Tarefa completa', criadoEm: now }
+          ],
+          pedidos: [],
+          nextId: 100
+        };
+      }
+
+      function carregarEstado() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed.horariosAula)) parsed.horariosAula = [];
+            return parsed;
+          }
+        } catch (e) {}
+        return criarEstadoInicial();
+      }
+
+      const DIAS_SEMANA = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+      function somarMinutos(hhmm, minutos = 45) {
+        if (!hhmm || !hhmm.includes(':')) return '08:15';
+        const [h, m] = hhmm.split(':').map(Number);
+        const total = Math.min(23 * 60 + 59, h * 60 + m + minutos);
+        return `${String(Math.floor(total / 60)).padStart(2, '0')}:${String(total % 60).padStart(2, '0')}`;
+      }
+
+      function turmasOrdenadas() {
+        return db.turmas.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR', { numeric: true, sensitivity: 'base' }));
+      }
+
+      function totalTokensTurma(turmaId) {
+        return db.usuarios
+          .filter(u => u.turmaId === turmaId && u.papel !== 'professor')
+          .reduce((acc, u) => acc + (u.saldo || 0), 0);
+      }
+
+      function encontrarHorarioAtivoAgora() {
+        const agora = new Date();
+        const dia = agora.getDay();
+        const hhmm = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
+        return (db.horariosAula || []).find(h => h.diaSemana === dia && hhmm >= h.inicio && hhmm <= h.fim) || null;
+      }
+
+      let db = carregarEstado();
+
+      function salvarEstado() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(db));
+        } catch (e) {}
+      }
+
+      function genId() {
+        db.nextId = (db.nextId || 100) + 1;
+        return db.nextId;
+      }
+
+      function fmtMoeda(valor) {
+        const n = Number(valor) || 0;
+        return `${n} ${n === 1 ? db.config.moedaSingular : db.config.moedaPlural}`;
+      }
+
+      const horarioInicial = encontrarHorarioAtivoAgora();
+      const session = {
+        modo: 'aluno',
+        abaProfessor: 'turma',
+        turmaAtualId: horarioInicial ? horarioInicial.turmaId : (db.turmas[0]?.id || 1),
+        escolhendoTurma: !horarioInicial,
+        selecaoMultipla: false,
+        selecionados: new Set(),
+        alunoAtivoId: null,
+        carrinho: {},
+        dataSelecionada: hojeISO(),
+        calMes: new Date().getMonth(),
+        calAno: new Date().getFullYear(),
+        historicoPeriodo: 'tudo',
+        historicoTurmaId: 'todas',
+        abaAnterior: 'turma'
+      };
+
+      function toast(msg, tipo = 'roxo') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const div = document.createElement('div');
+        const cor = tipo === 'erro'
+          ? 'bg-red-900/80 border-red-400/30'
+          : (tipo === 'sucesso' ? 'bg-emerald-900/80 border-emerald-400/30' : 'bg-purple-900/80 border-purple-300/30');
+        div.className = `${cor} backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl text-sm font-semibold text-center border transition-opacity`;
+        div.textContent = msg;
+        container.appendChild(div);
+        setTimeout(() => {
+          div.style.opacity = '0';
+          setTimeout(() => div.remove(), 250);
+        }, 2600);
+      }
+
+      function abrirModal(html) {
+        const backdrop = document.getElementById('modal-backdrop');
+        const content = document.getElementById('modal-content');
+        content.innerHTML = html;
+        backdrop.classList.remove('hidden');
+        backdrop.classList.add('flex');
+      }
+
+      function fecharModal() {
+        const backdrop = document.getElementById('modal-backdrop');
+        backdrop.classList.add('hidden');
+        backdrop.classList.remove('flex');
+      }
+
+      document.getElementById('modal-backdrop').addEventListener('click', (e) => {
+        if (e.target.id === 'modal-backdrop') fecharModal();
+      });
+
+      function escapeHtml(str) {
+        return String(str)
+          .replace(/&/g, '&amp;')
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/"/g, '&quot;');
+      }
+
+      function lancarIps(origemId, destinoIds, valor, motivo, tipo = 'ganho', dataRef = null) {
+        const hoje = hojeISO();
+        const alvoData = dataRef || hoje;
+        const criadoEm = alvoData === hoje ? new Date().toISOString() : `${alvoData}T12:00:00.000Z`;
+        destinoIds.forEach(id => {
+          const u = db.usuarios.find(x => x.id === id);
+          if (!u) return;
+          u.saldo = (u.saldo || 0) + valor;
+          db.transacoes.unshift({
+            id: genId(),
+            turmaId: session.turmaAtualId,
+            origemId,
+            destinoId: id,
+            valor,
+            tipo,
+            motivo,
+            criadoEm
+          });
+        });
+        salvarEstado();
+      }
+
+      function pontosDoAlunoNaData(alunoId, dataYmd) {
+        return db.transacoes
+          .filter(t => t.destinoId === alunoId && t.valor > 0 && t.criadoEm.startsWith(dataYmd))
+          .reduce((acc, t) => acc + t.valor, 0);
+      }
+
+      function abrirModalCalendario() {
+        const meses = ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+        const hoje = hojeISO();
+
+        function renderCal() {
+          const ano = session.calAno;
+          const mes = session.calMes;
+          const primeiroDia = new Date(ano, mes, 1).getDay();
+          const diasNoMes = new Date(ano, mes + 1, 0).getDate();
+          const diasComRegistro = new Set(
+            db.transacoes
+              .filter(t => t.turmaId === session.turmaAtualId && t.valor > 0)
+              .map(t => t.criadoEm.slice(0, 10))
+          );
+
+          let celulas = '';
+          for (let i = 0; i < primeiroDia; i++) {
+            celulas += '<div></div>';
+          }
+          for (let d = 1; d <= diasNoMes; d++) {
+            const ymd = `${ano}-${String(mes + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+            const futuro = ymd > hoje;
+            const sel = ymd === session.dataSelecionada;
+            const temReg = diasComRegistro.has(ymd);
+            celulas += `
+              <button type="button" data-cal-ymd="${ymd}" ${futuro ? 'disabled' : ''} class="btn-cal-dia h-10 rounded-xl text-xs font-bold flex flex-col items-center justify-center relative transition ${sel ? 'glass-gold-btn' : (futuro ? 'text-gray-600 opacity-40' : 'glass-pill text-white hover:border-[#FFD600]/60')}">
+                <span>${d}</span>
+                ${temReg ? `<span class="w-1.5 h-1.5 rounded-full ${sel ? 'bg-black' : 'bg-[#FFD600]'} mt-0.5"></span>` : ''}
+              </button>
+            `;
+          }
+
+          abrirModal(`
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-base flex items-center gap-2">${svgIcon('calendar', 'w-5 h-5 text-amarelo')} <span>Calendário de Lançamentos</span></h3>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+            <div class="flex items-center justify-between mb-3">
+              <button id="cal-prev" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold">&larr;</button>
+              <span class="font-bold text-sm">${meses[mes]} ${ano}</span>
+              <button id="cal-next" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold">&rarr;</button>
+            </div>
+            <div class="grid grid-cols-7 gap-1 text-center text-[10px] text-gray-400 font-semibold mb-1.5">
+              <div>D</div><div>S</div><div>T</div><div>Q</div><div>Q</div><div>S</div><div>S</div>
+            </div>
+            <div class="grid grid-cols-7 gap-1.5 mb-4">${celulas}</div>
+            <button id="cal-hoje" class="w-full glass-accent-purple text-white text-xs font-bold py-2.5 rounded-xl">Voltar para Hoje (${formatarDataCurta(hoje)})</button>
+          `);
+
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('cal-prev').onclick = () => {
+            session.calMes -= 1;
+            if (session.calMes < 0) { session.calMes = 11; session.calAno -= 1; }
+            renderCal();
+          };
+          document.getElementById('cal-next').onclick = () => {
+            session.calMes += 1;
+            if (session.calMes > 11) { session.calMes = 0; session.calAno += 1; }
+            renderCal();
+          };
+          document.getElementById('cal-hoje').onclick = () => {
+            session.dataSelecionada = hoje;
+            fecharModal();
+            render();
+          };
+          document.querySelectorAll('.btn-cal-dia').forEach(b => {
+            b.onclick = () => {
+              session.dataSelecionada = b.dataset.calYmd;
+              fecharModal();
+              render();
+            };
+          });
+        }
+        renderCal();
+      }
+
+
+
+      function alunoJaResgatouHoje(alunoId) {
+        const hoje = hojeISO();
+        return db.pedidos.some(p => p.alunoId === alunoId && p.status !== 'cancelado' && p.criadoEm.startsWith(hoje));
+      }
+
+      // --- Modais ---
+      function abrirModalLancar(alvosIds) {
+        const alvos = db.usuarios.filter(u => alvosIds.includes(u.id));
+        if (!alvos.length) return;
+        const regras = db.regras;
+        const dataAtiva = session.dataSelecionada;
+        const ehRetro = dataAtiva !== hojeISO();
+        const titulo = alvos.length === 1
+          ? `Dar ${db.config.moedaPlural} para ${escapeHtml(alvos[0].apelido)}`
+          : `Dar ${db.config.moedaPlural} para ${alvos.length} alunos`;
+
+        const listaRegras = regras.length === 0
+          ? `<p class="text-sm text-gray-400">Nenhuma regra liberada.</p>`
+          : regras.map(r => `
+              <button data-regra-id="${r.id}" class="btn-aplicar-regra w-full flex items-center justify-between p-3.5 rounded-2xl glass-pill hover:border-[#FFD600] transition mb-2.5 text-left">
+                <div class="flex items-center gap-3">
+                  <span class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white/90">${renderRegraIcone(r.icone, 'w-5 h-5')}</span>
+                  <span class="font-semibold text-sm">${escapeHtml(r.titulo)}</span>
+                </div>
+                <span class="glass-gold-btn font-extrabold text-xs px-3 py-1 rounded-full">+${r.valor}</span>
+              </button>
+            `).join('');
+
+        abrirModal(`
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-lg text-white flex items-center gap-2">${svgIcon('bolt', 'w-5 h-5 text-amarelo')} <span>${titulo}</span></h3>
+            <button id="btn-fechar-modal" class="text-gray-400 hover:text-white text-xl px-2">&times;</button>
+          </div>
+          ${ehRetro ? `<p class="text-xs text-amarelo mb-3">Lançamento retroativo para ${formatarDataCurta(dataAtiva)}</p>` : `<p class="text-xs text-gray-400 mb-3">Data: ${formatarDataCurta(dataAtiva)}</p>`}
+          <div class="max-h-72 overflow-y-auto">${listaRegras}</div>
+        `);
+
+        document.getElementById('btn-fechar-modal').onclick = fecharModal;
+        document.querySelectorAll('.btn-aplicar-regra').forEach(btn => {
+          btn.onclick = () => {
+            const regraId = Number(btn.dataset.regraId);
+            const regra = db.regras.find(r => r.id === regraId);
+            if (!regra) return;
+
+            lancarIps(1, alvos.map(a => a.id), regra.valor, regra.titulo, 'ganho', dataAtiva);
+            session.selecaoMultipla = false;
+            session.selecionados.clear();
+            fecharModal();
+            toast(`+${fmtMoeda(regra.valor)} (${regra.titulo}) lançado!`, 'sucesso');
+            render();
+          };
+        });
+      }
+
+      function abrirModalNovoAluno() {
+        let avatarSel = AVATARES[0].id;
+        let modoLote = false;
+
+        function renderDialog() {
+          const avsHtml = AVATARES.map(a => `
+            <button type="button" data-av="${a.id}" class="btn-av w-11 h-11 rounded-full flex items-center justify-center border-2 transition ${avatarSel === a.id ? 'border-[#FFD600] bg-yellow-400/20 text-amarelo' : 'border-white/10 bg-white/5 text-white/80'}">
+              ${svgIcon(a.icon, 'w-5 h-5')}
+            </button>
+          `).join('');
+
+          abrirModal(`
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-lg">Cadastrar Alunos</h3>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+            <div class="grid grid-cols-2 gap-2 mb-4">
+              <button type="button" id="tab-um-aluno" class="py-2 rounded-xl text-xs font-bold border ${!modoLote ? 'glass-accent-purple text-white' : 'glass-pill text-gray-300'}">1 Aluno</button>
+              <button type="button" id="tab-varios-alunos" class="py-2 rounded-xl text-xs font-bold border ${modoLote ? 'glass-accent-purple text-white' : 'glass-pill text-gray-300'}">Vários de uma vez</button>
+            </div>
+            ${!modoLote ? `
+              <label class="block text-xs text-gray-400 mb-1">Apelido ou primeiro nome (LGPD)</label>
+              <input id="inp-apelido" type="text" placeholder="Ex.: Lucas M." class="w-full glass-pill rounded-xl px-3.5 py-2.5 text-white mb-3 outline-none focus:border-[#FFD600]" />
+              <label class="block text-xs text-gray-400 mb-2">Silhueta do avatar</label>
+              <div class="flex flex-wrap gap-2 mb-5">${avsHtml}</div>
+              <button id="btn-salvar-aluno" class="w-full glass-gold-btn font-bold py-3 rounded-xl">Salvar Aluno</button>
+            ` : `
+              <label class="block text-xs text-gray-400 mb-1">Cole ou digite os apelidos (um por linha ou separados por vírgula)</label>
+              <textarea id="inp-varios-apelidos" rows="6" placeholder="Ana P.&#10;Bruno S.&#10;Carla M.&#10;Diego R." class="w-full glass-pill rounded-xl px-3.5 py-2.5 text-sm text-white mb-2 outline-none focus:border-[#FFD600]"></textarea>
+              <p class="text-[11px] text-gray-400 mb-4">Os avatares em silhueta serão distribuídos automaticamente.</p>
+              <button id="btn-salvar-varios" class="w-full glass-gold-btn font-bold py-3 rounded-xl">Cadastrar Todos</button>
+            `}
+          `);
+
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('tab-um-aluno').onclick = () => {
+            modoLote = false;
+            renderDialog();
+          };
+          document.getElementById('tab-varios-alunos').onclick = () => {
+            modoLote = true;
+            renderDialog();
+          };
+
+          if (!modoLote) {
+            document.querySelectorAll('.btn-av').forEach(b => {
+              b.onclick = () => {
+                const val = document.getElementById('inp-apelido').value;
+                avatarSel = b.dataset.av;
+                renderDialog();
+                document.getElementById('inp-apelido').value = val;
+              };
+            });
+            document.getElementById('btn-salvar-aluno').onclick = () => {
+              const apelido = document.getElementById('inp-apelido').value.trim();
+              if (!apelido) {
+                toast('Digite um apelido.', 'erro');
+                return;
+              }
+              db.usuarios.push({
+                id: genId(),
+                turmaId: session.turmaAtualId,
+                apelido,
+                avatarId: avatarSel,
+                papel: 'aluno',
+                pin: '',
+                saldo: 0
+              });
+              salvarEstado();
+              fecharModal();
+              toast(`${apelido} cadastrado!`, 'sucesso');
+              render();
+            };
+          } else {
+            document.getElementById('btn-salvar-varios').onclick = () => {
+              const raw = document.getElementById('inp-varios-apelidos').value;
+              const nomes = raw
+                .split(/[\n,;]+/)
+                .map(n => n.trim())
+                .filter(n => n.length > 0);
+              if (nomes.length === 0) {
+                toast('Digite pelo menos um apelido.', 'erro');
+                return;
+              }
+              const baseIdx = db.usuarios.length;
+              nomes.forEach((apelido, idx) => {
+                const av = AVATARES[(baseIdx + idx) % AVATARES.length];
+                db.usuarios.push({
+                  id: genId(),
+                  turmaId: session.turmaAtualId,
+                  apelido,
+                  avatarId: av.id,
+                  papel: 'aluno',
+                  pin: '',
+                  saldo: 0
+                });
+              });
+              salvarEstado();
+              fecharModal();
+              toast(`${nomes.length} aluno(s) cadastrados!`, 'sucesso');
+              render();
+            };
+          }
+        }
+
+        renderDialog();
+      }
+
+
+
+      function pedirPinProfessor() {
+        abrirModal(`
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Acesso do Professor</span></h3>
+            <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+          </div>
+          <p class="text-xs text-gray-400 mb-4">Acesso exclusivo pela sua digital (no navegador web, toque abaixo para simular a leitura biométrica).</p>
+          <button id="btn-simular-digital" class="w-full glass-gold-btn font-extrabold py-3.5 rounded-2xl flex items-center justify-center gap-2">${svgIcon('shield', 'w-5 h-5')} <span>Entrar com Digital</span></button>
+        `);
+        document.getElementById('btn-fechar-modal').onclick = fecharModal;
+        document.getElementById('btn-simular-digital').onclick = () => {
+          session.modo = 'professor';
+          session.abaProfessor = 'turma';
+          session.alunoAtivoId = null;
+          const h = encontrarHorarioAtivoAgora();
+          if (h) {
+            session.turmaAtualId = h.turmaId;
+            session.escolhendoTurma = false;
+          } else {
+            session.escolhendoTurma = true;
+          }
+          fecharModal();
+          toast('Digital confirmada!', 'sucesso');
+          render();
+        };
+      }
+
+      // --- Renderizadores ---
+      function render() {
+        const app = document.getElementById('app');
+        if (session.modo === 'bloqueado') {
+          app.innerHTML = renderTelaBloqueio();
+          bindTelaBloqueio();
+          return;
+        }
+        if (session.modo === 'aluno') {
+          app.innerHTML = renderModoAluno();
+          bindModoAluno();
+          return;
+        }
+
+        app.innerHTML = renderModoProfessor();
+        bindModoProfessor();
+      }
+
+      function renderTelaBloqueio() {
+        return `
+          <div class="flex-1 flex flex-col items-center justify-center p-6 text-center">
+            <div class="w-20 h-20 rounded-3xl glass-card flex items-center justify-center text-white mb-5">${svgIcon('lock', 'w-10 h-10')}</div>
+            <h1 class="text-2xl font-extrabold mb-2">Sessão encerrada</h1>
+            <p class="text-sm text-gray-400 mb-6 max-w-xs">Para proteger os dados da turma, o painel foi bloqueado por inatividade.</p>
+            <button id="btn-desbloquear-prof" class="glass-gold-btn font-bold px-6 py-3.5 rounded-2xl mb-3 w-full max-w-xs flex items-center justify-center gap-2">${svgIcon('lock', 'w-4 h-4')} <span>Entrar como Professor</span></button>
+            <button id="btn-entrar-aluno-bloq" class="glass-card text-white font-semibold px-6 py-3.5 rounded-2xl w-full max-w-xs flex items-center justify-center gap-2">${svgIcon('backpack', 'w-4 h-4')} <span>Abrir Modo Aluno</span></button>
+          </div>
+        `;
+      }
+
+      function bindTelaBloqueio() {
+        document.getElementById('btn-desbloquear-prof').onclick = pedirPinProfessor;
+        document.getElementById('btn-entrar-aluno-bloq').onclick = () => {
+          session.modo = 'aluno';
+          session.alunoAtivoId = null;
+          render();
+        };
+      }
+
+      function renderModoProfessor() {
+        const turmaAtual = db.turmas.find(t => t.id === session.turmaAtualId) || db.turmas[0];
+        const pendentesCount = db.pedidos.filter(p => p.status === 'pendente_entrega').length;
+
+        const horarioAtivo = encontrarHorarioAtivoAgora();
+        const podeVoltar = (session.abaProfessor === 'turma' && !session.escolhendoTurma) || session.abaProfessor !== 'turma';
+        const header = `
+          <header class="glass-header px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-2">
+              ${podeVoltar ? `<button id="btn-voltar-secao" title="Voltar" class="glass-pill w-9 h-9 rounded-xl flex items-center justify-center text-white hover:border-[#FFD600]/60 transition">${svgIcon('arrowLeft', 'w-4 h-4')}</button>` : ''}
+              ${session.abaProfessor === 'turma' && session.escolhendoTurma
+                ? `<span class="font-extrabold text-sm text-white">Escolha a Turma</span>`
+                : (turmaAtual ? `<select id="sel-turma" class="glass-pill text-white font-bold text-sm px-3.5 py-2 rounded-2xl outline-none">
+                    ${turmasOrdenadas().map(t => `<option value="${t.id}" class="bg-[#18181D]" ${t.id === turmaAtual.id ? 'selected' : ''}>${escapeHtml(t.nome)}</option>`).join('')}
+                   </select>
+                   ${horarioAtivo && horarioAtivo.turmaId === turmaAtual.id ? `<span class="hidden sm:inline-block text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-1 rounded-full font-semibold">Em aula</span>` : ''}` : '<span class="font-bold text-sm">Sem turmas</span>')
+              }
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="btn-abrir-entregas" class="glass-pill text-white text-xs font-bold px-3 py-2 rounded-2xl flex items-center gap-1.5 relative hover:border-[#FFD600]/40 transition">
+                ${svgIcon('gift', 'w-4 h-4 text-amarelo')} <span>Entregas</span>
+                ${pendentesCount > 0 ? `<span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">${pendentesCount}</span>` : ''}
+              </button>
+              <button id="btn-ir-aluno" class="glass-pill text-amarelo text-xs font-bold px-3.5 py-2 rounded-2xl flex items-center gap-1.5 hover:border-[#FFD600]/40 transition">
+                ${svgIcon('backpack', 'w-4 h-4')} <span>Modo Aluno</span>
+              </button>
+            </div>
+          </header>
+        `;
+
+        let conteudo = '';
+        if (session.abaProfessor === 'turma') conteudo = renderAbaTurma(turmaAtual);
+        if (session.abaProfessor === 'entregas') conteudo = renderAbaEntregas();
+        if (session.abaProfessor === 'cargos') conteudo = renderAbaCargos(turmaAtual);
+        if (session.abaProfessor === 'mercadinho') conteudo = renderAbaMercadinhoAdmin();
+        if (session.abaProfessor === 'historico') conteudo = renderAbaHistorico();
+        if (session.abaProfessor === 'config') conteudo = renderAbaConfig();
+
+        const nav = `
+          <nav class="fixed bottom-0 left-0 right-0 glass-nav z-30">
+            <div class="max-w-5xl mx-auto flex justify-around py-2 px-1 text-[11px] font-semibold">
+              ${navBtn('turma', 'users', 'Turmas')}
+              ${navBtn('cargos', 'briefcase', 'Cargos')}
+              ${navBtn('mercadinho', 'store', 'Loja')}
+              ${navBtn('historico', 'history', 'Histórico')}
+              ${navBtn('config', 'settings', 'Config')}
+            </div>
+          </nav>
+        `;
+
+        return header + `<main class="flex-1 p-4">${conteudo}</main>` + nav;
+      }
+
+      function navBtn(aba, icone, label, badge = 0) {
+        const ativo = session.abaProfessor === aba;
+        return `
+          <button data-aba="${aba}" class="btn-nav flex flex-col items-center px-2.5 py-1 rounded-2xl relative transition ${ativo ? 'text-amarelo' : 'text-gray-400 hover:text-white'}">
+            <span class="mb-1">${svgIcon(icone, 'w-5 h-5')}</span>
+            <span>${label}</span>
+            ${badge > 0 ? `<span class="absolute -top-0.5 right-0.5 bg-red-600 text-white text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center">${badge}</span>` : ''}
+          </button>
+        `;
+      }
+
+      function renderAbaTurma(turma) {
+        if (session.escolhendoTurma) {
+          return `
+            <div class="glass-card rounded-3xl p-5 mb-4">
+              <h2 class="font-extrabold text-lg mb-1">Fora do horário de aula</h2>
+              <p class="text-xs text-gray-400">Nenhuma turma está no horário cadastrado agora. Escolha qual turma deseja abrir:</p>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              ${turmasOrdenadas().map(t => {
+                const qtd = db.usuarios.filter(u => u.turmaId === t.id && u.papel !== 'professor').length;
+                const totalTurma = totalTokensTurma(t.id);
+                const hs = (db.horariosAula || []).filter(h => h.turmaId === t.id);
+                const resumoH = hs.length
+                  ? hs.map(h => `${DIAS_SEMANA[h.diaSemana]} ${h.inicio}–${h.fim}`).join(' • ')
+                  : 'Sem horário cadastrado';
+                return `
+                  <button data-pick-turma="${t.id}" class="btn-pick-turma glass-card hover:border-[#FFD600] rounded-3xl p-4 text-left flex items-center justify-between gap-3 transition">
+                    <div>
+                      <div class="font-extrabold text-base text-white">${escapeHtml(t.nome)}</div>
+                      <div class="text-xs text-gray-400 mt-0.5">${qtd} aluno(s) • <span class="text-amarelo font-bold">${fmtMoeda(totalTurma)} acumulados</span></div>
+                      <div class="text-[11px] text-gray-400 mt-1">${escapeHtml(resumoH)}</div>
+                    </div>
+                    <span class="glass-gold-btn text-xs font-extrabold px-3 py-2 rounded-xl shrink-0">Abrir &rarr;</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `;
+        }
+        const alunos = db.usuarios.filter(u => u.turmaId === turma.id && u.papel !== 'professor');
+        const hoje = hojeISO();
+        const ehRetro = session.dataSelecionada !== hoje;
+        return `
+          <div class="glass-card rounded-2xl p-2.5 mb-3 flex items-center justify-between gap-2 ${ehRetro ? '!border-[#FFD600]/60' : ''}">
+            <button id="btn-dia-anterior" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold">&larr;</button>
+            <button id="btn-abrir-cal" class="flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-white/5">
+              ${svgIcon('calendar', 'w-4 h-4 text-amarelo')}
+              <span>${ehRetro ? 'Retroativo: ' : 'Hoje: '}${formatarDataCurta(session.dataSelecionada)}</span>
+            </button>
+            ${ehRetro
+              ? `<button id="btn-voltar-hoje" class="glass-gold-btn px-3 py-1.5 rounded-xl text-xs font-bold">Hoje</button>`
+              : `<span class="text-[11px] text-gray-400 px-2">Atual</span>`
+            }
+          </div>
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-extrabold text-lg">Alunos (${alunos.length})</h2>
+              <p class="text-xs text-gray-400">Total da turma: <span class="text-amarelo font-bold">${fmtMoeda(totalTokensTurma(turma.id))}</span> • ${formatarDataCurta(session.dataSelecionada)}</p>
+            </div>
+            <div class="flex gap-2">
+              <button id="btn-multi" class="px-3 py-2 rounded-2xl text-xs font-bold transition ${session.selecaoMultipla ? 'glass-gold-btn' : 'glass-pill text-gray-200'}">
+                ${session.selecaoMultipla ? 'Cancelar' : '✓ Vários'}
+              </button>
+              <button id="btn-add-aluno" class="glass-gold-btn px-3.5 py-2 rounded-2xl text-xs font-bold">+ Aluno</button>
+            </div>
+          </div>
+          ${alunos.length === 0 ? `
+            <div class="glass-card rounded-3xl p-8 text-center">
+              <div class="w-14 h-14 mx-auto rounded-2xl bg-white/10 flex items-center justify-center text-white mb-3">${svgIcon('users', 'w-7 h-7')}</div>
+              <p class="font-semibold mb-1">Turma vazia</p>
+              <p class="text-xs text-gray-400">Toque em "+ Aluno" para cadastrar com apelido e silhueta.</p>
+            </div>
+          ` : `
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              ${alunos.map(a => {
+                const sel = session.selecionados.has(a.id);
+                const cargo = db.cargos.find(c => c.usuarioId === a.id && c.turmaId === turma.id);
+                return `
+                  <button data-aluno-id="${a.id}" class="card-aluno text-center p-4 rounded-3xl glass-card transition flex flex-col items-center ${sel ? '!border-[#FFD600] ring-2 ring-[#FFD600]/40' : 'hover:border-white/30'}">
+                    <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white/95 mb-2.5">${renderAvatar(a.avatarId, 'w-7 h-7')}</div>
+                    <div class="font-bold text-sm truncate w-full">${escapeHtml(a.apelido)}</div>
+
+                    ${cargo ? `<span class="text-[10px] text-gray-400 truncate w-full mt-0.5">${escapeHtml(cargo.titulo)}</span>` : ''}
+                    <div class="mt-2.5 glass-accent-purple text-amarelo font-extrabold text-xs px-3 py-1 rounded-full">${fmtMoeda(a.saldo)}</div>
+                    ${pontosDoAlunoNaData(a.id, session.dataSelecionada) > 0 ? `<div class="mt-1 text-[10px] text-emerald-300 font-semibold">+${pontosDoAlunoNaData(a.id, session.dataSelecionada)} no dia</div>` : ''}
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          `}
+          ${session.selecaoMultipla && session.selecionados.size > 0 ? `
+            <div class="fixed bottom-20 right-4 z-40">
+              <button id="btn-lancar-lote" class="glass-gold-btn font-extrabold px-5 py-3.5 rounded-full shadow-2xl flex items-center gap-2">
+                ${svgIcon('bolt', 'w-4 h-4')} <span>Dar ${escapeHtml(db.config.moedaPlural)} (${session.selecionados.size})</span>
+              </button>
+            </div>
+          ` : ''}
+        `;
+      }
+
+      function renderAbaEntregas() {
+        const pedidos = db.pedidos.slice().sort((a, b) => (a.status === 'pendente_entrega' ? -1 : 1));
+        return `
+          <h2 class="font-extrabold text-lg mb-1">Entregas do Mercadinho</h2>
+          <p class="text-xs text-gray-400 mb-4">Marque como entregue assim que recompensar o aluno</p>
+          ${pedidos.length === 0 ? `<p class="text-sm text-gray-400 glass-card p-5 rounded-3xl">Nenhuma compra realizada ainda.</p>` : `
+            <div class="space-y-3">
+              ${pedidos.map(p => {
+                const aluno = db.usuarios.find(u => u.id === p.alunoId);
+                const turma = db.turmas.find(t => t.id === p.turmaId);
+                const pendente = p.status === 'pendente_entrega';
+                return `
+                  <div class="glass-card ${pendente ? '!border-[#FFD600]/60' : ''} rounded-3xl p-4 flex items-center justify-between gap-3">
+                    <div>
+                      <div class="font-bold text-sm flex items-center gap-1.5">${aluno ? renderAvatar(aluno.avatarId, 'w-4 h-4 text-white') + ' <span>' + escapeHtml(aluno.apelido) + '</span>' : 'Aluno'} <span class="text-xs font-normal text-gray-400">(${turma ? escapeHtml(turma.nome) : ''})</span></div>
+                      <div class="text-xs text-gray-300 mt-1">${p.itens.map(i => `${i.qtd}x ${escapeHtml(i.nome)}`).join(', ')}</div>
+                      <div class="text-[11px] text-gray-500 mt-1">${formatarDataHora(p.criadoEm)} • ${fmtMoeda(p.total)}</div>
+                    </div>
+                    ${pendente
+                      ? `<button data-pedido-id="${p.id}" class="btn-entregar glass-gold-btn text-xs font-extrabold px-3.5 py-2.5 rounded-2xl shrink-0">Entregar ✓</button>`
+                      : `<span class="text-xs font-semibold ${p.status === 'entregue' ? 'text-emerald-400' : 'text-gray-500'} shrink-0">${p.status === 'entregue' ? 'Entregue' : 'Cancelado'}</span>`
+                    }
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        `;
+      }
+
+      function renderAbaCargos(turma) {
+        const cargos = db.cargos.filter(c => c.turmaId === turma.id);
+        const alunos = db.usuarios.filter(u => u.turmaId === turma.id && u.papel !== 'professor');
+        const dataRef = session.dataSelecionada;
+        return `
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-extrabold text-lg">Cargos & Diárias</h2>
+              <p class="text-xs text-gray-400">${escapeHtml(turma.nome)} • Pagamento diário (${formatarDataCurta(dataRef)})</p>
+            </div>
+            <div class="flex gap-2">
+              <button id="btn-pagar-dia" class="glass-accent-purple text-white px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1.5">${svgIcon('coin', 'w-4 h-4 text-amarelo')} <span>Pagar dia</span></button>
+              <button id="btn-novo-cargo" class="glass-gold-btn px-3 py-2 rounded-2xl text-xs font-bold">+ Cargo</button>
+            </div>
+          </div>
+          ${cargos.length === 0 ? `<p class="text-sm text-gray-400 glass-card p-5 rounded-3xl">Nenhum cargo nesta turma.</p>` : `
+            <div class="space-y-3">
+              ${cargos.map(c => {
+                const ocupante = db.usuarios.find(u => u.id === c.usuarioId);
+                const pagoNoDia = c.ultimoPagamento && c.ultimoPagamento.startsWith(dataRef);
+                return `
+                  <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
+                    <div>
+                      <div class="font-bold text-sm flex items-center gap-2">${escapeHtml(c.titulo)} ${pagoNoDia ? '<span class="text-[10px] bg-emerald-500/20 text-emerald-300 px-2 py-0.5 rounded-full">Pago ✓</span>' : ''}</div>
+                      <div class="text-xs text-amarelo font-semibold mt-0.5">Diária: ${fmtMoeda(c.salario)} / dia</div>
+                      <div class="text-xs text-gray-400 mt-1 flex items-center gap-1.5">Responsável: ${ocupante ? renderAvatar(ocupante.avatarId, 'w-3.5 h-3.5 text-white') + ' <span>' + escapeHtml(ocupante.apelido) + '</span>' : 'Vago'}</div>
+                    </div>
+                    <select data-cargo-id="${c.id}" class="sel-ocupante glass-pill rounded-xl px-2.5 py-2 text-xs text-white max-w-[140px]">
+                      <option value="" class="bg-[#18181D]">Vago</option>
+                      ${alunos.map(a => `<option value="${a.id}" class="bg-[#18181D]" ${a.id === c.usuarioId ? 'selected' : ''}>${escapeHtml(a.apelido)}</option>`).join('')}
+                    </select>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        `;
+      }
+
+      function renderAbaMercadinhoAdmin() {
+        return `
+          <div class="flex items-center justify-between mb-4">
+            <div>
+              <h2 class="font-extrabold text-lg">Mercadinho</h2>
+              <p class="text-xs text-gray-400">Gerencie recompensas e estoques</p>
+            </div>
+            <button id="btn-novo-item" class="glass-gold-btn px-3.5 py-2 rounded-2xl text-xs font-bold">+ Item</button>
+          </div>
+          <div class="space-y-2.5">
+            ${db.itensMercadinho.map(item => `
+              <div class="glass-card rounded-3xl p-3.5 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3">
+                  <span class="w-10 h-10 rounded-2xl bg-white/10 flex items-center justify-center text-white/90">${renderRegraIcone(item.icone, 'w-5 h-5')}</span>
+                  <div>
+                    <div class="font-bold text-sm ${item.ativo ? '' : 'line-through text-gray-500'}">${escapeHtml(item.nome)}</div>
+                    <div class="text-xs text-gray-400">${escapeHtml(item.categoria)} • <span class="text-amarelo font-bold">${fmtMoeda(item.preco)}</span> ${item.estoque !== null ? `• Estoque: ${item.estoque}` : ''}</div>
+                  </div>
+                </div>
+                <button data-item-id="${item.id}" class="btn-toggle-item text-xs font-semibold px-3 py-1.5 rounded-xl ${item.ativo ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' : 'bg-white/5 text-gray-400 border border-white/10'}">
+                  ${item.ativo ? 'Ativo' : 'Pausado'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      function renderAbaHistorico() {
+        const hoje = hojeISO();
+        const agoraMs = Date.now();
+        const filtradas = db.transacoes.filter(t => {
+          if (session.historicoTurmaId !== 'todas' && t.turmaId !== Number(session.historicoTurmaId)) {
+            return false;
+          }
+          if (session.historicoPeriodo === 'hoje') {
+            return t.criadoEm.startsWith(hoje);
+          }
+          if (session.historicoPeriodo === 'semana') {
+            return (agoraMs - new Date(t.criadoEm).getTime()) <= 7 * 86400000;
+          }
+          if (session.historicoPeriodo === 'mes') {
+            return (agoraMs - new Date(t.criadoEm).getTime()) <= 30 * 86400000;
+          }
+          return true;
+        });
+        const lista = filtradas.slice(0, 80);
+        const periodos = [
+          ['tudo', 'Tudo'],
+          ['hoje', 'Dia atual'],
+          ['semana', '1 semana'],
+          ['mes', '1 mês']
+        ];
+        return `
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="font-extrabold text-lg">Histórico (${filtradas.length})</h2>
+            <select id="sel-hist-turma" class="glass-pill rounded-xl px-3 py-1.5 text-xs text-white font-semibold">
+              <option value="todas" class="bg-[#18181D]" ${session.historicoTurmaId === 'todas' ? 'selected' : ''}>Todas as turmas</option>
+              ${turmasOrdenadas().map(t => `<option value="${t.id}" class="bg-[#18181D]" ${String(t.id) === String(session.historicoTurmaId) ? 'selected' : ''}>${escapeHtml(t.nome)}</option>`).join('')}
+            </select>
+          </div>
+          <div class="flex gap-1.5 overflow-x-auto no-scrollbar mb-4">
+            ${periodos.map(([id, label]) => `
+              <button data-hist-per="${id}" class="btn-hist-per px-3 py-1.5 rounded-xl text-xs font-bold shrink-0 ${session.historicoPeriodo === id ? 'glass-gold-btn' : 'glass-pill text-gray-300'}">${label}</button>
+            `).join('')}
+          </div>
+          ${lista.length === 0 ? `<p class="text-sm text-gray-400">Sem registros.</p>` : `
+            <div class="space-y-2.5">
+              ${lista.map(t => {
+                const orig = db.usuarios.find(u => u.id === t.origemId);
+                const dest = db.usuarios.find(u => u.id === t.destinoId);
+                const turma = db.turmas.find(tu => tu.id === t.turmaId);
+                const sinal = t.valor >= 0 ? '+' : '';
+                return `
+                  <div class="glass-card rounded-3xl p-3.5 flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-3">
+                      <span class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white/90">${dest ? renderAvatar(dest.avatarId, 'w-5 h-5') : svgIcon('user', 'w-5 h-5')}</span>
+                      <div>
+                        <div class="font-bold text-sm">${dest ? escapeHtml(dest.apelido) : 'Aluno'} • ${escapeHtml(t.motivo)}</div>
+                        <div class="text-[11px] text-gray-400 mt-0.5">Por ${orig ? escapeHtml(orig.apelido) : 'Sistema'} (${turma ? escapeHtml(turma.nome) : ''}) • ${formatarDataHora(t.criadoEm)}</div>
+                      </div>
+                    </div>
+                    <span class="font-extrabold text-sm ${t.valor >= 0 ? 'text-amarelo' : 'text-red-400'} shrink-0">${sinal}${fmtMoeda(t.valor)}</span>
+                  </div>
+                `;
+              }).join('')}
+            </div>
+          `}
+        `;
+      }
+
+      function renderAbaConfig() {
+        return `
+          <h2 class="font-extrabold text-lg mb-4">Configurações</h2>
+          <div class="glass-card rounded-3xl p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-sm">Turmas</h3>
+              <button id="btn-nova-turma" class="text-amarelo text-xs font-bold">+ Nova turma</button>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              ${turmasOrdenadas().map(t => `<button data-edit-turma="${t.id}" class="btn-edit-turma glass-pill hover:border-[#FFD600]/60 px-3 py-1.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition"><span>${escapeHtml(t.nome)}</span><span class="text-[10px] text-gray-400">(${fmtMoeda(totalTokensTurma(t.id))})</span><span class="text-amarelo text-[11px]">&#9998;</span></button>`).join('')}
+            </div>
+          </div>
+
+          <div class="glass-card rounded-3xl p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="font-bold text-sm">Horários de Aula do Professor</h3>
+                <p class="text-[11px] text-gray-400">Abre automaticamente a turma certa no horário</p>
+              </div>
+              <button id="btn-novo-horario" class="text-amarelo text-xs font-bold">+ Horário</button>
+            </div>
+            <div class="space-y-2">
+              ${turmasOrdenadas().map(t => {
+                const hs = (db.horariosAula || [])
+                  .filter(h => h.turmaId === t.id)
+                  .sort((a, b) => a.diaSemana - b.diaSemana || a.inicio.localeCompare(b.inicio));
+                const resumo = hs.length
+                  ? hs.map(h => `${DIAS_SEMANA[h.diaSemana]} ${h.inicio}–${h.fim}`).join(' • ')
+                  : 'Sem horários';
+                return `
+                  <button data-edit-hor-turma="${t.id}" class="btn-edit-hor-turma w-full flex items-center justify-between glass-pill hover:border-[#FFD600]/60 px-3 py-2.5 rounded-2xl text-xs text-left transition">
+                    <div class="pr-2">
+                      <div class="font-bold text-white">${escapeHtml(t.nome)}</div>
+                      <div class="text-[11px] ${hs.length ? 'text-amarelo' : 'text-gray-500'} mt-0.5">${escapeHtml(resumo)}</div>
+                    </div>
+                    <span class="text-amarelo font-bold shrink-0">Editar &#9998;</span>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+
+          <div class="glass-card rounded-3xl p-4 mb-4">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="font-bold text-sm">Regras de Ganho</h3>
+              <button id="btn-nova-regra" class="text-amarelo text-xs font-bold">+ Nova regra</button>
+            </div>
+            <div class="space-y-2">
+              ${db.regras.map(r => `
+                <button data-edit-regra="${r.id}" class="btn-edit-regra w-full flex items-center justify-between glass-pill hover:border-[#FFD600]/60 px-3 py-2.5 rounded-2xl text-xs text-left transition">
+                  <span class="flex items-center gap-2.5">${renderRegraIcone(r.icone, 'w-4 h-4 text-white/90')} <span class="font-semibold">${escapeHtml(r.titulo)}</span></span>
+                  <span class="flex items-center gap-2">
+                    <span class="text-amarelo font-bold">+${r.valor}</span>
+                    <span class="text-gray-400">&#9998;</span>
+                  </span>
+                </button>
+              `).join('')}
+            </div>
+          </div>
+
+          <div class="glass-card rounded-3xl p-4 mb-4">
+            <h3 class="font-bold text-sm mb-2">Backup</h3>
+            <p class="text-[11px] text-gray-400 mb-3">O acesso ao Modo Professor é exclusivo por digital.</p>
+            <button id="btn-exportar-json" class="w-full glass-pill text-gray-200 text-xs font-bold py-2.5 rounded-xl flex items-center justify-center gap-2">${svgIcon('download', 'w-4 h-4')} <span>Baixar Backup (JSON)</span></button>
+          </div>
+
+          <button id="btn-entrar-config-moeda" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
+            <div>
+              <h3 class="font-bold text-sm">Nome da Moeda</h3>
+              <p class="text-xs text-gray-400 mt-0.5">Atual: <span class="text-amarelo font-semibold">${escapeHtml(db.config.moedaSingular)} / ${escapeHtml(db.config.moedaPlural)}</span></p>
+            </div>
+            <span class="glass-pill text-xs font-bold px-3 py-2 rounded-xl text-amarelo">Configurar &rarr;</span>
+          </button>
+        `;
+      }
+
+      function bindModoProfessor() {
+        const selTurma = document.getElementById('sel-turma');
+        if (selTurma) {
+          selTurma.onchange = (e) => {
+            session.turmaAtualId = Number(e.target.value);
+            session.escolhendoTurma = false;
+            session.selecionados.clear();
+            session.selecaoMultipla = false;
+            render();
+          };
+        }
+        const btnVoltarSecao = document.getElementById('btn-voltar-secao');
+        if (btnVoltarSecao) {
+          btnVoltarSecao.onclick = () => {
+            if (session.abaProfessor === 'turma' && !session.escolhendoTurma) {
+              session.escolhendoTurma = true;
+            } else {
+              session.abaProfessor = session.abaAnterior && session.abaAnterior !== session.abaProfessor ? session.abaAnterior : 'turma';
+            }
+            render();
+          };
+        }
+        document.getElementById('btn-abrir-entregas').onclick = () => {
+          session.abaAnterior = session.abaProfessor;
+          session.abaProfessor = 'entregas';
+          render();
+        };
+        document.getElementById('btn-ir-aluno').onclick = () => {
+          session.modo = 'aluno';
+          session.alunoAtivoId = null;
+          session.carrinho = {};
+          render();
+        };
+        document.querySelectorAll('.btn-nav').forEach(b => {
+          b.onclick = () => {
+            if (b.dataset.aba !== session.abaProfessor) {
+              session.abaAnterior = session.abaProfessor;
+            }
+            session.abaProfessor = b.dataset.aba;
+            render();
+          };
+        });
+
+        if (session.abaProfessor === 'turma') {
+          if (session.escolhendoTurma) {
+            document.querySelectorAll('.btn-pick-turma').forEach(b => {
+              b.onclick = () => {
+                session.turmaAtualId = Number(b.dataset.pickTurma);
+                session.escolhendoTurma = false;
+                render();
+              };
+            });
+            return;
+          }
+          document.getElementById('btn-abrir-cal').onclick = abrirModalCalendario;
+          document.getElementById('btn-dia-anterior').onclick = () => {
+            const d = new Date(session.dataSelecionada + 'T12:00:00');
+            d.setDate(d.getDate() - 1);
+            session.dataSelecionada = d.toISOString().slice(0, 10);
+            render();
+          };
+          const btnVoltarHoje = document.getElementById('btn-voltar-hoje');
+          if (btnVoltarHoje) {
+            btnVoltarHoje.onclick = () => {
+              session.dataSelecionada = hojeISO();
+              render();
+            };
+          }
+          document.getElementById('btn-multi').onclick = () => {
+            session.selecaoMultipla = !session.selecaoMultipla;
+            session.selecionados.clear();
+            render();
+          };
+          document.getElementById('btn-add-aluno').onclick = abrirModalNovoAluno;
+          document.querySelectorAll('.card-aluno').forEach(c => {
+            c.onclick = () => {
+              const id = Number(c.dataset.alunoId);
+              if (session.selecaoMultipla) {
+                if (session.selecionados.has(id)) session.selecionados.delete(id);
+                else session.selecionados.add(id);
+                render();
+              } else {
+                abrirModalLancar([id]);
+              }
+            };
+          });
+          const btnLote = document.getElementById('btn-lancar-lote');
+          if (btnLote) btnLote.onclick = () => abrirModalLancar(Array.from(session.selecionados));
+        }
+
+        if (session.abaProfessor === 'entregas') {
+          document.querySelectorAll('.btn-entregar').forEach(b => {
+            b.onclick = () => {
+              const pid = Number(b.dataset.pedidoId);
+              const ped = db.pedidos.find(p => p.id === pid);
+              if (ped) {
+                ped.status = 'entregue';
+                ped.entregueEm = new Date().toISOString();
+                salvarEstado();
+                toast('Recompensa marcada como entregue!', 'sucesso');
+                render();
+              }
+            };
+          });
+        }
+
+        if (session.abaProfessor === 'cargos') {
+          document.getElementById('btn-pagar-dia').onclick = () => {
+            const dataRef = session.dataSelecionada;
+            const cargos = db.cargos.filter(c => c.turmaId === session.turmaAtualId && c.usuarioId && !(c.ultimoPagamento && c.ultimoPagamento.startsWith(dataRef)));
+            if (!cargos.length) {
+              toast('Todos os cargos ocupados já foram pagos neste dia.', 'erro');
+              return;
+            }
+            cargos.forEach(c => {
+              lancarIps(1, [c.usuarioId], c.salario, `Diária: ${c.titulo}`, 'salario', dataRef);
+              c.ultimoPagamento = dataRef;
+            });
+            salvarEstado();
+            toast(`Diária de ${cargos.length} cargo(s) paga!`, 'sucesso');
+            render();
+          };
+          document.getElementById('btn-novo-cargo').onclick = () => {
+            abrirModal(`
+              <h3 class="font-bold text-lg mb-3">Novo Cargo</h3>
+              <input id="inp-cargo-titulo" placeholder="Ex.: Organizador da fila" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-3 text-white" />
+              <input id="inp-cargo-salario" type="number" value="2" placeholder="Valor por dia" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-4 text-white" />
+              <button id="btn-save-cargo" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Cargo</button>
+            `);
+            document.getElementById('btn-save-cargo').onclick = () => {
+              const titulo = document.getElementById('inp-cargo-titulo').value.trim();
+              const salario = Number(document.getElementById('inp-cargo-salario').value) || 0;
+              if (!titulo || salario <= 0) return;
+              db.cargos.push({ id: genId(), turmaId: session.turmaAtualId, titulo, salario, usuarioId: null, ultimoPagamento: null });
+              salvarEstado();
+              fecharModal();
+              render();
+            };
+          };
+          document.querySelectorAll('.sel-ocupante').forEach(s => {
+            s.onchange = () => {
+              const cid = Number(s.dataset.cargoId);
+              const cargo = db.cargos.find(c => c.id === cid);
+              if (cargo) {
+                cargo.usuarioId = s.value ? Number(s.value) : null;
+                salvarEstado();
+                toast('Cargo atualizado!');
+              }
+            };
+          });
+        }
+
+        if (session.abaProfessor === 'mercadinho') {
+          document.getElementById('btn-novo-item').onclick = () => {
+            abrirModal(`
+              <h3 class="font-bold text-lg mb-3">Novo Item no Mercadinho</h3>
+              <input id="inp-item-nome" placeholder="Nome do item" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
+              <input id="inp-item-cat" value="Privilégio" placeholder="Categoria" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
+              <div class="grid grid-cols-2 gap-2 mb-3">
+                <input id="inp-item-preco" type="number" value="10" placeholder="Preço" class="glass-pill rounded-xl px-3 py-2 text-sm text-white" />
+                <input id="inp-item-est" type="number" placeholder="Estoque (vazio = livre)" class="glass-pill rounded-xl px-3 py-2 text-sm text-white" />
+              </div>
+              <button id="btn-save-item" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Salvar Item</button>
+            `);
+            document.getElementById('btn-save-item').onclick = () => {
+              const nome = document.getElementById('inp-item-nome').value.trim();
+              const categoria = document.getElementById('inp-item-cat').value.trim() || 'Geral';
+              const preco = Number(document.getElementById('inp-item-preco').value) || 0;
+              const estRaw = document.getElementById('inp-item-est').value.trim();
+              if (!nome || preco <= 0) return;
+              db.itensMercadinho.push({
+                id: genId(),
+                nome,
+                categoria,
+                preco,
+                icone: 'gift',
+                estoque: estRaw ? Number(estRaw) : null,
+                ativo: true
+              });
+              salvarEstado();
+              fecharModal();
+              render();
+            };
+          };
+          document.querySelectorAll('.btn-toggle-item').forEach(b => {
+            b.onclick = () => {
+              const item = db.itensMercadinho.find(i => i.id === Number(b.dataset.itemId));
+              if (item) {
+                item.ativo = !item.ativo;
+                salvarEstado();
+                render();
+              }
+            };
+          });
+        }
+
+        if (session.abaProfessor === 'historico') {
+          const selHT = document.getElementById('sel-hist-turma');
+          if (selHT) {
+            selHT.onchange = () => {
+              session.historicoTurmaId = selHT.value;
+              render();
+            };
+          }
+          document.querySelectorAll('.btn-hist-per').forEach(b => {
+            b.onclick = () => {
+              session.historicoPeriodo = b.dataset.histPer;
+              render();
+            };
+          });
+        }
+        if (session.abaProfessor === 'config') {
+          document.getElementById('btn-entrar-config-moeda').onclick = () => {
+            abrirModal(`
+              <div class="flex items-center justify-between mb-3">
+                <h3 class="font-bold text-lg">Configurar Nome da Moeda</h3>
+                <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+              </div>
+              <p class="text-xs text-gray-400 mb-3">Defina como a moeda aparece no singular e no plural em todo o aplicativo.</p>
+              <label class="block text-xs text-gray-400 mb-1">Singular</label>
+              <input id="cfg-singular" value="${escapeHtml(db.config.moedaSingular)}" placeholder="Ex.: IP" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-3" />
+              <label class="block text-xs text-gray-400 mb-1">Plural</label>
+              <input id="cfg-plural" value="${escapeHtml(db.config.moedaPlural)}" placeholder="Ex.: IPs" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-4" />
+              <button id="btn-salvar-moeda" class="w-full glass-gold-btn text-xs font-bold py-3 rounded-xl">Salvar moeda</button>
+            `);
+            document.getElementById('btn-fechar-modal').onclick = fecharModal;
+            document.getElementById('btn-salvar-moeda').onclick = () => {
+              const s = document.getElementById('cfg-singular').value.trim();
+              const p = document.getElementById('cfg-plural').value.trim();
+              if (!s || !p) return;
+              db.config.moedaSingular = s;
+              db.config.moedaPlural = p;
+              salvarEstado();
+              fecharModal();
+              toast('Nome da moeda atualizado!', 'sucesso');
+              render();
+            };
+          };
+          function abrirModalHorariosTurma(turmaIdInicial) {
+            let turmaIdSel = turmaIdInicial || turmasOrdenadas()[0]?.id;
+            let rascunhos = (db.horariosAula || [])
+              .filter(h => h.turmaId === turmaIdSel)
+              .sort((a, b) => a.diaSemana - b.diaSemana || a.inicio.localeCompare(b.inicio))
+              .map(h => ({ id: h.id, diaSemana: h.diaSemana, inicio: h.inicio, fim: h.fim }));
+            if (rascunhos.length === 0) {
+              rascunhos.push({ id: genId(), diaSemana: new Date().getDay(), inicio: '07:30', fim: somarMinutos('07:30', 45) });
+            }
+
+            function lerCamposAtuais() {
+              rascunhos = rascunhos.map((r, idx) => {
+                const diaEl = document.getElementById(`hor-dia-${idx}`);
+                const iniEl = document.getElementById(`hor-ini-${idx}`);
+                const fimEl = document.getElementById(`hor-fim-${idx}`);
+                return {
+                  id: r.id,
+                  diaSemana: diaEl ? Number(diaEl.value) : r.diaSemana,
+                  inicio: iniEl ? iniEl.value : r.inicio,
+                  fim: fimEl ? fimEl.value : r.fim
+                };
+              });
+            }
+
+            function renderEditor() {
+              const linhas = rascunhos.length === 0
+                ? `<p class="text-xs text-gray-400 mb-3">Nenhum horário para esta turma. Adicione abaixo.</p>`
+                : rascunhos.map((r, idx) => `
+                    <div class="glass-pill rounded-2xl p-3 mb-2.5">
+                      <div class="flex items-center justify-between gap-2 mb-2">
+                        <select id="hor-dia-${idx}" class="bg-[#121218] border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white font-semibold">
+                          ${DIAS_SEMANA.map((d, i) => `<option value="${i}" ${i === r.diaSemana ? 'selected' : ''}>${d}</option>`).join('')}
+                        </select>
+                        <button type="button" data-rem-slot="${idx}" class="btn-rem-slot text-red-400 text-xs font-bold px-2 py-1">Remover &times;</button>
+                      </div>
+                      <div class="grid grid-cols-2 gap-2">
+                        <div>
+                          <label class="block text-[10px] text-gray-400 mb-0.5">Início</label>
+                          <input id="hor-ini-${idx}" data-slot-idx="${idx}" type="time" value="${r.inicio}" class="inp-hor-ini w-full bg-[#121218] border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white" />
+                        </div>
+                        <div>
+                          <label class="block text-[10px] text-gray-400 mb-0.5">Fim</label>
+                          <input id="hor-fim-${idx}" type="time" value="${r.fim}" class="w-full bg-[#121218] border border-white/15 rounded-xl px-2.5 py-1.5 text-xs text-white" />
+                        </div>
+                      </div>
+                    </div>
+                  `).join('');
+
+              abrirModal(`
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">Horários da Turma</h3>
+                  <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+                </div>
+                <label class="block text-xs text-gray-400 mb-1">Turma</label>
+                <select id="inp-hor-turma" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-3">
+                  ${turmasOrdenadas().map(t => `<option value="${t.id}" class="bg-[#18181D]" ${t.id === turmaIdSel ? 'selected' : ''}>${escapeHtml(t.nome)}</option>`).join('')}
+                </select>
+                <div class="max-h-64 overflow-y-auto pr-0.5 mb-3">${linhas}</div>
+                <button type="button" id="btn-add-mais-horario" class="w-full glass-accent-purple text-white text-xs font-bold py-2.5 rounded-xl mb-2.5">+ Adicionar outro horário</button>
+                <button type="button" id="btn-save-hor" class="w-full glass-gold-btn font-bold py-3 rounded-xl">Salvar e encerrar</button>
+              `);
+
+              document.getElementById('btn-fechar-modal').onclick = fecharModal;
+              document.getElementById('inp-hor-turma').onchange = (e) => {
+                turmaIdSel = Number(e.target.value);
+                rascunhos = (db.horariosAula || [])
+                  .filter(h => h.turmaId === turmaIdSel)
+                  .sort((a, b) => a.diaSemana - b.diaSemana || a.inicio.localeCompare(b.inicio))
+                  .map(h => ({ id: h.id, diaSemana: h.diaSemana, inicio: h.inicio, fim: h.fim }));
+                renderEditor();
+              };
+              document.querySelectorAll('.btn-rem-slot').forEach(b => {
+                b.onclick = () => {
+                  lerCamposAtuais();
+                  rascunhos.splice(Number(b.dataset.remSlot), 1);
+                  renderEditor();
+                };
+              });
+              document.querySelectorAll('.inp-hor-ini').forEach(inp => {
+                inp.onchange = () => {
+                  const idx = Number(inp.dataset.slotIdx);
+                  const fimEl = document.getElementById(`hor-fim-${idx}`);
+                  if (fimEl && inp.value) {
+                    fimEl.value = somarMinutos(inp.value, 45);
+                  }
+                };
+              });
+              document.getElementById('btn-add-mais-horario').onclick = () => {
+                lerCamposAtuais();
+                const ultimo = rascunhos[rascunhos.length - 1];
+                const novoIni = ultimo ? ultimo.fim : '07:30';
+                rascunhos.push({
+                  id: genId(),
+                  diaSemana: ultimo ? ultimo.diaSemana : new Date().getDay(),
+                  inicio: novoIni,
+                  fim: somarMinutos(novoIni, 45)
+                });
+                renderEditor();
+              };
+              document.getElementById('btn-save-hor').onclick = () => {
+                lerCamposAtuais();
+                for (const r of rascunhos) {
+                  if (!r.inicio || !r.fim || r.fim <= r.inicio) {
+                    toast('Verifique um horário com fim menor ou igual ao início.', 'erro');
+                    return;
+                  }
+                }
+                db.horariosAula = (db.horariosAula || []).filter(h => h.turmaId !== turmaIdSel);
+                rascunhos.forEach(r => {
+                  db.horariosAula.push({
+                    id: r.id || genId(),
+                    turmaId: turmaIdSel,
+                    diaSemana: r.diaSemana,
+                    inicio: r.inicio,
+                    fim: r.fim
+                  });
+                });
+                salvarEstado();
+                fecharModal();
+                toast('Horários salvos!', 'sucesso');
+                render();
+              };
+            }
+            renderEditor();
+          }
+
+          document.getElementById('btn-novo-horario').onclick = () => abrirModalHorariosTurma(turmasOrdenadas()[0]?.id);
+          document.querySelectorAll('.btn-edit-hor-turma').forEach(b => {
+            b.onclick = () => abrirModalHorariosTurma(Number(b.dataset.editHorTurma));
+          });
+          document.querySelectorAll('.btn-edit-turma').forEach(b => {
+            b.onclick = () => {
+              const tid = Number(b.dataset.editTurma);
+              const turma = db.turmas.find(t => t.id === tid);
+              if (!turma) return;
+              abrirModal(`
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">Editar Turma</h3>
+                  <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+                </div>
+                <label class="block text-xs text-gray-400 mb-1">Nome da turma</label>
+                <input id="inp-edit-turma-nome" value="${escapeHtml(turma.nome)}" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-4 text-white outline-none focus:border-[#FFD600]" />
+                <button id="btn-save-edit-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl mb-2.5">Salvar Nome</button>
+                <button id="btn-del-turma" class="w-full bg-red-900/50 border border-red-400/30 text-red-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5">${svgIcon('trash', 'w-4 h-4')} <span>Excluir Turma</span></button>
+              `);
+              document.getElementById('btn-fechar-modal').onclick = fecharModal;
+              document.getElementById('btn-save-edit-turma').onclick = () => {
+                const novo = document.getElementById('inp-edit-turma-nome').value.trim();
+                if (!novo) return;
+                turma.nome = novo;
+                salvarEstado();
+                fecharModal();
+                toast('Nome da turma atualizado!', 'sucesso');
+                render();
+              };
+              document.getElementById('btn-del-turma').onclick = () => {
+                if (db.turmas.length <= 1) {
+                  toast('Mantenha pelo menos 1 turma cadastrada.', 'erro');
+                  return;
+                }
+                db.turmas = db.turmas.filter(t => t.id !== tid);
+                db.horariosAula = (db.horariosAula || []).filter(h => h.turmaId !== tid);
+                db.cargos = db.cargos.filter(c => c.turmaId !== tid);
+                db.usuarios = db.usuarios.filter(u => u.turmaId !== tid);
+                if (session.turmaAtualId === tid) {
+                  session.turmaAtualId = turmasOrdenadas()[0]?.id || 1;
+                }
+                salvarEstado();
+                fecharModal();
+                toast('Turma excluída.', 'sucesso');
+                render();
+              };
+            };
+          });
+          document.getElementById('btn-nova-turma').onclick = () => {
+            abrirModal(`
+              <h3 class="font-bold text-lg mb-3">Nova Turma</h3>
+              <input id="inp-turma-nome" placeholder="Ex.: 8º Ano B" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-3 text-white" />
+              <button id="btn-save-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Turma</button>
+            `);
+            document.getElementById('btn-save-turma').onclick = () => {
+              const nome = document.getElementById('inp-turma-nome').value.trim();
+              if (!nome) return;
+              db.turmas.push({ id: genId(), nome, ativa: true });
+              salvarEstado();
+              fecharModal();
+              render();
+            };
+          };
+          function abrirModalRegra(regraExistente = null) {
+            let iconeSel = regraExistente ? regraExistente.icone : ICONES_ATIVIDADES[0];
+            let titVal = regraExistente ? regraExistente.titulo : '';
+            let valVal = regraExistente ? String(regraExistente.valor) : '2';
+
+            function renderRegraModal() {
+              const iconesHtml = ICONES_ATIVIDADES.map(ic => `
+                <button type="button" data-ic="${ic}" class="btn-ic-regra w-10 h-10 rounded-xl flex items-center justify-center border transition ${iconeSel === ic ? 'border-[#FFD600] bg-yellow-400/20 text-amarelo' : 'border-white/10 bg-white/5 text-white/80'}">
+                  ${svgIcon(ic, 'w-5 h-5')}
+                </button>
+              `).join('');
+
+              abrirModal(`
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="font-bold text-lg">${regraExistente ? 'Editar Atividade' : 'Nova Atividade'}</h3>
+                  <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+                </div>
+                <label class="block text-xs text-gray-400 mb-1">Nome da atividade</label>
+                <input id="inp-regra-tit" value="${escapeHtml(titVal)}" placeholder="Ex.: Caderno organizado" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
+                <label class="block text-xs text-gray-400 mb-1">Quantidade de ${escapeHtml(db.config.moedaPlural)}</label>
+                <input id="inp-regra-val" type="number" value="${escapeHtml(valVal)}" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-3 text-white" />
+                <label class="block text-xs text-gray-400 mb-2">Ícone da atividade (20 opções)</label>
+                <div class="grid grid-cols-5 gap-2 mb-4">${iconesHtml}</div>
+                <button id="btn-save-regra" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl mb-2">${regraExistente ? 'Salvar Alterações' : 'Criar Atividade'}</button>
+                ${regraExistente ? `<button id="btn-del-regra" class="w-full bg-red-900/50 border border-red-400/30 text-red-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5">${svgIcon('trash', 'w-4 h-4')} <span>Excluir Atividade</span></button>` : ''}
+              `);
+
+              document.getElementById('btn-fechar-modal').onclick = fecharModal;
+              document.querySelectorAll('.btn-ic-regra').forEach(b => {
+                b.onclick = () => {
+                  titVal = document.getElementById('inp-regra-tit').value;
+                  valVal = document.getElementById('inp-regra-val').value;
+                  iconeSel = b.dataset.ic;
+                  renderRegraModal();
+                };
+              });
+              document.getElementById('btn-save-regra').onclick = () => {
+                const titulo = document.getElementById('inp-regra-tit').value.trim();
+                const valor = Number(document.getElementById('inp-regra-val').value) || 0;
+                if (!titulo || valor <= 0) {
+                  toast('Preencha nome e valor válido.', 'erro');
+                  return;
+                }
+                if (regraExistente) {
+                  regraExistente.titulo = titulo;
+                  regraExistente.valor = valor;
+                  regraExistente.icone = iconeSel;
+                  toast('Atividade atualizada!', 'sucesso');
+                } else {
+                  db.regras.push({ id: genId(), titulo, valor, icone: iconeSel, monitorPode: true });
+                  toast('Atividade criada!', 'sucesso');
+                }
+                salvarEstado();
+                fecharModal();
+                render();
+              };
+              const btnDel = document.getElementById('btn-del-regra');
+              if (btnDel) {
+                btnDel.onclick = () => {
+                  db.regras = db.regras.filter(r => r.id !== regraExistente.id);
+                  salvarEstado();
+                  fecharModal();
+                  toast('Atividade excluída.', 'sucesso');
+                  render();
+                };
+              }
+            }
+            renderRegraModal();
+          }
+
+          document.getElementById('btn-nova-regra').onclick = () => abrirModalRegra(null);
+          document.querySelectorAll('.btn-edit-regra').forEach(b => {
+            b.onclick = () => {
+              const r = db.regras.find(x => x.id === Number(b.dataset.editRegra));
+              if (r) abrirModalRegra(r);
+            };
+          });
+
+
+          document.getElementById('btn-exportar-json').onclick = () => {
+            const blob = new Blob([JSON.stringify(db, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_economia_${hojeISO()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            toast('Backup exportado!', 'sucesso');
+          };
+        }
+      }
+
+
+
+      // --- Modo Aluno ---
+      function renderModoAluno() {
+        const turma = db.turmas.find(t => t.id === session.turmaAtualId);
+        if (!session.alunoAtivoId) {
+          const alunos = db.usuarios.filter(u => u.turmaId === session.turmaAtualId && u.papel !== 'professor');
+          return `
+            <header class="glass-header px-4 py-3 flex items-center justify-between">
+              <div class="font-bold text-base flex items-center gap-2">${svgIcon('backpack', 'w-5 h-5 text-amarelo')} <span>Quem é você? (${turma ? escapeHtml(turma.nome) : ''})</span></div>
+              <button id="btn-voltar-prof" class="text-xs glass-pill text-gray-200 px-3 py-2 rounded-xl flex items-center gap-1.5">${svgIcon('lock', 'w-3.5 h-3.5')} <span>Professor</span></button>
+            </header>
+            <main class="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+              ${alunos.map(a => `
+                <button data-escolher-aluno="${a.id}" class="btn-escolher-aluno glass-card hover:border-[#FFD600] rounded-3xl p-5 flex flex-col items-center">
+                  <div class="w-16 h-16 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white mb-2.5">${renderAvatar(a.avatarId, 'w-8 h-8')}</div>
+                  <div class="font-bold text-base">${escapeHtml(a.apelido)}</div>
+                </button>
+              `).join('')}
+            </main>
+          `;
+        }
+
+        const aluno = db.usuarios.find(u => u.id === session.alunoAtivoId);
+        const cargo = db.cargos.find(c => c.usuarioId === aluno.id && c.turmaId === session.turmaAtualId);
+        const itensAtivos = db.itensMercadinho.filter(i => i.ativo && (i.estoque === null || i.estoque > 0));
+        const jaResgatou = alunoJaResgatouHoje(aluno.id);
+
+        const metaItem = itensAtivos.slice().sort((a, b) => a.preco - b.preco).find(i => i.preco > aluno.saldo) || itensAtivos[0];
+        const pctMeta = metaItem ? Math.min(100, Math.round((aluno.saldo / metaItem.preco) * 100)) : 100;
+
+        let totalCarrinho = 0;
+        Object.entries(session.carrinho).forEach(([id, qtd]) => {
+          const it = db.itensMercadinho.find(x => x.id === Number(id));
+          if (it) totalCarrinho += it.preco * qtd;
+        });
+        const saldoRestante = aluno.saldo - totalCarrinho;
+
+        return `
+          <header class="glass-header px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+            <div class="flex items-center gap-2.5">
+              <span class="w-9 h-9 rounded-xl bg-white/10 flex items-center justify-center text-white">${renderAvatar(aluno.avatarId, 'w-5 h-5')}</span>
+              <div>
+                <div class="font-bold text-sm">${escapeHtml(aluno.apelido)}</div>
+                ${cargo ? `<div class="text-[11px] text-amarelo flex items-center gap-1">${svgIcon('briefcase', 'w-3 h-3')} ${escapeHtml(cargo.titulo)}</div>` : ''}
+              </div>
+            </div>
+            <button id="btn-fechar-aluno" class="glass-pill text-white text-xs font-bold px-3.5 py-2 rounded-xl">Fechar conta ✓</button>
+          </header>
+
+          <main class="p-4 space-y-4">
+            <div class="glass-accent-purple rounded-3xl p-5">
+              <div class="text-xs text-purple-200 font-semibold">Seu saldo atual</div>
+              <div class="text-3xl font-extrabold text-amarelo mt-1">${fmtMoeda(aluno.saldo)}</div>
+              ${metaItem ? `
+                <div class="mt-3">
+                  <div class="flex justify-between text-[11px] text-purple-100 mb-1">
+                    <span class="flex items-center gap-1">Meta: ${renderRegraIcone(metaItem.icone, 'w-3.5 h-3.5')} ${escapeHtml(metaItem.nome)}</span>
+                    <span>${pctMeta}%</span>
+                  </div>
+                  <div class="w-full h-2.5 bg-black/40 rounded-full overflow-hidden">
+                    <div class="h-full bg-[#FFD600] rounded-full" style="width:${pctMeta}%"></div>
+                  </div>
+                </div>
+              ` : ''}
+            </div>
+
+            ${jaResgatou ? `
+              <div class="glass-card !border-amber-400/40 text-amber-200 text-xs p-3.5 rounded-2xl font-semibold">
+                Você já fez seu resgate de hoje! Volte amanhã para comprar novamente.
+              </div>
+            ` : ''}
+
+            <div>
+              <h3 class="font-extrabold text-base mb-2.5 flex items-center gap-2">${svgIcon('store', 'w-5 h-5 text-amarelo')} <span>Mercadinho</span></h3>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                ${itensAtivos.map(it => {
+                  const qtd = session.carrinho[it.id] || 0;
+                  return `
+                    <div class="glass-card rounded-3xl p-3.5 flex items-center justify-between gap-3">
+                      <div class="flex items-center gap-3">
+                        <span class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white/95">${renderRegraIcone(it.icone, 'w-5 h-5')}</span>
+                        <div>
+                          <div class="font-bold text-sm">${escapeHtml(it.nome)}</div>
+                          <div class="text-xs text-amarelo font-extrabold">${fmtMoeda(it.preco)}</div>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        ${qtd > 0 ? `<button data-rem="${it.id}" class="btn-rem-cart w-8 h-8 rounded-xl glass-pill font-bold">-</button><span class="text-sm font-bold w-4 text-center">${qtd}</span>` : ''}
+                        <button data-add="${it.id}" ${jaResgatou ? 'disabled' : ''} class="btn-add-cart w-8 h-8 rounded-xl glass-gold-btn font-extrabold disabled:opacity-40">+</button>
+                      </div>
+                    </div>
+                  `;
+                }).join('')}
+              </div>
+            </div>
+          </main>
+
+          ${totalCarrinho > 0 ? `
+            <div class="fixed bottom-0 left-0 right-0 glass-nav p-4 z-40">
+              <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-xs text-gray-400">Total: <span class="text-white font-bold">${fmtMoeda(totalCarrinho)}</span></div>
+                  <div class="text-xs ${saldoRestante < 0 ? 'text-red-400 font-bold' : 'text-emerald-400'}">
+                    Saldo restante: ${fmtMoeda(saldoRestante)}
+                  </div>
+                </div>
+                <button id="btn-finalizar-compra" ${saldoRestante < 0 || jaResgatou ? 'disabled' : ''} class="glass-gold-btn font-extrabold px-5 py-3 rounded-2xl disabled:opacity-40">
+                  Finalizar compra
+                </button>
+              </div>
+            </div>
+          ` : ''}
+        `;
+      }
+
+      function bindModoAluno() {
+        const btnVoltar = document.getElementById('btn-voltar-prof');
+        if (btnVoltar) btnVoltar.onclick = pedirPinProfessor;
+
+        document.querySelectorAll('.btn-escolher-aluno').forEach(b => {
+          b.onclick = () => {
+            session.alunoAtivoId = Number(b.dataset.escolherAluno);
+            session.carrinho = {};
+            render();
+          };
+        });
+
+        const btnFechar = document.getElementById('btn-fechar-aluno');
+        if (btnFechar) {
+          btnFechar.onclick = () => {
+            session.alunoAtivoId = null;
+            session.carrinho = {};
+            render();
+          };
+        }
+
+        document.querySelectorAll('.btn-add-cart').forEach(b => {
+          b.onclick = () => {
+            const id = Number(b.dataset.add);
+            const it = db.itensMercadinho.find(x => x.id === id);
+            const atual = session.carrinho[id] || 0;
+            if (it && it.estoque !== null && atual >= it.estoque) {
+              toast('Estoque máximo atingido.', 'erro');
+              return;
+            }
+            session.carrinho[id] = atual + 1;
+            render();
+          };
+        });
+
+        document.querySelectorAll('.btn-rem-cart').forEach(b => {
+          b.onclick = () => {
+            const id = Number(b.dataset.rem);
+            if ((session.carrinho[id] || 0) <= 1) delete session.carrinho[id];
+            else session.carrinho[id] -= 1;
+            render();
+          };
+        });
+
+        const btnFin = document.getElementById('btn-finalizar-compra');
+        if (btnFin) {
+          btnFin.onclick = () => {
+            const aluno = db.usuarios.find(u => u.id === session.alunoAtivoId);
+            if (!aluno) return;
+            const itens = [];
+            let total = 0;
+            Object.entries(session.carrinho).forEach(([id, qtd]) => {
+              const it = db.itensMercadinho.find(x => x.id === Number(id));
+              if (it && qtd > 0) {
+                itens.push({ itemId: it.id, nome: it.nome, qtd, preco: it.preco });
+                total += it.preco * qtd;
+              }
+            });
+            if (!itens.length || total > aluno.saldo || alunoJaResgatouHoje(aluno.id)) return;
+
+            aluno.saldo -= total;
+            itens.forEach(i => {
+              const orig = db.itensMercadinho.find(x => x.id === i.itemId);
+              if (orig && orig.estoque !== null) orig.estoque = Math.max(0, orig.estoque - i.qtd);
+            });
+            const pedidoId = genId();
+            const now = new Date().toISOString();
+            db.pedidos.unshift({
+              id: pedidoId,
+              alunoId: aluno.id,
+              turmaId: session.turmaAtualId,
+              itens,
+              total,
+              status: 'pendente_entrega',
+              criadoEm: now,
+              entregueEm: null
+            });
+            db.transacoes.unshift({
+              id: genId(),
+              turmaId: session.turmaAtualId,
+              origemId: aluno.id,
+              destinoId: aluno.id,
+              valor: -total,
+              tipo: 'compra',
+              motivo: `Mercadinho: ${itens.map(i => `${i.qtd}x ${i.nome}`).join(', ')}`,
+              criadoEm: now
+            });
+            salvarEstado();
+            session.carrinho = {};
+
+            let segs = 10;
+            abrirModal(`
+              <div class="text-center py-2">
+                <div class="w-16 h-16 mx-auto rounded-2xl glass-accent-purple flex items-center justify-center text-amarelo mb-3">${svgIcon('check', 'w-9 h-9')}</div>
+                <h3 class="font-extrabold text-xl mb-1">Compra confirmada!</h3>
+                <p class="text-xs text-gray-300 mb-4">O professor recebeu seu pedido para entrega.</p>
+                <button id="btn-desfazer-compra" class="w-full bg-red-700/85 border border-red-400/30 text-white font-bold py-3 rounded-xl mb-2">Desfazer (<span id="undo-sec">10</span>s)</button>
+                <button id="btn-concluir-aluno" class="w-full glass-gold-btn font-bold py-3 rounded-xl">Concluir agora</button>
+              </div>
+            `);
+
+            const timer = setInterval(() => {
+              segs -= 1;
+              const el = document.getElementById('undo-sec');
+              if (el) el.textContent = String(segs);
+              if (segs <= 0) {
+                clearInterval(timer);
+                fecharModal();
+                session.alunoAtivoId = null;
+                render();
+              }
+            }, 1000);
+
+            document.getElementById('btn-concluir-aluno').onclick = () => {
+              clearInterval(timer);
+              fecharModal();
+              session.alunoAtivoId = null;
+              render();
+            };
+
+            document.getElementById('btn-desfazer-compra').onclick = () => {
+              clearInterval(timer);
+              const ped = db.pedidos.find(p => p.id === pedidoId);
+              if (ped) {
+                ped.status = 'cancelado';
+                aluno.saldo += ped.total;
+                ped.itens.forEach(i => {
+                  const orig = db.itensMercadinho.find(x => x.id === i.itemId);
+                  if (orig && orig.estoque !== null) orig.estoque += i.qtd;
+                });
+                db.transacoes.unshift({
+                  id: genId(),
+                  turmaId: session.turmaAtualId,
+                  origemId: aluno.id,
+                  destinoId: aluno.id,
+                  valor: ped.total,
+                  tipo: 'estorno',
+                  motivo: 'Compra desfeita pelo aluno',
+                  criadoEm: new Date().toISOString()
+                });
+                salvarEstado();
+              }
+              fecharModal();
+              toast('Compra desfeita e saldo devolvido!', 'sucesso');
+              render();
+            };
+          };
+        }
+      }
+
+      render();
+    })();
+  </script>
+</body>
+</html>
