@@ -315,8 +315,12 @@
             inatividadeSegundos: 45,
             limiteDiarioMonitor: 10,
             tema: 'escuro',
-            biometriaAtivada: false
+            biometriaAtivada: false,
+            presencaAtiva: true,
+            presencaValor: 1,
+            moedaIcone: null
           },
+          bimestres: [],
           turmas: [
             { id: 1, nome: '6º Ano A', ativa: true },
             { id: 2, nome: '7º Ano A', ativa: true },
@@ -336,7 +340,6 @@
             { id: 6, turmaId: 3, apelido: 'Julia C.', avatarId: 'star', papel: 'monitor', pin: '2222', saldo: 12 }
           ],
           regras: [
-            { id: 1, titulo: 'Presença', valor: 1, icone: 'check', ehPresenca: true },
             { id: 2, titulo: 'Participação em aula', valor: 2, icone: 'bolt' },
             { id: 3, titulo: 'Tarefa completa', valor: 3, icone: 'book' },
             { id: 4, titulo: 'Ajudou um colega', valor: 2, icone: 'heart' },
@@ -369,6 +372,10 @@
             if (!Array.isArray(parsed.horariosAula)) parsed.horariosAula = [];
             if (!parsed.config.tema) parsed.config.tema = 'escuro';
             if (typeof parsed.config.biometriaAtivada !== 'boolean') parsed.config.biometriaAtivada = false;
+            if (typeof parsed.config.presencaAtiva !== 'boolean') parsed.config.presencaAtiva = true;
+            if (typeof parsed.config.presencaValor !== 'number') parsed.config.presencaValor = 1;
+            if (!Array.isArray(parsed.bimestres)) parsed.bimestres = [];
+            parsed.regras = (parsed.regras || []).filter(r => !r.ehPresenca && r.titulo.toLowerCase() !== 'presença');
             if (!parsed.presencaMigrada) {
               const jaTem = (parsed.regras || []).some(r => r.ehPresenca || r.titulo.toLowerCase() === 'presença');
               if (!jaTem) {
@@ -463,9 +470,21 @@
         return db.nextId;
       }
 
+      const IPE_ICON_DEFAULT = 'data:image/png;base64,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';
+
+      function iconeMoedaImg(sizeClass = 'w-4 h-4') {
+        const src = db.config.moedaIcone || IPE_ICON_DEFAULT;
+        return `<img src="${src}" alt="Ficha" class="${sizeClass} object-contain inline-block shrink-0" />`;
+      }
+
       function fmtMoeda(valor) {
         const n = Number(valor) || 0;
         return `${n} ${n === 1 ? db.config.moedaSingular : db.config.moedaPlural}`;
+      }
+
+      function encontrarBimestreAtual() {
+        const hoje = hojeISO();
+        return (db.bimestres || []).find(b => b.inicio && b.fim && hoje >= b.inicio && hoje <= b.fim) || null;
       }
 
       const horarioInicial = encontrarHorarioAtivoAgora();
@@ -895,7 +914,11 @@
       }
 
       function regraPresencaAtual() {
-        return db.regras.find(r => r.ehPresenca) || db.regras.find(r => r.titulo.toLowerCase() === 'presença') || { titulo: 'Presença', valor: 1 };
+        return {
+          titulo: 'Presença',
+          ativa: db.config.presencaAtiva !== false,
+          valor: db.config.presencaAtiva === false ? 0 : (Number(db.config.presencaValor) || 0)
+        };
       }
 
       function alunoTemPresencaNaData(alunoId, dataYmd) {
@@ -909,12 +932,24 @@
 
       function abrirModalChamada(turma) {
         const alunos = alunosDaTurmaOrdenados(turma.id);
-        if (!alunos.length) {
-          toast('Cadastre alunos na turma antes de fazer a chamada.', 'erro');
-          return;
-        }
         const dataRef = session.dataSelecionada;
         const regraP = regraPresencaAtual();
+        if (!alunos.length) {
+          abrirModal(`
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-lg">Chamada — ${escapeHtml(turma.nome)}</h3>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+            <p class="text-xs text-gray-400 mb-4">Esta turma ainda não tem alunos cadastrados.</p>
+            <button id="btn-ch-cad-alunos" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">+ Adicionar Alunos</button>
+          `);
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('btn-ch-cad-alunos').onclick = () => {
+            fecharModal();
+            abrirModalNovoAluno(turma.id);
+          };
+          return;
+        }
         const jaPresentes = new Set(alunos.filter(a => alunoTemPresencaNaData(a.id, dataRef)).map(a => a.id));
         const selecionados = new Set(alunos.filter(a => !jaPresentes.has(a.id)).map(a => a.id));
 
@@ -935,7 +970,7 @@
               <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('clipboardCheck', 'w-5 h-5 text-amarelo')} <span>Chamada — ${escapeHtml(turma.nome)}</span></h3>
               <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">${formatarDataCurta(dataRef)} • Cada presença vale <strong class="text-amarelo">+${fmtMoeda(regraP.valor)}</strong> (${escapeHtml(regraP.titulo)})</p>
+            <p class="text-xs text-gray-400 mb-3">${formatarDataCurta(dataRef)} • ${regraP.ativa && regraP.valor > 0 ? `Cada presença vale <strong class="text-amarelo">+${fmtMoeda(regraP.valor)}</strong>` : 'Presença sem pontuação configurada'}</p>
             <div class="flex gap-2 mb-3">
               <button id="btn-ch-todos" class="flex-1 glass-pill py-1.5 rounded-xl text-xs font-bold">Marcar todos</button>
               <button id="btn-ch-nenhum" class="flex-1 glass-pill py-1.5 rounded-xl text-xs font-bold">Desmarcar</button>
@@ -977,45 +1012,67 @@
 
       function renderGradeSemanalHtml() {
         const dias = [1, 2, 3, 4, 5, 6]; // Seg a Sáb
-        const slots = [];
-        // De 07:00 às 18:30 (ou até 22:00 se houver aula noturna)
-        let maxMin = 18 * 60 + 30;
-        (db.horariosAula || []).forEach(h => {
-          const [fh, fm] = h.fim.split(':').map(Number);
-          if (fh * 60 + fm > maxMin) maxMin = Math.min(22 * 60 + 30, fh * 60 + fm);
-        });
-        for (let m = 7 * 60; m < maxMin; m += 30) {
-          const h1 = String(Math.floor(m / 60)).padStart(2, '0');
-          const m1 = String(m % 60).padStart(2, '0');
-          const mEnd = m + 30;
-          const h2 = String(Math.floor(mEnd / 60)).padStart(2, '0');
-          const m2 = String(mEnd % 60).padStart(2, '0');
-          slots.push({ ini: `${h1}:${m1}`, fim: `${h2}:${m2}` });
+        const aulas = (db.horariosAula || []).filter(h => h.diaSemana >= 1 && h.diaSemana <= 6);
+        const toMin = (hhmm) => {
+          const [h, m] = hhmm.split(':').map(Number);
+          return h * 60 + m;
+        };
+
+        let minStart = 7 * 60;
+        let maxEnd = 12 * 60 + 30;
+        if (aulas.length > 0) {
+          minStart = Math.min(...aulas.map(a => toMin(a.inicio)));
+          maxEnd = Math.max(...aulas.map(a => toMin(a.fim)));
+          minStart = Math.floor(minStart / 60) * 60;
+          maxEnd = Math.ceil(maxEnd / 60) * 60;
+        }
+        const totalMin = Math.max(60, maxEnd - minStart);
+        const pxPerMin = 1.15;
+        const heightPx = Math.round(totalMin * pxPerMin);
+
+        const hourMarks = [];
+        for (let m = minStart; m <= maxEnd; m += 60) {
+          const top = Math.round((m - minStart) * pxPerMin);
+          const lbl = `${String(Math.floor(m / 60)).padStart(2, '0')}:00`;
+          hourMarks.push({ top, lbl });
         }
 
-        const linhas = slots.map(sl => {
-          const cols = dias.map(d => {
-            const aula = (db.horariosAula || []).find(h => h.diaSemana === d && h.inicio < sl.fim && h.fim > sl.ini);
-            if (!aula) {
-              return `<td class="border border-white/10 p-1 text-center text-[10px] text-gray-600">—</td>`;
-            }
-            const t = db.turmas.find(x => x.id === aula.turmaId);
-            return `<td class="border border-white/15 p-1 text-center text-[10px] font-bold bg-[#6A1B9A]/50 text-[#FFD600] rounded-sm">${t ? escapeHtml(t.nome) : 'Aula'}</td>`;
+        const colsHtml = dias.map(d => {
+          const doDia = aulas.filter(a => a.diaSemana === d);
+          const blocos = doDia.map(a => {
+            const top = Math.round((toMin(a.inicio) - minStart) * pxPerMin);
+            const h = Math.max(26, Math.round((toMin(a.fim) - toMin(a.inicio)) * pxPerMin) - 2);
+            const t = db.turmas.find(x => x.id === a.turmaId);
+            return `
+              <div style="top:${top}px;height:${h}px" class="absolute left-0.5 right-0.5 rounded-xl bg-[#6A1B9A]/80 border border-[#FFD600]/45 px-1 py-0.5 flex flex-col justify-center overflow-hidden shadow">
+                <div class="text-[9px] font-extrabold text-[#FFD600] leading-tight truncate">${t ? escapeHtml(t.nome) : 'Aula'}</div>
+                <div class="text-[8px] text-white/90 leading-tight">${a.inicio}–${a.fim}</div>
+              </div>
+            `;
           }).join('');
-          return `<tr><td class="border border-white/10 px-1.5 py-1 text-[10px] font-mono text-gray-400 whitespace-nowrap">${sl.ini}</td>${cols}</tr>`;
+          const linhas = hourMarks.map(hm => `<div style="top:${hm.top}px" class="absolute left-0 right-0 border-t border-white/10"></div>`).join('');
+          return `
+            <div class="flex-1 min-w-[68px] border-l border-white/10 relative" style="height:${heightPx}px">
+              ${linhas}
+              ${blocos}
+            </div>
+          `;
         }).join('');
 
         return `
-          <div class="overflow-x-auto mt-3 rounded-2xl border border-white/10">
-            <table class="w-full border-collapse text-left">
-              <thead>
-                <tr class="bg-white/5 text-[10px] font-bold text-gray-300">
-                  <th class="border border-white/10 px-1.5 py-1.5">Hora</th>
-                  ${dias.map(d => `<th class="border border-white/10 px-1.5 py-1.5 text-center">${DIAS_SEMANA[d]}</th>`).join('')}
-                </tr>
-              </thead>
-              <tbody>${linhas}</tbody>
-            </table>
+          <div class="overflow-x-auto">
+            <div class="min-w-[460px]">
+              <div class="flex border-b border-white/15 pb-1.5 mb-1 text-[10px] font-bold text-gray-300">
+                <div class="w-10 shrink-0">Hora</div>
+                ${dias.map(d => `<div class="flex-1 min-w-[68px] text-center">${DIAS_SEMANA[d]}</div>`).join('')}
+              </div>
+              <div class="flex">
+                <div class="w-10 shrink-0 relative" style="height:${heightPx}px">
+                  ${hourMarks.map(hm => `<div style="top:${Math.max(0, hm.top - 6)}px" class="absolute left-0 text-[9px] font-mono text-gray-400">${hm.lbl}</div>`).join('')}
+                </div>
+                ${colsHtml}
+              </div>
+            </div>
           </div>
         `;
       }
@@ -1065,28 +1122,23 @@
         const pendentesCount = db.pedidos.filter(p => p.status === 'pendente_entrega').length;
 
         const horarioAtivo = encontrarHorarioAtivoAgora();
+        const bimestreAtual = encontrarBimestreAtual();
         const podeVoltar = (session.abaProfessor === 'turma' && !session.escolhendoTurma) || (session.abaProfessor === 'config' && session.subConfig !== null) || (session.abaProfessor !== 'turma' && session.abaProfessor !== 'config');
         const header = `
           <header class="glass-header px-4 py-3 flex items-center justify-between sticky top-0 z-30">
             <div class="flex items-center gap-2">
               ${podeVoltar ? `<button id="btn-voltar-secao" title="Voltar" class="glass-pill w-9 h-9 rounded-xl flex items-center justify-center text-white hover:border-[#FFD600]/60 transition">${svgIcon('arrowLeft', 'w-4 h-4')}</button>` : ''}
               ${session.abaProfessor === 'turma' && session.escolhendoTurma
-                ? `<span class="font-extrabold text-sm text-white">Escolha a Turma</span>`
-                : (turmaAtual ? `<select id="sel-turma" class="glass-pill text-white font-bold text-sm px-3.5 py-2 rounded-2xl outline-none">
+                ? `<span class="font-extrabold text-sm text-white">Turmas</span>`
+                : (turmaAtual ? `<select id="sel-turma" class="glass-pill text-white font-bold text-sm px-3 py-2 rounded-2xl outline-none">
                     ${turmasOrdenadas().map(t => `<option value="${t.id}" class="bg-[#18181D]" ${t.id === turmaAtual.id ? 'selected' : ''}>${escapeHtml(t.nome)}</option>`).join('')}
-                   </select>
-                   ${horarioAtivo && horarioAtivo.turmaId === turmaAtual.id ? `<span class="hidden sm:inline-block text-[10px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 px-2 py-1 rounded-full font-semibold">Em aula</span>` : ''}` : '<span class="font-bold text-sm">Sem turmas</span>')
+                   </select>` : '<span class="font-bold text-sm">Turmas</span>')
               }
+              ${bimestreAtual ? `<span class="text-[10px] glass-accent-purple px-2.5 py-1 rounded-full font-bold text-amarelo">${escapeHtml(bimestreAtual.nome)}</span>` : ''}
             </div>
-            <div class="flex items-center gap-2">
-              <button id="btn-abrir-entregas" class="glass-pill text-white text-xs font-bold px-3 py-2 rounded-2xl flex items-center gap-1.5 relative hover:border-[#FFD600]/40 transition">
-                ${svgIcon('gift', 'w-4 h-4 text-amarelo')} <span>Entregas</span>
-                ${pendentesCount > 0 ? `<span class="bg-red-600 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full leading-none">${pendentesCount}</span>` : ''}
-              </button>
-              <button id="btn-ir-aluno" class="glass-pill text-amarelo text-xs font-bold px-3.5 py-2 rounded-2xl flex items-center gap-1.5 hover:border-[#FFD600]/40 transition">
-                ${svgIcon('backpack', 'w-4 h-4')} <span>Modo Aluno</span>
-              </button>
-            </div>
+            <button id="btn-ir-aluno" class="glass-pill text-amarelo text-xs font-bold px-3.5 py-2 rounded-2xl flex items-center gap-1.5 hover:border-[#FFD600]/40 transition">
+              ${svgIcon('backpack', 'w-4 h-4')} <span>Aluno</span>
+            </button>
           </header>
         `;
 
@@ -1105,12 +1157,12 @@
               ${navBtn('mercadinho', 'store', 'Loja')}
               ${navBtn('turma', 'users', 'Turmas')}
               ${navBtn('historico', 'history', 'Histórico')}
-              ${navBtn('cargos', 'briefcase', 'Cargos')}
+              ${navBtn('entregas', 'gift', 'Entregas', pendentesCount)}
             </div>
           </nav>
         `;
 
-        const mostrarFab = ['turma', 'mercadinho', 'cargos'].includes(session.abaProfessor) || (session.abaProfessor === 'config' && session.subConfig !== 'app');
+        const mostrarFab = ['turma', 'mercadinho'].includes(session.abaProfessor) || (session.abaProfessor === 'config' && session.subConfig !== 'app');
         const fabHtml = mostrarFab ? `
           <div id="fab-speed-dial" class="fixed bottom-36 right-4 z-40 flex flex-col items-end gap-2 ${session.fabMenuAberto ? '' : 'hidden'}"></div>
           <button id="btn-fab-adicionar" aria-label="Adicionar" class="fixed bottom-20 right-4 z-40 glass-gold-btn w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-2xl font-extrabold leading-none transition-opacity duration-500 ${session.fabMenuAberto ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}">
@@ -1137,8 +1189,8 @@
             <div class="glass-card !border-red-500/70 !bg-red-950/35 rounded-3xl p-5 mb-4 flex items-start gap-3">
               <span class="text-red-400 shrink-0 mt-0.5">${svgIcon('alertTriangle', 'w-6 h-6')}</span>
               <div>
-                <h2 class="font-extrabold text-base text-red-300 mb-0.5">Fora do horário de aula</h2>
-                <p class="text-xs text-red-200/90">Nenhuma turma está no horário cadastrado agora. Escolha qual turma deseja abrir:</p>
+                <h2 class="font-extrabold text-base text-red-300 mb-0.5">Sem aula no horário atual</h2>
+                <p class="text-xs text-red-200/90">Escolha a turma que queira abrir.</p>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -1185,6 +1237,7 @@
             </div>
             <div class="flex gap-1.5 flex-wrap justify-end">
               <button id="btn-chamada" class="glass-accent-purple text-white px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1">${svgIcon('clipboardCheck', 'w-3.5 h-3.5 text-amarelo')} <span>Chamada</span></button>
+              <button id="btn-cargos-turma" class="glass-pill text-white px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1">${svgIcon('briefcase', 'w-3.5 h-3.5 text-amarelo')} <span>Cargos</span></button>
               <button id="btn-multi" class="px-3 py-2 rounded-2xl text-xs font-bold transition ${session.selecaoMultipla ? 'glass-gold-btn' : 'glass-pill text-gray-200'}">
                 ${session.selecaoMultipla ? 'Cancelar' : '✓ Vários'}
               </button>
@@ -1207,7 +1260,7 @@
                     <div class="font-bold text-sm truncate w-full">${escapeHtml(a.apelido)}</div>
 
                     ${cargo ? `<span class="text-[10px] text-gray-400 truncate w-full mt-0.5">${escapeHtml(cargo.titulo)}</span>` : ''}
-                    <div class="mt-2.5 glass-accent-purple text-amarelo font-extrabold text-xs px-3 py-1 rounded-full">${fmtMoeda(a.saldo)}</div>
+                    <div class="mt-2.5 glass-accent-purple text-amarelo font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1">${iconeMoedaImg('w-3.5 h-3.5')} <span>${fmtMoeda(a.saldo)}</span></div>
                     ${pontosDoAlunoNaData(a.id, session.dataSelecionada) > 0 ? `<div class="mt-1 text-[10px] text-emerald-300 font-semibold">+${pontosDoAlunoNaData(a.id, session.dataSelecionada)} no dia</div>` : ''}
                   </button>
                 `;
@@ -1382,15 +1435,15 @@
 
       function renderAbaConfig() {
         if (!session.subConfig) {
+          const bim = encontrarBimestreAtual();
           const categorias = [
-            { id: 'turmas', icone: 'users', titulo: 'Turmas', desc: `${db.turmas.length} turma(s) • Renomear, excluir e adicionar alunos` },
-            { id: 'horarios', icone: 'calendar', titulo: 'Horários de Aula', desc: 'Dias, blocos de 45 min e grade semanal' },
-            { id: 'cargos', icone: 'briefcase', titulo: 'Cargos', desc: `${db.cargos.length} cargo(s) • Para todas ou turma específica` },
-            { id: 'atividades', icone: 'star', titulo: 'Atividades (Regras)', desc: `${db.regras.length} atividade(s) • Valores e 20 ícones` },
-            { id: 'app', icone: 'settings', titulo: 'Configurações do Aplicativo', desc: 'Moeda, tema, backup e biometria' }
+            { id: 'escola', icone: 'users', titulo: 'Escola', desc: 'Turmas, horários e bimestres' },
+            { id: 'regras', icone: 'star', titulo: 'Regras', desc: 'Presença, cargos e atividades' },
+            { id: 'app', icone: 'settings', titulo: 'Aplicativo', desc: 'Biometria, tema, backup, ícone e moeda' }
           ];
           return `
             <h2 class="font-extrabold text-lg mb-4">Configurações</h2>
+            ${bim ? `<div class="glass-card rounded-2xl px-4 py-2.5 mb-3 text-xs flex items-center justify-between"><span>Período atual</span><strong class="text-amarelo">${escapeHtml(bim.nome)}</strong></div>` : ''}
             <div class="space-y-3">
               ${categorias.map(c => `
                 <button data-sub-cfg="${c.id}" class="btn-sub-cfg w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between gap-3 text-left transition">
@@ -1408,28 +1461,26 @@
           `;
         }
 
-        if (session.subConfig === 'turmas') {
+        if (session.subConfig === 'escola') {
+          const bimAtual = encontrarBimestreAtual();
           return `
-            <h2 class="font-extrabold text-lg mb-3">Configurações • Turmas</h2>
-            <div class="space-y-2.5">
+            <h2 class="font-extrabold text-lg mb-4">Escola</h2>
+
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Turmas</h3>
+            <div class="space-y-2 mb-5">
               ${turmasOrdenadas().map(t => `
-                <button data-edit-turma="${t.id}" class="btn-edit-turma w-full glass-card hover:border-[#FFD600]/60 p-4 rounded-3xl flex items-center justify-between text-left transition">
+                <button data-edit-turma="${t.id}" class="btn-edit-turma w-full glass-card hover:border-[#FFD600]/60 p-3.5 rounded-2xl flex items-center justify-between text-left transition">
                   <div>
                     <div class="font-bold text-sm">${escapeHtml(t.nome)}</div>
-                    <div class="text-[11px] text-amarelo mt-0.5">${fmtMoeda(totalTokensTurma(t.id))} acumulados</div>
+                    <div class="text-[11px] text-amarelo mt-0.5">${fmtMoeda(totalTokensTurma(t.id))}</div>
                   </div>
                   <span class="text-amarelo text-xs font-bold">Editar &#9998;</span>
                 </button>
               `).join('')}
             </div>
-          `;
-        }
 
-        if (session.subConfig === 'horarios') {
-          return `
-            <h2 class="font-extrabold text-lg mb-1">Horários de Aula</h2>
-            <p class="text-xs text-gray-400 mb-3">Toque em uma turma para editar • Grade semanal fixa abaixo</p>
-            <div class="space-y-2 mb-4">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Horários</h3>
+            <div class="space-y-2 mb-3">
               ${turmasOrdenadas().map(t => {
                 const hs = (db.horariosAula || [])
                   .filter(h => h.turmaId === t.id)
@@ -1438,31 +1489,71 @@
                   ? hs.map(h => `${DIAS_SEMANA[h.diaSemana]} ${h.inicio}–${h.fim}`).join(' • ')
                   : 'Sem horários';
                 return `
-                  <button data-edit-hor-turma="${t.id}" class="btn-edit-hor-turma w-full flex items-center justify-between glass-card hover:border-[#FFD600]/60 px-4 py-3 rounded-2xl text-xs text-left transition">
+                  <button data-edit-hor-turma="${t.id}" class="btn-edit-hor-turma w-full flex items-center justify-between glass-card hover:border-[#FFD600]/60 px-3.5 py-2.5 rounded-2xl text-xs text-left transition">
                     <div class="pr-2">
                       <div class="font-bold text-sm">${escapeHtml(t.nome)}</div>
                       <div class="text-[11px] ${hs.length ? 'text-amarelo' : 'text-gray-500'} mt-0.5">${escapeHtml(resumo)}</div>
                     </div>
-                    <span class="text-amarelo font-bold shrink-0">Editar &#9998;</span>
+                    <span class="text-amarelo font-bold shrink-0">&#9998;</span>
                   </button>
                 `;
               }).join('')}
             </div>
-            <div class="glass-card rounded-3xl p-3">${renderGradeSemanalHtml()}</div>
+            <div class="glass-card rounded-3xl p-3 mb-5">${renderGradeSemanalHtml()}</div>
+
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Bimestres</h3>
+            <div class="space-y-2">
+              ${(db.bimestres || []).length === 0
+                ? `<p class="text-xs text-gray-400 glass-card p-3.5 rounded-2xl">Nenhum bimestre cadastrado. Use o + para adicionar.</p>`
+                : db.bimestres.map(b => {
+                    const ativo = bimAtual && bimAtual.id === b.id;
+                    return `
+                      <div class="glass-card ${ativo ? '!border-[#FFD600]/70' : ''} px-3.5 py-3 rounded-2xl flex items-center justify-between text-xs">
+                        <div>
+                          <div class="font-bold text-sm flex items-center gap-2">${escapeHtml(b.nome)} ${ativo ? '<span class="text-[10px] glass-gold-btn px-2 py-0.5 rounded-full">Atual</span>' : ''}</div>
+                          <div class="text-[11px] text-gray-400 mt-0.5">${formatarDataCurta(b.inicio)} até ${formatarDataCurta(b.fim)}</div>
+                        </div>
+                        <button data-del-bim="${b.id}" class="btn-del-bim text-red-400 font-bold px-2 text-lg">&times;</button>
+                      </div>
+                    `;
+                  }).join('')}
+            </div>
           `;
         }
 
-        if (session.subConfig === 'cargos') {
+        if (session.subConfig === 'regras') {
           return `
-            <h2 class="font-extrabold text-lg mb-3">Configurações • Cargos</h2>
-            <div class="space-y-2.5">
+            <h2 class="font-extrabold text-lg mb-4">Regras</h2>
+
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Presença</h3>
+            <div class="glass-card rounded-3xl p-4 mb-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <div class="font-bold text-sm">Pontuar presença</div>
+                  <div class="text-[11px] text-gray-400">Aplicada automaticamente na Chamada</div>
+                </div>
+                <button id="btn-toggle-presenca" class="px-3.5 py-2 rounded-xl text-xs font-bold ${db.config.presencaAtiva ? 'glass-gold-btn' : 'glass-pill text-gray-300'}">
+                  ${db.config.presencaAtiva ? 'Ativa ✓' : 'Inativa'}
+                </button>
+              </div>
+              ${db.config.presencaAtiva ? `
+                <div class="flex items-center gap-2">
+                  <label class="text-xs text-gray-400">Valor:</label>
+                  <input id="inp-presenca-val" type="number" min="0" value="${db.config.presencaValor}" class="w-20 glass-pill rounded-xl px-3 py-1.5 text-sm text-center font-bold" />
+                  <button id="btn-salvar-presenca" class="glass-accent-purple text-white text-xs font-bold px-3.5 py-2 rounded-xl">Salvar</button>
+                </div>
+              ` : ''}
+            </div>
+
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Cargos</h3>
+            <div class="space-y-2 mb-5">
               ${db.cargos.length === 0
-                ? `<p class="text-xs text-gray-400 glass-card p-4 rounded-3xl">Nenhum cargo cadastrado. Toque no + para criar.</p>`
+                ? `<p class="text-xs text-gray-400 glass-card p-3.5 rounded-2xl">Nenhum cargo cadastrado.</p>`
                 : db.cargos.map(c => {
                     const t = c.turmaId === null ? null : db.turmas.find(x => x.id === c.turmaId);
                     const escopo = c.turmaId === null ? 'Todas as turmas' : (t ? t.nome : '');
                     return `
-                      <div class="glass-card px-4 py-3 rounded-3xl flex items-center justify-between text-xs">
+                      <div class="glass-card px-3.5 py-3 rounded-2xl flex items-center justify-between text-xs">
                         <div>
                           <div class="font-bold text-sm">${escapeHtml(c.titulo)}</div>
                           <div class="text-[11px] text-gray-400">${escapeHtml(escopo)} • <span class="text-amarelo font-bold">${fmtMoeda(c.salario)}/dia</span></div>
@@ -1472,15 +1563,11 @@
                     `;
                   }).join('')}
             </div>
-          `;
-        }
 
-        if (session.subConfig === 'atividades') {
-          return `
-            <h2 class="font-extrabold text-lg mb-3">Configurações • Atividades</h2>
-            <div class="space-y-2.5">
+            <h3 class="font-bold text-xs uppercase tracking-wider text-gray-400 mb-2">Atividades</h3>
+            <div class="space-y-2">
               ${db.regras.map(r => `
-                <button data-edit-regra="${r.id}" class="btn-edit-regra w-full flex items-center justify-between glass-card hover:border-[#FFD600]/60 px-4 py-3 rounded-3xl text-xs text-left transition">
+                <button data-edit-regra="${r.id}" class="btn-edit-regra w-full flex items-center justify-between glass-card hover:border-[#FFD600]/60 px-3.5 py-3 rounded-2xl text-xs text-left transition">
                   <span class="flex items-center gap-3">${renderRegraIcone(r.icone, 'w-5 h-5')} <span class="font-bold text-sm">${escapeHtml(r.titulo)}</span></span>
                   <span class="flex items-center gap-2">
                     <span class="text-amarelo font-extrabold">+${r.valor}</span>
@@ -1493,22 +1580,22 @@
         }
 
         return `
-          <h2 class="font-extrabold text-lg mb-4">Configurações do Aplicativo</h2>
+          <h2 class="font-extrabold text-lg mb-4">Aplicativo</h2>
           <div class="space-y-3">
             <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
               <div>
-                <h3 class="font-bold text-sm">Biometria do Professor</h3>
-                <p class="text-[11px] text-gray-400">${db.config.biometriaAtivada ? 'Ativada: exige sua digital ao voltar do Modo Aluno' : 'Desativada: volta direto sem pedir digital'}</p>
+                <h3 class="font-bold text-sm">Biometria</h3>
+                <p class="text-[11px] text-gray-400">${db.config.biometriaAtivada ? 'Exige digital ao voltar do Aluno' : 'Desativada'}</p>
               </div>
               <button id="btn-toggle-biometria" class="px-3.5 py-2 rounded-xl text-xs font-bold ${db.config.biometriaAtivada ? 'glass-gold-btn' : 'glass-pill text-gray-300'}">
-                ${db.config.biometriaAtivada ? 'Ativada ✓' : 'Desativada'}
+                ${db.config.biometriaAtivada ? 'Ativa ✓' : 'Inativa'}
               </button>
             </div>
 
             <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
               <div>
-                <h3 class="font-bold text-sm">Tema do Aplicativo</h3>
-                <p class="text-[11px] text-gray-400">Alterne entre tema escuro e claro</p>
+                <h3 class="font-bold text-sm">Tema</h3>
+                <p class="text-[11px] text-gray-400">${db.config.tema === 'claro' ? 'Claro' : 'Escuro'}</p>
               </div>
               <button id="btn-alternar-tema" class="glass-accent-purple text-white text-xs font-bold px-3.5 py-2 rounded-xl flex items-center gap-1.5">
                 ${svgIcon('sun', 'w-4 h-4 text-amarelo')} <span>${db.config.tema === 'claro' ? 'Escuro' : 'Claro'}</span>
@@ -1517,18 +1604,35 @@
 
             <button id="btn-exportar-json" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
               <div>
-                <h3 class="font-bold text-sm">Backup dos Dados</h3>
-                <p class="text-[11px] text-gray-400">Baixar cópia de segurança em arquivo JSON</p>
+                <h3 class="font-bold text-sm">Backup</h3>
+                <p class="text-[11px] text-gray-400">Baixar arquivo JSON</p>
               </div>
               <span class="glass-pill p-2.5 rounded-xl text-amarelo">${svgIcon('download', 'w-4 h-4')}</span>
             </button>
 
+            <div class="glass-card rounded-3xl p-4">
+              <div class="flex items-center justify-between gap-3 mb-2">
+                <div class="flex items-center gap-2.5">
+                  ${iconeMoedaImg('w-8 h-8')}
+                  <div>
+                    <h3 class="font-bold text-sm">Ícone da ficha</h3>
+                    <p class="text-[11px] text-gray-400">PNG ou JPEG (remove o fundo)</p>
+                  </div>
+                </div>
+                ${db.config.moedaIcone ? `<button id="btn-reset-icone" class="text-xs text-red-400 font-bold">Padrão</button>` : ''}
+              </div>
+              <label class="block w-full text-center glass-pill hover:border-[#FFD600]/60 text-xs font-bold py-2.5 rounded-xl cursor-pointer">
+                Enviar imagem
+                <input id="inp-upload-icone" type="file" accept="image/png,image/jpeg" class="hidden" />
+              </label>
+            </div>
+
             <button id="btn-entrar-config-moeda" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
               <div>
-                <h3 class="font-bold text-sm">Nome da Moeda</h3>
-                <p class="text-xs text-gray-400 mt-0.5">Atual: <span class="text-amarelo font-semibold">${escapeHtml(db.config.moedaSingular)} / ${escapeHtml(db.config.moedaPlural)}</span></p>
+                <h3 class="font-bold text-sm">Moeda</h3>
+                <p class="text-xs text-gray-400 mt-0.5">${escapeHtml(db.config.moedaSingular)} / ${escapeHtml(db.config.moedaPlural)}</p>
               </div>
-              <span class="glass-pill text-xs font-bold px-3 py-2 rounded-xl text-amarelo">Configurar &rarr;</span>
+              <span class="glass-pill text-xs font-bold px-3 py-2 rounded-xl text-amarelo">Editar &rarr;</span>
             </button>
           </div>
         `;
@@ -1558,11 +1662,7 @@
             render();
           };
         }
-        document.getElementById('btn-abrir-entregas').onclick = () => {
-          session.abaAnterior = session.abaProfessor;
-          session.abaProfessor = 'entregas';
-          render();
-        };
+
         document.getElementById('btn-ir-aluno').onclick = () => {
           session.modo = 'aluno';
           session.alunoTurmaId = null;
@@ -1582,6 +1682,42 @@
             render();
           };
         });
+
+        function abrirModalNovoBimestre() {
+          abrirModal(`
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-lg">Novo Bimestre</h3>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+            <input id="inp-bim-nome" placeholder="Ex.: 1º Bimestre" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-2.5 text-white" />
+            <div class="grid grid-cols-2 gap-2 mb-4">
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-1">Início</label>
+                <input id="inp-bim-ini" type="date" class="w-full glass-pill rounded-xl px-2.5 py-2 text-xs text-white" />
+              </div>
+              <div>
+                <label class="block text-[10px] text-gray-400 mb-1">Fim</label>
+                <input id="inp-bim-fim" type="date" class="w-full glass-pill rounded-xl px-2.5 py-2 text-xs text-white" />
+              </div>
+            </div>
+            <button id="btn-save-bim" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Salvar Bimestre</button>
+          `);
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('btn-save-bim').onclick = () => {
+            const nome = document.getElementById('inp-bim-nome').value.trim();
+            const inicio = document.getElementById('inp-bim-ini').value;
+            const fim = document.getElementById('inp-bim-fim').value;
+            if (!nome || !inicio || !fim || fim < inicio) {
+              toast('Preencha nome e datas válidas.', 'erro');
+              return;
+            }
+            db.bimestres.push({ id: genId(), nome, inicio, fim });
+            salvarEstado();
+            fecharModal();
+            toast('Bimestre cadastrado!', 'sucesso');
+            render();
+          };
+        }
 
         function abrirModalNovaTurma() {
           abrirModal(`
@@ -1876,18 +2012,20 @@
               opcoes.push({ label: 'Adicionar Alunos', icone: 'user', fn: () => abrirModalNovoAluno() });
               opcoes.push({ label: 'Nova Turma', icone: 'users', fn: abrirModalNovaTurma });
             }
-          } else if (session.abaProfessor === 'cargos') {
-            opcoes.push({ label: 'Novo Cargo', icone: 'briefcase', fn: abrirModalNovoCargo });
           } else if (session.abaProfessor === 'mercadinho') {
             opcoes.push({ label: 'Novo Item', icone: 'store', fn: abrirModalNovoItemLoja });
           } else if (session.abaProfessor === 'config') {
-            if (session.subConfig === 'turmas') opcoes.push({ label: 'Nova Turma', icone: 'users', fn: abrirModalNovaTurma });
-            else if (session.subConfig === 'horarios') opcoes.push({ label: 'Novo Horário', icone: 'calendar', fn: () => abrirModalHorariosGlobal(turmasOrdenadas()[0]?.id) });
-            else if (session.subConfig === 'cargos') opcoes.push({ label: 'Novo Cargo', icone: 'briefcase', fn: abrirModalNovoCargo });
-            else if (session.subConfig === 'atividades') opcoes.push({ label: 'Nova Atividade', icone: 'star', fn: () => abrirModalRegraGlobal(null) });
-            else {
+            if (session.subConfig === 'escola') {
               opcoes.push({ label: 'Nova Turma', icone: 'users', fn: abrirModalNovaTurma });
               opcoes.push({ label: 'Novo Horário', icone: 'calendar', fn: () => abrirModalHorariosGlobal(turmasOrdenadas()[0]?.id) });
+              opcoes.push({ label: 'Novo Bimestre', icone: 'clock', fn: abrirModalNovoBimestre });
+            } else if (session.subConfig === 'regras') {
+              opcoes.push({ label: 'Novo Cargo', icone: 'briefcase', fn: abrirModalNovoCargo });
+              opcoes.push({ label: 'Nova Atividade', icone: 'star', fn: () => abrirModalRegraGlobal(null) });
+            } else {
+              opcoes.push({ label: 'Nova Turma', icone: 'users', fn: abrirModalNovaTurma });
+              opcoes.push({ label: 'Novo Horário', icone: 'calendar', fn: () => abrirModalHorariosGlobal(turmasOrdenadas()[0]?.id) });
+              opcoes.push({ label: 'Novo Bimestre', icone: 'clock', fn: abrirModalNovoBimestre });
               opcoes.push({ label: 'Novo Cargo', icone: 'briefcase', fn: abrirModalNovoCargo });
               opcoes.push({ label: 'Nova Atividade', icone: 'star', fn: () => abrirModalRegraGlobal(null) });
             }
@@ -1956,6 +2094,11 @@
             };
           }
           document.getElementById('btn-chamada').onclick = () => abrirModalChamada(turma);
+          document.getElementById('btn-cargos-turma').onclick = () => {
+            session.abaAnterior = 'turma';
+            session.abaProfessor = 'cargos';
+            render();
+          };
           document.getElementById('btn-multi').onclick = () => {
             session.selecaoMultipla = !session.selecaoMultipla;
             session.selecionados.clear();
@@ -2062,13 +2205,14 @@
             document.querySelectorAll('.btn-sub-cfg').forEach(b => {
               b.onclick = () => {
                 session.subConfig = b.dataset.subCfg;
+                session.fabMenuAberto = false;
                 render();
               };
             });
             return;
           }
 
-          if (session.subConfig === 'turmas') {
+          if (session.subConfig === 'escola') {
             document.querySelectorAll('.btn-edit-turma').forEach(b => {
               b.onclick = () => {
                 const tid = Number(b.dataset.editTurma);
@@ -2082,7 +2226,7 @@
                   <label class="block text-xs text-gray-400 mb-1">Nome da turma</label>
                   <input id="inp-edit-turma-nome" value="${escapeHtml(turma.nome)}" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-4 text-white outline-none focus:border-[#FFD600]" />
                   <button id="btn-save-edit-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl mb-2.5">Salvar Nome</button>
-                  <button id="btn-add-alunos-turma-cfg" class="w-full glass-accent-purple text-white font-bold py-2.5 rounded-xl text-xs mb-2.5">+ Adicionar Estudantes nesta Turma</button>
+                  <button id="btn-add-alunos-turma-cfg" class="w-full glass-accent-purple text-white font-bold py-2.5 rounded-xl text-xs mb-2.5">+ Adicionar Estudantes</button>
                   <button id="btn-del-turma" class="w-full bg-red-900/50 border border-red-400/30 text-red-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5">${svgIcon('trash', 'w-4 h-4')} <span>Excluir Turma</span></button>
                 `);
                 document.getElementById('btn-fechar-modal').onclick = fecharModal;
@@ -2092,7 +2236,7 @@
                   turma.nome = novo;
                   salvarEstado();
                   fecharModal();
-                  toast('Nome da turma atualizado!', 'sucesso');
+                  toast('Turma atualizada!', 'sucesso');
                   render();
                 };
                 document.getElementById('btn-add-alunos-turma-cfg').onclick = () => {
@@ -2108,9 +2252,7 @@
                   db.horariosAula = (db.horariosAula || []).filter(h => h.turmaId !== tid);
                   db.cargos = db.cargos.filter(c => c.turmaId !== tid);
                   db.usuarios = db.usuarios.filter(u => u.turmaId !== tid);
-                  if (session.turmaAtualId === tid) {
-                    session.turmaAtualId = turmasOrdenadas()[0]?.id || 1;
-                  }
+                  if (session.turmaAtualId === tid) session.turmaAtualId = turmasOrdenadas()[0]?.id || 1;
                   salvarEstado();
                   fecharModal();
                   toast('Turma excluída.', 'sucesso');
@@ -2118,15 +2260,36 @@
                 };
               };
             });
-          }
-
-          if (session.subConfig === 'horarios') {
             document.querySelectorAll('.btn-edit-hor-turma').forEach(b => {
               b.onclick = () => abrirModalHorariosGlobal(Number(b.dataset.editHorTurma));
             });
+            document.querySelectorAll('.btn-del-bim').forEach(b => {
+              b.onclick = () => {
+                const id = Number(b.dataset.delBim);
+                db.bimestres = (db.bimestres || []).filter(x => x.id !== id);
+                salvarEstado();
+                toast('Bimestre removido.');
+                render();
+              };
+            });
           }
 
-          if (session.subConfig === 'cargos') {
+          if (session.subConfig === 'regras') {
+            document.getElementById('btn-toggle-presenca').onclick = () => {
+              db.config.presencaAtiva = !db.config.presencaAtiva;
+              salvarEstado();
+              render();
+            };
+            const btnSavePres = document.getElementById('btn-salvar-presenca');
+            if (btnSavePres) {
+              btnSavePres.onclick = () => {
+                const v = Math.max(0, Number(document.getElementById('inp-presenca-val').value) || 0);
+                db.config.presencaValor = v;
+                salvarEstado();
+                toast('Valor da presença salvo!', 'sucesso');
+                render();
+              };
+            }
             document.querySelectorAll('.btn-del-cargo-cfg').forEach(b => {
               b.onclick = () => {
                 const id = Number(b.dataset.delCargoCfg);
@@ -2136,9 +2299,6 @@
                 render();
               };
             });
-          }
-
-          if (session.subConfig === 'atividades') {
             document.querySelectorAll('.btn-edit-regra').forEach(b => {
               b.onclick = () => {
                 const r = db.regras.find(x => x.id === Number(b.dataset.editRegra));
@@ -2169,18 +2329,67 @@
               URL.revokeObjectURL(url);
               toast('Backup exportado!', 'sucesso');
             };
+            const btnResetIc = document.getElementById('btn-reset-icone');
+            if (btnResetIc) {
+              btnResetIc.onclick = () => {
+                db.config.moedaIcone = null;
+                salvarEstado();
+                toast('Ícone padrão restaurado!', 'sucesso');
+                render();
+              };
+            }
+            document.getElementById('inp-upload-icone').onchange = (e) => {
+              const file = e.target.files && e.target.files[0];
+              if (!file) return;
+              const reader = new FileReader();
+              reader.onload = () => {
+                const img = new Image();
+                img.onload = () => {
+                  const maxDim = 96;
+                  const scale = Math.min(maxDim / img.width, maxDim / img.height, 1);
+                  const w = Math.max(1, Math.round(img.width * scale));
+                  const h = Math.max(1, Math.round(img.height * scale));
+                  const canvas = document.createElement('canvas');
+                  canvas.width = w;
+                  canvas.height = h;
+                  const ctx = canvas.getContext('2d');
+                  ctx.drawImage(img, 0, 0, w, h);
+                  const imgData = ctx.getImageData(0, 0, w, h);
+                  const data = imgData.data;
+                  // Amostra a cor de fundo do canto superior esquerdo
+                  const bgR = data[0], bgG = data[1], bgB = data[2];
+                  for (let i = 0; i < data.length; i += 4) {
+                    const dr = data[i] - bgR;
+                    const dg = data[i + 1] - bgG;
+                    const db2 = data[i + 2] - bgB;
+                    const dist = Math.sqrt(dr * dr + dg * dg + db2 * db2);
+                    if (dist < 48) {
+                      data[i + 3] = 0;
+                    } else if (dist < 75) {
+                      data[i + 3] = Math.round(((dist - 48) / 27) * data[i + 3]);
+                    }
+                  }
+                  ctx.putImageData(imgData, 0, 0);
+                  db.config.moedaIcone = canvas.toDataURL('image/png');
+                  salvarEstado();
+                  toast('Ícone atualizado sem fundo!', 'sucesso');
+                  render();
+                };
+                img.src = reader.result;
+              };
+              reader.readAsDataURL(file);
+            };
             document.getElementById('btn-entrar-config-moeda').onclick = () => {
               abrirModal(`
                 <div class="flex items-center justify-between mb-3">
-                  <h3 class="font-bold text-lg">Configurar Nome da Moeda</h3>
+                  <h3 class="font-bold text-lg">Moeda</h3>
                   <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
                 </div>
-                <p class="text-xs text-gray-400 mb-3">Defina como a moeda aparece no singular e no plural em todo o aplicativo.</p>
                 <label class="block text-xs text-gray-400 mb-1">Singular</label>
                 <input id="cfg-singular" value="${escapeHtml(db.config.moedaSingular)}" placeholder="Ex.: IP" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-3" />
                 <label class="block text-xs text-gray-400 mb-1">Plural</label>
                 <input id="cfg-plural" value="${escapeHtml(db.config.moedaPlural)}" placeholder="Ex.: IPs" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-4" />
-                <button id="btn-salvar-moeda" class="w-full glass-gold-btn text-xs font-bold py-3 rounded-xl">Salvar moeda</button>
+                <button id="btn-salvar-moeda" class="w-full glass-gold-btn text-xs font-bold py-3 rounded-xl">Salvar</button>
               `);
               document.getElementById('btn-fechar-modal').onclick = fecharModal;
               document.getElementById('btn-salvar-moeda').onclick = () => {
@@ -2191,7 +2400,7 @@
                 db.config.moedaPlural = plural;
                 salvarEstado();
                 fecharModal();
-                toast('Nome da moeda atualizado!', 'sucesso');
+                toast('Moeda atualizada!', 'sucesso');
                 render();
               };
             };
@@ -2279,7 +2488,7 @@
           <main class="p-4 space-y-4">
             <div class="glass-accent-purple rounded-3xl p-5">
               <div class="text-xs text-purple-200 font-semibold">Seu saldo atual</div>
-              <div class="text-3xl font-extrabold text-amarelo mt-1">${fmtMoeda(aluno.saldo)}</div>
+              <div class="text-3xl font-extrabold text-amarelo mt-1 flex items-center gap-2">${iconeMoedaImg('w-8 h-8')} <span>${fmtMoeda(aluno.saldo)}</span></div>
               ${metaItem ? `
                 <div class="mt-3">
                   <div class="flex justify-between text-[11px] text-purple-100 mb-1">
