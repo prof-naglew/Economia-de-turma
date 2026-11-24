@@ -243,6 +243,7 @@
       function validarSenhaForte(senha) {
         const s = String(senha || '');
         if (s.length < 8) return 'A senha deve ter pelo menos 8 caracteres.';
+        if (!/[A-Z]/.test(s)) return 'A senha deve conter pelo menos 1 letra maiúscula.';
         if (!/[0-9]/.test(s)) return 'A senha deve conter pelo menos 1 número.';
         if (!/[^A-Za-z0-9\s]/.test(s)) return 'A senha deve conter pelo menos 1 caractere especial (ex: !@#$%).';
         return '';
@@ -1176,6 +1177,13 @@
           `);
 
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          const cadNome = document.getElementById('cad-nome');
+          const cadLogin = document.getElementById('cad-login');
+          const cadSenha = document.getElementById('cad-senha');
+          const btnCad = document.getElementById('btn-confirmar-cad');
+          if (cadNome && cadLogin) cadNome.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); cadLogin.focus(); } });
+          if (cadLogin && cadSenha) cadLogin.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); cadSenha.focus(); } });
+          if (cadSenha && btnCad) cadSenha.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); btnCad.click(); } });
           document.getElementById('cal-prev').onclick = () => {
             session.calMes -= 1;
             if (session.calMes < 0) { session.calMes = 11; session.calAno -= 1; }
@@ -1546,10 +1554,94 @@
         }, 350);
       }
 
+      function getPinKey() {
+        const login = session.contaAtiva && session.contaAtiva.login ? session.contaAtiva.login.toLowerCase() : 'default';
+        return 'economia_turma_pin_v1_' + login;
+      }
+      function getPinProfessor() {
+        const login = session.contaAtiva && session.contaAtiva.login ? session.contaAtiva.login.toLowerCase() : 'default';
+        if (db.config && db.config.pinsPorLogin && db.config.pinsPorLogin[login]) {
+          return String(db.config.pinsPorLogin[login]);
+        }
+        try { return localStorage.getItem(getPinKey()) || ''; } catch (e) { return ''; }
+      }
+      function setPinProfessor(pin) {
+        const login = session.contaAtiva && session.contaAtiva.login ? session.contaAtiva.login.toLowerCase() : 'default';
+        if (!db.config.pinsPorLogin || typeof db.config.pinsPorLogin !== 'object') db.config.pinsPorLogin = {};
+        db.config.pinsPorLogin[login] = String(pin);
+        try { localStorage.setItem(getPinKey(), String(pin)); } catch (e) {}
+        salvarEstado();
+      }
+
+      function abrirModalAlterarPin(aoConcluir) {
+        abrirModal(`
+          <div class="flex items-center justify-between mb-3">
+            <h3 class="font-bold text-base flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Cadastrar Senha Numérica</span></h3>
+            <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+          </div>
+          <p class="text-xs text-gray-300 mb-3">A biometria está desativada. Cadastre uma senha numérica de <strong>4 dígitos</strong> — ela será solicitada sempre que sair do Modo Aluno para o Modo Professor.</p>
+          <input id="inp-novo-pin4" type="password" inputmode="numeric" maxlength="4" placeholder="•••• (4 dígitos)" class="w-full glass-pill rounded-xl px-4 py-3 text-center text-lg tracking-[0.5em] text-white mb-4 outline-none focus:border-[#FFD600]" />
+          <button id="btn-salvar-pin4" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl">Salvar Senha de 4 Dígitos</button>
+        `);
+        const inp = document.getElementById('inp-novo-pin4');
+        const btn = document.getElementById('btn-salvar-pin4');
+        if (inp) {
+          inp.focus();
+          inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); });
+          inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
+        }
+        document.getElementById('btn-fechar-modal').onclick = fecharModal;
+        btn.onclick = () => {
+          const val = (inp ? inp.value : '').trim();
+          if (!/^\d{4}$/.test(val)) {
+            toast('Digite exatamente 4 números.', 'erro');
+            if (inp) inp.focus();
+            return;
+          }
+          setPinProfessor(val);
+          fecharModal();
+          toast('Senha numérica de 4 dígitos cadastrada! Ela será pedida ao voltar do Modo Aluno.', 'sucesso');
+          if (typeof aoConcluir === 'function') aoConcluir();
+        };
+      }
+
       function pedirPinProfessor() {
         if (!isBiometriaAtivaLocal()) {
-          concluirEntradaProfessor(false);
-          sugerirBiometriaSeNecessario();
+          const pinSalvo = getPinProfessor();
+          if (!pinSalvo) {
+            abrirModalAlterarPin(() => {
+              concluirEntradaProfessor(false);
+              sugerirBiometriaSeNecessario();
+            });
+            return;
+          }
+          abrirModal(`
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Acesso do Professor</span></h3>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+            <p class="text-xs text-gray-300 mb-3">Digite sua senha numérica de 4 dígitos para voltar ao Modo Professor.</p>
+            <input id="inp-check-pin4" type="password" inputmode="numeric" maxlength="4" placeholder="••••" class="w-full glass-pill rounded-xl px-4 py-3 text-center text-lg tracking-[0.5em] text-white mb-4 outline-none focus:border-[#FFD600]" />
+            <button id="btn-confirmar-pin4" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl">Desbloquear</button>
+          `);
+          const inp = document.getElementById('inp-check-pin4');
+          const btn = document.getElementById('btn-confirmar-pin4');
+          if (inp) {
+            inp.focus();
+            inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); });
+            inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
+          }
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          btn.onclick = () => {
+            const val = (inp ? inp.value : '').trim();
+            if (val === pinSalvo) {
+              concluirEntradaProfessor(false);
+              sugerirBiometriaSeNecessario();
+            } else {
+              toast('Senha numérica incorreta.', 'erro');
+              if (inp) { inp.value = ''; inp.focus(); }
+            }
+          };
           return;
         }
         let bioCadastrada = false;
@@ -1814,6 +1906,25 @@
       }
 
       function bindLogin() {
+        const inpUser = document.getElementById('inp-login-user');
+        const inpPass = document.getElementById('inp-login-pass');
+        const btnEntrar = document.getElementById('btn-entrar-login');
+        if (inpUser && inpPass) {
+          inpUser.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              inpPass.focus();
+            }
+          });
+        }
+        if (inpPass && btnEntrar) {
+          inpPass.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              btnEntrar.click();
+            }
+          });
+        }
         document.getElementById('btn-criar-conta-login').onclick = async () => {
           await sincronizarComNuvem(true);
           const escolasOrd = db.escolas.slice().sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
@@ -1831,7 +1942,7 @@
             <input id="cad-nome" placeholder="Seu nome" class="w-full glass-pill rounded-xl px-3 py-2 text-sm text-white mb-2.5" />
             <input id="cad-login" placeholder="Login (sem espaços)" class="w-full glass-pill rounded-xl px-3 py-2 text-sm text-white mb-2.5" />
             <input id="cad-senha" type="password" placeholder="Senha" class="w-full glass-pill rounded-xl px-3 py-2 text-sm text-white mb-1.5" />
-            <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 número e 1 caractere especial.</p>
+            <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 letra maiúscula, 1 número e 1 caractere especial.</p>
             <button id="btn-confirmar-cad" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Conta</button>
           `);
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
@@ -2077,7 +2188,7 @@
             <input id="inp-crd-nome" placeholder="Nome completo" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
             <input id="inp-crd-login" placeholder="Login (sem espaços)" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
             <input id="inp-crd-senha" type="password" placeholder="Senha" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-1.5 text-white" />
-            <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 número e 1 caractere especial.</p>
+            <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 letra maiúscula, 1 número e 1 caractere especial.</p>
             <button id="btn-save-crd" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Coordenador</button>
           `);
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
@@ -2647,6 +2758,14 @@
                 ${isBiometriaAtivaLocal() ? 'Ativa ✓' : 'Inativa'}
               </button>
             </div>
+
+            <button id="btn-cfg-pin4" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
+              <div>
+                <h3 class="font-bold text-sm">Senha Numérica (4 dígitos)</h3>
+                <p class="text-[11px] text-gray-400">${getPinProfessor() ? 'Cadastrada • Usada quando a biometria está inativa' : 'Ainda não cadastrada'}</p>
+              </div>
+              <span class="glass-pill text-xs font-bold px-3 py-2 rounded-xl text-amarelo">${getPinProfessor() ? 'Alterar' : 'Cadastrar'}</span>
+            </button>
 
             <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
               <div>
@@ -3434,7 +3553,7 @@
                   <input id="inp-prof-nome" placeholder="Nome do professor" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
                   <input id="inp-prof-login" placeholder="Login (sem espaços)" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-2.5 text-white" />
                   <input id="inp-prof-senha" type="password" placeholder="Senha" class="w-full glass-pill rounded-xl px-3 py-2 text-sm mb-1.5 text-white" />
-                  <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 número e 1 caractere especial.</p>
+                  <p class="text-[11px] text-gray-400 mb-3">Mínimo 8 caracteres, 1 letra maiúscula, 1 número e 1 caractere especial.</p>
                   <button id="btn-save-prof" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Professor</button>
                 `);
                 document.getElementById('btn-fechar-modal').onclick = fecharModal;
@@ -3596,6 +3715,8 @@
           }
 
           if (session.subConfig === 'app') {
+            const btnCfgPin4 = document.getElementById('btn-cfg-pin4');
+            if (btnCfgPin4) btnCfgPin4.onclick = () => abrirModalAlterarPin(() => render());
             document.getElementById('btn-toggle-biometria').onclick = () => {
               const novo = !isBiometriaAtivaLocal();
               setBiometriaAtivaLocal(novo);
