@@ -1067,6 +1067,32 @@
         }
       });
 
+
+      function abrirMenuAluno(alunoId) {
+        const aluno = db.usuarios.find(u => u.id === alunoId);
+        if (!aluno) return;
+        const trilhaDone = aluno.trilhaProgresso && aluno.trilhaProgresso.completedLessons
+          ? Object.keys(aluno.trilhaProgresso.completedLessons).length : 0;
+        abrirModal(`
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h3 class="font-bold text-lg">${escapeHtml(aluno.apelido)}</h3>
+              <p class="text-[11px] text-gray-400">Saldo: ${fmtMoeda(aluno.saldo)} • Nota: ${calcularNotaRoteiros(aluno)} • MateMAGICA: ${trilhaDone}/80</p>
+            </div>
+            <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+          </div>
+          <div class="space-y-2">
+            <button id="btn-ma-dar" class="w-full glass-gold-btn font-bold py-2.5 rounded-2xl text-sm">Dar ${escapeHtml(db.config.moedaPlural)}</button>
+            <button id="btn-ma-rot" class="w-full glass-accent-purple text-white font-bold py-2.5 rounded-2xl text-sm">Roteiros (Nota: ${calcularNotaRoteiros(aluno)})</button>
+            <button id="btn-ma-ed" class="w-full glass-pill text-white font-bold py-2.5 rounded-2xl text-sm">Editar / Mudar de Turma</button>
+          </div>
+        `);
+        document.getElementById('btn-fechar-modal').onclick = fecharModal;
+        document.getElementById('btn-ma-dar').onclick = () => { fecharModal(); abrirModalLancar([aluno.id]); };
+        document.getElementById('btn-ma-rot').onclick = () => { fecharModal(); abrirModalBrochesAluno(aluno.id); };
+        document.getElementById('btn-ma-ed').onclick = () => { fecharModal(); abrirModalEditarAluno(aluno); };
+      }
+
       function abrirTrilhaBloco2(alunoId) {
         _trilhaAlunoAtivoId = alunoId || null;
         const baseUrl = (db.config && db.config.matemagicaUrl ? db.config.matemagicaUrl.trim() : '') || './matemagica.html';
@@ -1104,7 +1130,7 @@
             nome: a.apelido,
             saldo: a.saldo,
             nota: calcularNotaRoteiros(a),
-            trilha: `${licoes}/20`
+            trilha: `${licoes}/80`
           };
         });
         abrirModal(`
@@ -1429,6 +1455,7 @@
       }
 
       function abrirModalEditarAluno(aluno) {
+        const cargosTurma = cargosDaTurma(aluno.turmaId);
         let apelidoVal = aluno.apelido;
         let turmaSelId = aluno.turmaId;
         let avSel = aluno.avatarId;
@@ -2673,9 +2700,8 @@
               </button>
             </div>
           </div>
-          <div class="flex gap-1.5 mb-3 flex-wrap">
+          <div class="flex gap-2 mb-3">
             <button id="btn-boletim-turma" class="glass-pill text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('clipboardCheck', 'w-3.5 h-3.5')} <span>Boletim</span></button>
-            <button id="btn-trilha-prof" class="glass-pill text-purple-200 px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('compass', 'w-3.5 h-3.5 text-amarelo')} <span>MateMAGICA</span></button>
             <button id="btn-cargos-turma" class="glass-pill text-white px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('briefcase', 'w-3.5 h-3.5 text-amarelo')} <span>Cargos</span></button>
           </div>
           ${mostrarAvisoBusca ? `
@@ -2702,18 +2728,13 @@
                 const sel = session.selecionados.has(a.id);
                 const cargo = cargosDaTurma(turma.id).find(c => getOcupanteCargo(c, turma.id) === a.id);
                 return `
-                  <button data-aluno-id="${a.id}" class="card-aluno text-center p-4 rounded-3xl glass-card transition flex flex-col items-center ${sel ? '!border-[#FFD600] ring-2 ring-[#FFD600]/40' : 'hover:border-white/30'}">
+                  <button data-aluno-id="${a.id}" class="card-aluno relative text-center p-4 rounded-3xl glass-card transition flex flex-col items-center ${sel ? '!border-[#FFD600] ring-2 ring-[#FFD600]/40' : 'hover:border-white/30'}">
+                    <span data-menu-aluno="${a.id}" title="Roteiros, editar ou trilha" class="btn-menu-aluno absolute top-2.5 right-2.5 w-7 h-7 rounded-full glass-pill flex items-center justify-center text-xs font-extrabold text-gray-300 hover:text-amarelo">&hellip;</span>
                     <div class="w-14 h-14 rounded-2xl bg-white/10 border border-white/15 flex items-center justify-center text-white/95 mb-2.5">${renderAvatar(a.avatarId, 'w-7 h-7')}</div>
                     <div class="font-bold text-sm truncate w-full">${escapeHtml(a.apelido)}</div>
-
                     ${cargo ? `<span class="text-[10px] text-gray-400 truncate w-full mt-0.5">${escapeHtml(cargo.titulo)}</span>` : ''}
                     <div class="mt-2.5 glass-accent-purple text-amarelo font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1">${iconeMoedaImg('w-3.5 h-3.5')} <span>${fmtMoeda(a.saldo)}</span></div>
                     ${pontosDoAlunoNaData(a.id, session.dataSelecionada) > 0 ? `<div class="mt-1 text-[10px] text-emerald-300 font-semibold">+${pontosDoAlunoNaData(a.id, session.dataSelecionada)} no dia</div>` : ''}
-                    <div class="mt-2 flex items-center justify-center gap-1.5 w-full">
-                      <span data-broches-aluno="${a.id}" class="btn-broches-aluno glass-pill text-[10px] font-bold px-2.5 py-1 rounded-full text-purple-200 hover:border-[#FFD600]/60">Nota: ${calcularNotaRoteiros(a)}</span>
-                      <span data-edit-aluno="${a.id}" title="Editar ou mudar de turma" class="btn-edit-aluno-card glass-pill text-[10px] font-bold px-2 py-1 rounded-full text-amarelo hover:border-[#FFD600]/60">&#9998;</span>
-                    </div>
-                    ${trilhaDone > 0 ? `<div class="mt-1 text-[10px] text-purple-300/85 font-semibold">MateMAGICA: ${trilhaDone}/20</div>` : ''}
                   </button>
                 `;
               }).join('')}
@@ -3064,6 +3085,7 @@
         return `
           <h2 class="font-extrabold text-lg mb-4">Aplicativo</h2>
           <div class="space-y-3">
+            <p class="text-[11px] font-bold uppercase tracking-wider text-purple-300 pt-1">Segurança</p>
             <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
               <div>
                 <h3 class="font-bold text-sm">Biometria</h3>
@@ -3082,6 +3104,7 @@
               <span class="glass-pill text-xs font-bold px-3 py-2 rounded-xl text-amarelo">${getPinProfessor() ? 'Alterar' : 'Cadastrar'}</span>
             </button>
 
+            <p class="text-[11px] font-bold uppercase tracking-wider text-purple-300 pt-1">Aparência</p>
             <div class="glass-card rounded-3xl p-4 flex items-center justify-between gap-3">
               <div>
                 <h3 class="font-bold text-sm">Tema</h3>
@@ -3094,6 +3117,7 @@
               </button>
             </div>
 
+            <p class="text-[11px] font-bold uppercase tracking-wider text-purple-300 pt-1">Dados e MateMAGICA</p>
             <div class="glass-card rounded-3xl p-4">
               <div class="flex items-center justify-between mb-2.5">
                 <div>
@@ -3138,6 +3162,7 @@
                 <input id="inp-matemagica-url" type="text" value="${escapeHtml((db.config && db.config.matemagicaUrl) || './matemagica.html')}" class="flex-1 glass-pill rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#FFD600]" />
                 <button id="btn-save-matemagica-url" class="glass-gold-btn text-xs font-bold px-3.5 py-2 rounded-xl">Salvar</button>
               </div>
+              <button id="btn-testar-matemagica" class="w-full glass-accent-purple text-white text-xs font-bold py-2 rounded-xl">Abrir MateMAGICA</button>
             </div>
 
             <button id="btn-entrar-config-moeda" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
@@ -3606,11 +3631,10 @@
             });
             return;
           }
-          document.querySelectorAll('.btn-edit-aluno-card').forEach(b => {
+          document.querySelectorAll('.btn-menu-aluno').forEach(b => {
             b.onclick = (ev) => {
               ev.stopPropagation();
-              const al = db.usuarios.find(u => u.id === Number(b.dataset.editAluno));
-              if (al) abrirModalEditarAluno(al);
+              abrirMenuAluno(Number(b.dataset.menuAluno));
             };
           });
           const btnBoletim = document.getElementById('btn-boletim-turma');
@@ -3638,8 +3662,6 @@
               if (re) { re.focus(); try { re.setSelectionRange(pos, pos); } catch (err) {} }
             };
           }
-          const btnTrilhaProf = document.getElementById('btn-trilha-prof');
-          if (btnTrilhaProf) btnTrilhaProf.onclick = () => abrirTrilhaBloco2(null);
           document.querySelectorAll('.btn-broches-aluno').forEach(b => {
             b.onclick = (ev) => {
               ev.stopPropagation();
@@ -4082,6 +4104,8 @@
 
           if (session.subConfig === 'app') {
             const btnSaveMatUrl = document.getElementById('btn-save-matemagica-url');
+            const btnTestarMat = document.getElementById('btn-testar-matemagica');
+            if (btnTestarMat) btnTestarMat.onclick = () => abrirTrilhaBloco2(null);
             if (btnSaveMatUrl) {
               btnSaveMatUrl.onclick = () => {
                 const u = document.getElementById('inp-matemagica-url').value.trim() || './matemagica.html';

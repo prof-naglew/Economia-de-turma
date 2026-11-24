@@ -1134,10 +1134,226 @@
       .duo-step.offset-left { transform: translateX(-34px); }
       .duo-step.offset-right { transform: translateX(34px); }
     }
+
+    .visual-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: var(--space-md);
+    }
+    .visual-opt-card {
+      background: var(--surface-container);
+      border: 2px solid var(--outline-variant);
+      border-radius: var(--rounded);
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      transition: transform var(--dur-short) var(--ease-bounce), box-shadow var(--dur-short) var(--ease-out), border-color 0.15s ease;
+    }
+    .visual-opt-card:hover:not(:disabled) {
+      transform: var(--pop-scale);
+      background: var(--surface-container-low);
+      box-shadow: var(--shadow-grape);
+    }
+    .visual-opt-card.selected {
+      background: var(--primary-soft);
+      border-color: var(--primary);
+      box-shadow: var(--shadow-pink);
+    }
+    .visual-opt-card.correct {
+      background: var(--positive-soft);
+      border-color: var(--positive);
+      box-shadow: var(--shadow-positive);
+    }
+    .visual-opt-card.wrong {
+      background: var(--error-soft);
+      border-color: var(--error);
+      box-shadow: var(--shadow-error);
+    }
+    .nl-interactive-wrap {
+      background: var(--surface-container);
+      border-radius: var(--rounded);
+      padding: var(--space-lg) var(--space-md);
+      display: grid;
+      gap: var(--space-md);
+      justify-items: center;
+    }
+    .nl-ticks-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      position: relative;
+      padding: 1.5rem 0.5rem 0.5rem;
+    }
+    .nl-rail {
+      position: absolute;
+      left: 1rem;
+      right: 1rem;
+      top: 2.35rem;
+      height: 4px;
+      background: var(--on-surface);
+      border-radius: 999px;
+    }
+    .nl-tick-btn {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.35rem;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0.25rem;
+      min-width: 34px;
+    }
+    .nl-dot {
+      width: 18px;
+      height: 18px;
+      border-radius: 9999px;
+      background: var(--surface-container-low);
+      border: 3px solid var(--on-surface);
+      transition: transform 0.15s var(--ease-bounce), background 0.15s ease;
+    }
+    .nl-tick-btn:hover:not(:disabled) .nl-dot {
+      transform: scale(1.25);
+      border-color: var(--primary);
+    }
+    .nl-tick-btn.picked .nl-dot {
+      background: var(--primary);
+      border-color: var(--primary);
+      transform: scale(1.35);
+      box-shadow: 0 0 0 4px rgb(194 32 127 / 0.22);
+    }
+    .nl-tick-btn.correct .nl-dot {
+      background: var(--positive);
+      border-color: var(--positive);
+    }
+    .nl-tick-btn.wrong .nl-dot {
+      background: var(--error);
+      border-color: var(--error);
+    }
+    .nl-lbl {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: var(--on-surface);
+    }
+
+    /* Mobile & Text Wrap Fixes */
+    .question-prompt, .option-card, .option-card span, .match-chip, .feedback-explain,
+    .unit-title-wrap, .unit-title-wrap h2, .unit-title-wrap p, .chibi-bubble, .blank-sentence {
+      overflow-wrap: anywhere;
+      word-break: break-word;
+      min-width: 0;
+    }
+    .katex {
+      font-size: 0.96em;
+      max-width: 100%;
+    }
+    .katex-display {
+      overflow-x: auto;
+      overflow-y: hidden;
+      max-width: 100%;
+    }
+    @media (max-width: 640px) {
+      .hero-panel { padding: 1rem; gap: 1rem; }
+      .display { font-size: 1.55rem; }
+      .chibi-mascot-wrap { width: 100% !important; padding: 0.6rem 0.75rem; }
+      .hud-metrics { width: 100%; display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+      .stat-pill { min-width: 0; padding: 0.45rem 0.65rem; border-radius: 1rem; }
+      .stat-value { font-size: 0.95rem; }
+      .stat-label { font-size: 0.65rem; }
+      .block-tab { min-width: 140px; padding: 0.65rem 0.85rem; font-size: 0.85rem; }
+      .arena-topbar { border-radius: 1.25rem; padding: 0.65rem 0.75rem; gap: 0.5rem; }
+      .question-card { padding: 1rem; gap: 1rem; border-radius: 1.25rem; }
+      .question-prompt { font-size: 1.05rem; }
+      .options-grid { grid-template-columns: 1fr; gap: 0.65rem; }
+      .option-card { padding: 0.75rem 0.9rem; font-size: 0.9rem; min-height: 50px; }
+      .visual-options-grid { gap: 0.6rem; }
+      .visual-opt-card { padding: 0.65rem; }
+      .visual-opt-card svg { width: 64px; height: 64px; }
+      .nl-ticks-row { overflow-x: auto; padding: 1.25rem 0.25rem 0.5rem; gap: 0.15rem; }
+      .nl-tick-btn { min-width: 28px; flex: 1; }
+      .nl-lbl { font-size: 0.7rem; }
+      .blank-sentence { padding: 0.9rem; font-size: 0.95rem; line-height: 1.8; }
+      .feedback-panel { padding: 0.9rem; }
+      .celebration-card { padding: 1.5rem 1rem; }
+    }
+
+    /* Softer Clean Cute Theme + 3D Flashcards */
+    body {
+      background: linear-gradient(180deg, #fff8fc 0%, #f6effc 100%);
+    }
+    .hero-panel, .unit-card, .card, .question-card {
+      border: 1.5px solid #f0dff5;
+      box-shadow: 0 8px 24px rgb(156 96 184 / 0.09);
+    }
+    .flashcard-scene {
+      perspective: 1000px;
+      width: 100%;
+    }
+    .flashcard-inner {
+      position: relative;
+      width: 100%;
+      min-height: 190px;
+      transition: transform 0.55s cubic-bezier(0.34, 1.4, 0.64, 1);
+      transform-style: preserve-3d;
+      cursor: pointer;
+    }
+    .flashcard-inner.flipped {
+      transform: rotateY(180deg);
+    }
+    .flashcard-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      border-radius: 1.5rem;
+      padding: 1.35rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      gap: 0.65rem;
+    }
+    .flashcard-front {
+      background: linear-gradient(135deg, #fff0f7, #f5ebff);
+      border: 2px dashed #e2b8ec;
+    }
+    .flashcard-back {
+      background: linear-gradient(135deg, #ecfdf5, #eff6ff);
+      border: 2px solid #86efac;
+      transform: rotateY(180deg);
+    }
   </style>
 </head>
 <body>
   <div class="page-grid">
+    <!-- Top Right Hearts + Compact Controls -->
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:0.45rem;">
+        <span class="badge badge-bubblegum" style="font-size:0.75rem;">MateMAGICA</span>
+        <button type="button" id="btn-sound-toggle" class="btn btn-surface" style="min-height:36px;padding:0.35rem 0.75rem;font-size:0.78rem;" onclick="toggleSound()" aria-pressed="true">
+          <i data-lucide="volume-2" style="width:15px;height:15px;" aria-hidden="true"></i>
+          <span id="sound-label">Som</span>
+        </button>
+      </div>
+      <div style="display:flex;align-items:center;gap:0.45rem;">
+        <button type="button" id="btn-recover-hearts" class="btn btn-surface hidden" style="min-height:36px;padding:0.35rem 0.75rem;font-size:0.78rem;" onclick="recoverHearts()">
+          <i data-lucide="heart-handshake" style="width:15px;height:15px;color:var(--primary);" aria-hidden="true"></i>
+          <span>Recarregar</span>
+        </button>
+        <div class="stat-pill" style="min-height:38px;padding:0.35rem 0.85rem;background:#fff0f6;border:2px solid #fbcfe8;">
+          <i data-lucide="heart" style="width:18px;height:18px;color:var(--error);fill:var(--error);" aria-hidden="true"></i>
+          <span id="hud-hearts" class="stat-value tabular" style="font-size:0.95rem;">5 / 5</span>
+        </div>
+      </div>
+    </div>
+
     <!-- Static Header & Hero -->
     <header class="hero-panel">
       <div style="display: grid; gap: var(--space-sm);">
@@ -1148,7 +1364,7 @@
         <p class="kicker">MateMAGICA · Trilha Interativa · Bloco I e II</p>
         <h1 class="display">Aventura <em>MateMAGICA</em></h1>
         <p style="margin: 0; max-width: 60ch; color: var(--on-surface-variant);">
-          Lições curtas de 1 a 2 minutos com feedback imediato passo a passo. Escolha o Bloco I (6º e 7º) ou Bloco II (8º e 9º) e avance pela trilha com lições rápidas e desafios!
+          Lições interativas de 2 a 4 minutos com feedback imediato passo a passo. Escolha o Bloco I (6º e 7º) ou Bloco II (8º e 9º) e avance pela trilha com lições rápidas e desafios!
         </p>
       </div>
       <div style="display: grid; gap: var(--space-md);">
@@ -1161,7 +1377,7 @@
             <div id="overall-progress-fill" class="progress-fill pink" style="width: 0%;"></div>
           </div>
           <span id="overall-lessons-label" style="font-size: var(--label-size); font-weight: 600; color: var(--on-surface-variant);">
-            0 de 12 lições concluídas
+            0 de 40 lições concluídas
           </span>
         </div>
         <div style="display: flex; flex-wrap: wrap; gap: var(--space-sm);">
@@ -1177,53 +1393,35 @@
       </div>
     </header>
 
-    <!-- Gamified HUD Strip -->
-    <section class="hud-strip" aria-label="Painel de pontuação e vidas">
+    <!-- Clean Compact HUD Strip -->
+    <section class="hud-strip" aria-label="Painel de progresso">
       <div class="hud-metrics">
         <div class="stat-pill pink">
-          <i data-lucide="sparkles" style="width:20px;height:20px;color:var(--primary);" aria-hidden="true"></i>
+          <i data-lucide="sparkles" style="width:18px;height:18px;color:var(--primary);" aria-hidden="true"></i>
           <div>
             <div id="hud-xp" class="stat-value tabular">0 XP</div>
             <div id="hud-level" class="stat-label">Nível 1 · Aprendiz</div>
           </div>
         </div>
-        <div class="stat-pill">
-          <i data-lucide="heart" style="width:20px;height:20px;color:var(--error);" aria-hidden="true"></i>
-          <div>
-            <div id="hud-hearts" class="stat-value tabular">5 / 5</div>
-            <div class="stat-label">Vidas</div>
-          </div>
-        </div>
         <div class="stat-pill sky">
-          <i data-lucide="flame" style="width:20px;height:20px;color:var(--warning);" aria-hidden="true"></i>
+          <i data-lucide="flame" style="width:18px;height:18px;color:var(--warning);" aria-hidden="true"></i>
           <div>
             <div id="hud-streak" class="stat-value tabular">0</div>
-            <div class="stat-label">Maior Combo</div>
+            <div id="hud-streak-lbl" class="stat-label">Combo</div>
           </div>
         </div>
         <div class="stat-pill positive">
-          <i data-lucide="award" style="width:20px;height:20px;color:var(--positive);" aria-hidden="true"></i>
+          <i data-lucide="award" style="width:18px;height:18px;color:var(--positive);" aria-hidden="true"></i>
           <div>
             <div id="hud-badges" class="stat-value tabular">0 / 8</div>
-            <div class="stat-label">Conquistas</div>
+            <div id="hud-badges-lbl" class="stat-label">Conquistas</div>
           </div>
         </div>
       </div>
-
-      <div class="hud-actions">
-        <button type="button" id="btn-recover-hearts" class="btn btn-surface hidden" onclick="recoverHearts()">
-          <i data-lucide="heart-handshake" style="width:18px;height:18px;color:var(--primary);" aria-hidden="true"></i>
-          <span>Recarregar Vidas</span>
-        </button>
-        <button type="button" id="btn-sound-toggle" class="btn btn-surface" onclick="toggleSound()" aria-pressed="true">
-          <i data-lucide="volume-2" style="width:18px;height:18px;" aria-hidden="true"></i>
-          <span id="sound-label">Som ligado</span>
-        </button>
-        <button type="button" id="btn-reset-progress" class="btn btn-quiet" onclick="handleResetProgress(this)">
-          <i data-lucide="rotate-ccw" style="width:18px;height:18px;" aria-hidden="true"></i>
-          <span>Zerar progresso</span>
-        </button>
-      </div>
+      <button type="button" id="btn-reset-progress" class="btn btn-quiet" style="font-size:0.8rem;" onclick="handleResetProgress(this)">
+        <i data-lucide="rotate-ccw" style="width:15px;height:15px;" aria-hidden="true"></i>
+        <span>Zerar</span>
+      </button>
     </section>
 
     <!-- VIEW 1: Learning Path (Trilha + Barra Lateral de Progresso e Conquistas) -->
@@ -1314,942 +1512,9 @@
     /* ===========================
        1. CURRICULUM & LESSON DATA
        =========================== */
-    const UNITS = [
-      {
-        id: `u1`,
-        num: 1,
-        title: `Sistemas Numéricos e Conjuntos`,
-        bncc: `EF09MA01 · EF09MA02`,
-        desc: `Naturais (N), Inteiros (Z), Racionais (Q), Irracionais (I), Reais (R) e a Reta Real.`,
-        lessons: [
-          {
-            id: `u1_l1`,
-            title: `Conjuntos N, Z, Q, I e R`,
-            duration: `1–2 min`,
-            xp: 50,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Observe a hierarquia dos conjuntos numéricos. O resultado da expressão $\\sqrt{100}$ pertence a quais conjuntos?`,
-                visual: `venn`,
-                options: [
-                  `Apenas Irracionais ($\\mathbb{I}$) e Reais ($\\mathbb{R}$)`,
-                  `Naturais ($\\mathbb{N}$), Inteiros ($\\mathbb{Z}$), Racionais ($\\mathbb{Q}$) e Reais ($\\mathbb{R}$)`,
-                  `Apenas Inteiros ($\\mathbb{Z}$) e Racionais ($\\mathbb{Q}$)`,
-                  `Pertence a $\\mathbb{Q}$ e a $\\mathbb{I}$ ao mesmo tempo`
-                ],
-                correctIndex: 1,
-                hint: `Calcule primeiro quanto vale a raiz quadrada de 100 e veja em qual círculo interno ela entra.`,
-                explain: `Como $\\sqrt{100} = 10$, e 10 é um número natural, pela hierarquia $\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$, ele pertence a $\\mathbb{N}, \\mathbb{Z}, \\mathbb{Q}$ e $\\mathbb{R}$. Nenhum número pertence a $\\mathbb{Q}$ e $\\mathbb{I}$ ao mesmo tempo!`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `O número $5,121221222\\dots$ (a quantidade de algarismos 2 aumenta a cada passo) tem um padrão lógico. Ele é racional ou irracional?`,
-                options: [
-                  `Racional, pois tem um padrão previsível`,
-                  `Racional, pois é uma dízima periódica simples`,
-                  `Irracional, pois sua parte decimal é infinita e não há um bloco fixo que se repete`,
-                  `Natural, pois começa com 5`
-                ],
-                correctIndex: 2,
-                hint: `Uma dízima periódica exige um bloco idêntico se repetindo sem parar, como 0,666...`,
-                explain: `Ter uma lei de formação não torna o número racional! Para ser racional, precisa existir um bloco periódico idêntico (fração geratriz). Como a quantidade de 2 aumenta sempre, a parte decimal não é periódica: é um número irracional.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Associe cada número à sua classificação correta nos conjuntos numéricos:`,
-                pairs: [
-                  { left: `$0,75$`, right: `Racional (decimal exato = 3/4)` },
-                  { left: `$\\sqrt{10}$`, right: `Irracional (raiz não exata)` },
-                  { left: `$-2$`, right: `Inteiro e Racional (-2/1)` },
-                  { left: `$20\\pi$`, right: `Irracional (múltiplo de Pi)` }
-                ],
-                explain: `Decimais exatos ($0,75$) e inteiros ($-2$) podem ser escritos como fração de inteiros (são racionais). Já raízes não exatas ($\\sqrt{10}$) e múltiplos de $\\pi$ ($20\\pi$) têm decimais infinitos sem período, sendo irracionais.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Complete a definição fundamental sobre números racionais e reais:`,
-                sentence: `Um número real ou é racional ou é [0] — nunca os dois ao mesmo tempo. Todo número racional pode ser escrito como fração $a/b$, com denominador diferente de [1].`,
-                inputs: [
-                  { label: `Lacuna 1 (conjunto)`, answers: [`irracional`, `Irracional`, `IRRACIONAL`] },
-                  { label: `Lacuna 2 (número proibido)`, answers: [`0`, `zero`, `Zero`] }
-                ],
-                hint: `Pense na divisão: por qual número nunca podemos dividir?`,
-                explain: `O conjunto dos Reais ($\\mathbb{R}$) é a união disjunta de Racionais ($\\mathbb{Q}$) e Irracionais ($\\mathbb{I}$). Em $a/b$, o denominador $b$ nunca pode ser $0$, pois não existe divisão por zero.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Quantos números inteiros existem estritamente entre $-2{,}5$ e $3{,}2$ na Reta Real?`,
-                visual: `numberline_real`,
-                answers: [`6`],
-                hint: `Conte os inteiros: -2, -1, 0, 1, 2 e 3.`,
-                explain: `Os números inteiros entre $-2,5$ e $3,2$ são: $-2, -1, 0, 1, 2$ e $3$. Ao todo são exatamente $6$ números inteiros.`
-              }
-            ]
-          },
-          {
-            id: `u1_l2`,
-            title: `Reta Real e Notação Científica`,
-            duration: `1–2 min`,
-            xp: 50,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Na Reta Real, entre quais dois números inteiros consecutivos está localizado o número irracional $\\sqrt{30}$?`,
-                options: [
-                  `Entre $4$ e $5$`,
-                  `Entre $5$ e $6$`,
-                  `Entre $6$ e $7$`,
-                  `Entre $14$ e $16$`
-                ],
-                correctIndex: 1,
-                hint: `Compare 30 com os quadrados perfeitos vizinhos: $5^2 = 25$ e $6^2 = 36$.`,
-                explain: `Como $25 < 30 < 36$, tirando a raiz quadrada obtemos $\\sqrt{25} < \\sqrt{30} < \\sqrt{36}$, ou seja, $5 < \\sqrt{30} < 6$ (aproximadamente $5,48$).`
-              },
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Posicione cada número real no intervalo correto da Reta Real (arraste ou clique no chip e depois no espaço):`,
-                chips: [`$-1,5$`, `$\\sqrt{2}$`, `$\\pi$`, `$-4$`],
-                slots: [
-                  { label: `Menor que $-3$`, answer: `$-4$` },
-                  { label: `Entre $-2$ e $0$`, answer: `$-1,5$` },
-                  { label: `Entre $1$ e $2$`, answer: `$\\sqrt{2}$` },
-                  { label: `Entre $3$ e $4$`, answer: `$\\pi$` }
-                ],
-                explain: `Lembrando das aproximações: $\\sqrt{2} \\approx 1,41$ (entre 1 e 2) e $\\pi \\approx 3,14$ (entre 3 e 4). Nos negativos, $-4$ fica à esquerda de $-3$, e $-1,5$ entre $-2$ e $0$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Como escrevemos a medida de $14\\,000\\,000$ de litros em notação científica (padrão $a \\times 10^n$, com $1 \\le a < 10$)?`,
-                options: [
-                  `$14 \\times 10^6$`,
-                  `$1,4 \\times 10^7$`,
-                  `$0,14 \\times 10^8$`,
-                  `$1,4 \\times 10^6$`
-                ],
-                correctIndex: 1,
-                hint: `A vírgula anda da direita para a esquerda até ficar logo após o primeiro algarismo diferente de zero (1).`,
-                explain: `Movendo a vírgula 7 casas para a esquerda em $14\\,000\\,000$, obtemos $1,4$, que está entre $1$ e $10$. Logo, $1,4 \\times 10^7$.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Complete sobre o preenchimento completo da Reta Real:`,
-                sentence: `Cada ponto na Reta Real corresponde a um único número [0], sem deixar nenhum [1] — nem mesmo onde ficam raízes não exatas como $\\sqrt{7}$.`,
-                inputs: [
-                  { label: `Lacuna 1`, answers: [`real`, `Real`, `REAL`] },
-                  { label: `Lacuna 2`, answers: [`buraco`, `espaço`, `vazio`] }
-                ],
-                explain: `Os números racionais sozinhos deixariam "buracos" na reta (onde estão $\\sqrt{2}, \\sqrt{7}, \\pi$). Ao unir $\\mathbb{Q}$ e $\\mathbb{I}$, os Reais ($\\mathbb{R}$) preenchem completamente a reta.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Qual é o menor número inteiro maior do que $\\sqrt{50}$?`,
-                answers: [`8`],
-                hint: `Qual é o primeiro quadrado perfeito maior que 50? ($7^2 = 49$ e $8^2 = 64$)`,
-                explain: `Como $49 < 50 < 64$, temos $7 < \\sqrt{50} < 8$. Logo, o menor inteiro maior que $\\sqrt{50}$ é $8$.`
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: `u2`,
-        num: 2,
-        title: `Operações com Naturais e Inteiros`,
-        bncc: `EF07MA04 · EF08MA01`,
-        desc: `Saldos negativos, números opostos, subtração de inteiros e propriedade distributiva.`,
-        lessons: [
-          {
-            id: `u2_l1`,
-            title: `Saldos, Opostos e Subtração`,
-            duration: `1–2 min`,
-            xp: 50,
-            questions: [
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Um criador de conteúdo ganha $500$ seguidores no dia 1, perde $200$ no dia 2 e ganha $100$ no dia 3. Qual é o saldo final da semana?`,
-                answers: [`400`, `+400`],
-                hint: `Faça $(+500) + (-200) + (+100)$.`,
-                explain: `Agrupando ganhos e perdas: $500 - 200 + 100 = 300 + 100 = +400$ seguidores.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Para resolver $(-7) - (-10)$, usamos a regra de transformar a subtração na soma do oposto. Qual é o resultado?`,
-                options: [
-                  `$-17$`,
-                  `$-3$`,
-                  `$+3$`,
-                  `$+17$`
-                ],
-                correctIndex: 2,
-                hint: `O oposto de $-10$ é $+10$. Então a conta vira $(-7) + (+10)$.`,
-                explain: `Subtrair $-10$ é o mesmo que somar seu oposto $+10$: $(-7) - (-10) = (-7) + 10 = +3$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Um elevador estava no $3^\\circ$ subsolo ($-3$) e subiu até o $4^\\circ$ andar ($+4$). Quantos andares ele deslocou ao todo?`,
-                visual: `elevator_line`,
-                answers: [`7`, `+7`],
-                hint: `Calcule a distância do $-3$ ao $0$ e depois do $0$ ao $+4$ (ou faça $+4 - (-3)$).`,
-                explain: `Do $-3$ até o térreo ($0$) são $3$ andares; do $0$ até o $+4$ são mais $4$ andares. Deslocamento total: $(+4) - (-3) = 4 + 3 = 7$ andares.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Combine cada expressão com números inteiros ao seu resultado exato:`,
-                pairs: [
-                  { left: `$(+15) - (+10)$`, right: `$+5$` },
-                  { left: `$(+20) + (-20)$`, right: `$0$` },
-                  { left: `$(-8) - (+4)$`, right: `$-12$` },
-                  { left: `Antecessor de $-70$`, right: `$-71$` }
-                ],
-                explain: `Atenção aos negativos: o antecessor de $-70$ é $-70 - 1 = -71$ (fica mais à esquerda na reta numérica!). E $(+20) + (-20) = 0$, pois são opostos.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Complete a regra do elemento neutro e do número oposto:`,
-                sentence: `Na adição de inteiros, o número [0] é o elemento neutro. Já o oposto de $-15$ está à mesma distância da origem, valendo [1].`,
-                inputs: [
-                  { label: `Elemento neutro da soma`, answers: [`0`, `zero`] },
-                  { label: `Oposto de -15`, answers: [`15`, `+15`] }
-                ],
-                explain: `Somar $0$ não altera nenhum valor (elemento neutro da adição). O oposto de $-15$ é $+15$ (simétrico em relação ao zero).`
-              }
-            ]
-          },
-          {
-            id: `u2_l2`,
-            title: `Distributiva e Expressões`,
-            duration: `1–2 min`,
-            xp: 55,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Aplicando a propriedade distributiva em $137 \\cdot 5 = (100 + 30 + 7) \\cdot 5$, qual soma intermediária obtemos antes do resultado final?`,
-                options: [
-                  `$500 + 30 + 7$`,
-                  `$500 + 150 + 35$`,
-                  `$100 + 150 + 35$`,
-                  `$500 + 15 + 35$`
-                ],
-                correctIndex: 1,
-                hint: `Multiplique cada parcela dentro dos parênteses por 5.`,
-                explain: `Distribuindo o $5$: $100 \\cdot 5 + 30 \\cdot 5 + 7 \\cdot 5 = 500 + 150 + 35 = 685$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Resolva a expressão respeitando a prioridade da multiplicação sobre a adição: $10 + 4 \\cdot (-3)$.`,
-                answers: [`-2`],
-                hint: `Sempre multiplique primeiro: quanto vale $4 \\cdot (-3)$?`,
-                explain: `Primeiro a multiplicação: $4 \\cdot (-3) = -12$. Depois a soma: $10 + (-12) = -2$.`
-              },
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Relacione cada situação ao elemento neutro ou propriedade matemática correspondente:`,
-                chips: [`$1$`, `$0$`, `Associativa`, `Distributiva`],
-                slots: [
-                  { label: `Elemento neutro da multiplicação`, answer: `$1$` },
-                  { label: `Elemento neutro da adição`, answer: `$0$` },
-                  { label: `$(6 \\cdot 15) \\cdot 20 = 6 \\cdot (15 \\cdot 20)$`, answer: `Associativa` },
-                  { label: `$3 \\cdot (a + b) = 3a + 3b$`, answer: `Distributiva` }
-                ],
-                explain: `Na multiplicação, multiplicar por $1$ mantém o número inalterado; na soma, o neutro é $0$. Reagrupar fatores é propriedade associativa, e espalhar o fator pela soma é distributiva.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Preencha a regra de sinais da multiplicação e divisão de inteiros:`,
-                sentence: `Quando multiplicamos dois números com sinais iguais (como $(-4)\\cdot(-5)$), o resultado é [0]. Quando os sinais são diferentes, o resultado é [1].`,
-                inputs: [
-                  { label: `Sinais iguais`, answers: [`positivo`, `Positivo`, `+`] },
-                  { label: `Sinais diferentes`, answers: [`negativo`, `Negativo`, `-`] }
-                ],
-                explain: `Regra fundamental de $\\mathbb{Z}$ e $\\mathbb{Q}$: sinais iguais geram resultado positivo; sinais diferentes geram resultado negativo.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Calcule o valor de $(-3) \\cdot (-4) - 20$:`,
-                answers: [`-8`],
-                hint: `$(-3) \\cdot (-4) = +12$. Depois subtraia $20$.`,
-                explain: `$(-3) \\cdot (-4) = +12$. Em seguida, $12 - 20 = -8$.`
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: `u3`,
-        num: 3,
-        title: `Frações, Decimais, Porcentagem e Racionais`,
-        bncc: `EF08MA04 · EF08MA05`,
-        desc: `Fração irredutível, conversão decimal/porcentagem, dízimas periódicas e fração geratriz.`,
-        lessons: [
-          {
-            id: `u3_l1`,
-            title: `Disfarces do Número Racional`,
-            duration: `1–2 min`,
-            xp: 55,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Em um conjunto com $9$ figuras geométricas, $4$ são triângulos. E se você comer $2$ pedaços de uma barra de chocolate dividida em $6$ partes iguais, que fração representa o que SOBROU?`,
-                visual: `chocolate_bar`,
-                options: [
-                  `$\\frac{2}{6}$`,
-                  `$\\frac{4}{6}$ (ou $\\frac{2}{3}$ simplificado)`,
-                  `$\\frac{4}{9}$`,
-                  `$\\frac{1}{6}$`
-                ],
-                correctIndex: 1,
-                hint: `Se comeu 2 de 6 pedaços, restam 6 - 2 = 4 pedaços.`,
-                explain: `Você comeu $\\frac{2}{6}$ e sobrou $\\frac{4}{6}$ da barra, que simplificando por 2 equivale a $\\frac{2}{3}$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Em uma sala de aula, $18$ dos $25$ alunos foram aprovados. Qual é a porcentagem de alunos aprovados? (digite apenas o número)`,
-                answers: [`72`, `72%`],
-                hint: `Multiplique numerador e denominador por 4 para transformar o denominador 25 em 100!`,
-                explain: `$\\frac{18}{25} = \\frac{18 \\cdot 4}{25 \\cdot 4} = \\frac{72}{100} = 72\\%$.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Ligue cada valor racional aos seus diferentes "disfarces" (fração irredutível, decimal ou porcentagem):`,
-                pairs: [
-                  { left: `Desconto de $40\\%$`, right: `$\\frac{2}{5}$` },
-                  { left: `$0,125$`, right: `$12,5\\%$` },
-                  { left: `$\\frac{18}{24}$ simplificada`, right: `$\\frac{3}{4}$` },
-                  { left: `$2,25$ em fração`, right: `$\\frac{9}{4}$` }
-                ],
-                explain: `$40\\% = \\frac{40}{100} = \\frac{2}{5}$; $0,125$ move a vírgula 2 casas para a direita = $12,5\\%$; $\\frac{18}{24}$ divide por 6 = $\\frac{3}{4}$; $2,25 = \\frac{225}{100} = \\frac{9}{4}$.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `De uma pizza inteira, João comeu $\\frac{1}{3}$ e Maria comeu $\\frac{1}{4}$. Complete para descobrir quanto sobrou:`,
-                sentence: `Com o mesmo denominador $12$, João comeu $\\frac{4}{12}$ e Maria comeu [0]. Juntos comeram $\\frac{7}{12}$, portanto sobrou [1] da pizza.`,
-                inputs: [
-                  { label: `Fração de Maria (sobre 12)`, answers: [`3/12`] },
-                  { label: `Fração que sobrou`, answers: [`5/12`] }
-                ],
-                hint: `Multiplique $1/4$ por $3$ em cima e embaixo. Depois faça $12/12 - 7/12$.`,
-                explain: `$\\frac{1}{3} + \\frac{1}{4} = \\frac{4}{12} + \\frac{3}{12} = \\frac{7}{12}$. O inteiro é $\\frac{12}{12}$, então sobrou $\\frac{12}{12} - \\frac{7}{12} = \\frac{5}{12}$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Se o saldo da sua carteira digital é de $-15$ reais e você recebe um bônus de $+12{,}50$ reais, qual passa a ser o seu novo saldo? (ex: -2,50)`,
-                answers: [`-2,5`, `-2,50`, `-2.5`, `-2.50`],
-                hint: `Calcule $-15 + 12,50$. O sinal negativo vence porque 15 é maior que 12,50.`,
-                explain: `$-15,00 + 12,50 = -2,50$ reais (você ainda fica negativo em R$ 2,50).`
-              }
-            ]
-          },
-          {
-            id: `u3_l2`,
-            title: `Dízimas e Fração Geratriz`,
-            duration: `1–2 min`,
-            xp: 60,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Qual é a fração geratriz irredutível da dízima periódica simples $0,6666\\dots$?`,
-                options: [
-                  `$\\frac{6}{10}$`,
-                  `$\\frac{2}{3}$`,
-                  `$\\frac{6}{100}$`,
-                  `$\\frac{3}{5}$`
-                ],
-                correctIndex: 1,
-                hint: `Coloque o período (6) sobre um 9 ($\\frac{6}{9}$) e simplifique por 3.`,
-                explain: `Para dízima simples $0,666\\dots$: $x = 0,666\\dots \\Rightarrow 10x = 6,666\\dots \\Rightarrow 9x = 6 \\Rightarrow x = \\frac{6}{9} = \\frac{2}{3}$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Encontre a fração geratriz irredutível da dízima periódica $0,444\\dots$ (digite no formato a/b):`,
-                answers: [`4/9`],
-                hint: `O período tem apenas 1 algarismo (4), então o denominador é 9.`,
-                explain: `$0,444\\dots = \\frac{4}{9}$. Como 4 e 9 não têm divisores comuns além de 1, já é irredutível!`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Na dízima periódica composta $0,1222\\dots$ (o $1$ não se repete, apenas o $2$), qual é a fração geratriz?`,
-                options: [
-                  `$\\frac{12}{99}$`,
-                  `$\\frac{12}{90}$`,
-                  `$\\frac{11}{90}$`,
-                  `$\\frac{1}{9}$`
-                ],
-                correctIndex: 2,
-                hint: `Faça $100x - 10x$: $12,222\\dots - 1,222\\dots = 11$. Então $90x = 11$.`,
-                explain: `Seja $x = 0,1222\\dots$. Temos $10x = 1,222\\dots$ e $100x = 12,222\\dots$. Subtraindo: $90x = 12 - 1 = 11 \\Rightarrow x = \\frac{11}{90}$.`
-              },
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Associe cada fração à sua forma decimal (exata ou dízima periódica):`,
-                chips: [`$0,875$`, `$-0,75$`, `$0,8333\\dots$`, `$-1,8$`],
-                slots: [
-                  { label: `$-\\frac{3}{4}$`, answer: `$-0,75$` },
-                  { label: `$-\\frac{9}{5}$`, answer: `$-1,8$` },
-                  { label: `$\\frac{7}{8}$`, answer: `$0,875$` },
-                  { label: `$\\frac{5}{6}$`, answer: `$0,8333\\dots$` }
-                ],
-                explain: `Dividindo numerador pelo denominador: $-3:4 = -0,75$; $-9:5 = -1,8$; $7:8 = 0,875$; e $5:6 = 0,8333\\dots$ (período 3).`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Resolva a multiplicação e a divisão de frações:`,
-                sentence: `Na divisão $\\frac{2}{3} \\div \\frac{5}{4}$, mantemos $\\frac{2}{3}$ e multiplicamos pelo [0] da segunda fração, resultando em [1].`,
-                inputs: [
-                  { label: `Palavra-chave`, answers: [`inverso`, `Inverso`] },
-                  { label: `Resultado (a/b)`, answers: [`8/15`] }
-                ],
-                explain: `Dividir por $\\frac{5}{4}$ é multiplicar pelo inverso $\\frac{4}{5}$: $\\frac{2}{3} \\cdot \\frac{4}{5} = \\frac{8}{15}$.`
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: `u4`,
-        num: 4,
-        title: `Radiciação e Potenciação`,
-        bncc: `EF08MA02 · EF09MA03`,
-        desc: `Anatomia do radical, expoente fracionário, racionalização e expressões com raízes.`,
-        lessons: [
-          {
-            id: `u4_l1`,
-            title: `Anatomia da Raiz e Expoentes`,
-            duration: `1–2 min`,
-            xp: 55,
-            questions: [
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Observe a expressão $\\sqrt[4]{81} = 3$. Arraste (ou clique para encaixar) cada termo da radiciação:`,
-                visual: `radical_anatomy`,
-                chips: [`$4$`, `$81$`, `$3$`, `Radical`],
-                slots: [
-                  { label: `Índice`, answer: `$4$` },
-                  { label: `Radicando`, answer: `$81$` },
-                  { label: `Raiz (resultado)`, answer: `$3$` },
-                  { label: `Nome do símbolo $\\sqrt{\\phantom{a}}$`, answer: `Radical` }
-                ],
-                explain: `Em $\\sqrt[4]{81} = 3$: o símbolo é o radical, $4$ é o índice, $81$ é o radicando e $3$ é a raiz (pois $3^4 = 81$).`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Como escrevemos a expressão $\\sqrt[7]{x^2}$ na forma de potência com expoente fracionário (para $x \\ge 0$)?`,
-                options: [
-                  `$x^{\\frac{7}{2}}$`,
-                  `$x^{\\frac{2}{7}}$`,
-                  `$7x^2$`,
-                  `$x^{-5}$`
-                ],
-                correctIndex: 1,
-                hint: `Dica clássica: "quem está na sombra (dentro da raiz) vai para cima; quem está no sol (índice) vai para baixo".`,
-                explain: `Pela relação entre potenciação e radiciação, $\\sqrt[n]{a^m} = a^{\\frac{m}{n}}$. Portanto, $\\sqrt[7]{x^2} = x^{\\frac{2}{7}}$.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Calcule as raízes exatas em $\\mathbb{Q}$ e combine os pares:`,
-                pairs: [
-                  { left: `$\\sqrt{256}$`, right: `$16$` },
-                  { left: `$\\sqrt{0,25}$`, right: `$0,5$` },
-                  { left: `$\\sqrt{\\frac{4}{9}}$`, right: `$\\frac{2}{3}$` },
-                  { left: `$\\sqrt[3]{8}$`, right: `$2$` }
-                ],
-                explain: `Como $16^2 = 256$, $(0,5)^2 = 0,25$, $(2/3)^2 = 4/9$ e $2^3 = 8$, todas essas raízes são exatas no conjunto $\\mathbb{Q}$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Decompondo $720 = 2^4 \\times 3^2 \\times 5$, podemos afirmar que $\\sqrt{720}$ é:`,
-                options: [
-                  `Racional e igual a $12$`,
-                  `Racional e igual a $24$`,
-                  `Irracional, pois o fator $5$ tem expoente $1$ (não divisível por $2$)`,
-                  `Inexistente nos Reais`
-                ],
-                correctIndex: 2,
-                hint: `Para a raiz quadrada ser exata, todos os expoentes da fatoração prima devem ser pares.`,
-                explain: `$\\sqrt{720} = \\sqrt{2^4 \\cdot 3^2 \\cdot 5} = 2^2 \\cdot 3 \\sqrt{5} = 12\\sqrt{5}$. Como sobra $\\sqrt{5}$ (fator 5 com expoente ímpar), o resultado é irracional.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Qual é o valor de $16^{\\frac{1}{2}} + \\sqrt[4]{81}$?`,
-                answers: [`7`],
-                hint: `$16^{1/2}$ é o mesmo que $\\sqrt{16}$.`,
-                explain: `$16^{\\frac{1}{2}} = \\sqrt{16} = 4$ e $\\sqrt[4]{81} = 3$. Logo, $4 + 3 = 7$.`
-              }
-            ]
-          },
-          {
-            id: `u4_l2`,
-            title: `Racionalização e Radicais`,
-            duration: `1–2 min`,
-            xp: 65,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Racionalize o denominador da expressão $\\dfrac{1}{3 + \\sqrt{2}}$ multiplicando pelo conjugado $(3 - \\sqrt{2})$:`,
-                options: [
-                  `$\\dfrac{3 - \\sqrt{2}}{7}$`,
-                  `$\\dfrac{3 + \\sqrt{2}}{7}$`,
-                  `$\\dfrac{3 - \\sqrt{2}}{11}$`,
-                  `$\\dfrac{1}{5}$`
-                ],
-                correctIndex: 0,
-                hint: `No denominador, aplique $(a+b)(a-b) = a^2 - b^2$: $3^2 - (\\sqrt{2})^2$.`,
-                explain: `Multiplicando cima e baixo por $(3 - \\sqrt{2})$: o numerador fica $3 - \\sqrt{2}$ e o denominador fica $3^2 - (\\sqrt{2})^2 = 9 - 2 = 7$. Resultado: $\\frac{3 - \\sqrt{2}}{7}$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Qual é a forma simplificada e racionalizada de $\\dfrac{\\sqrt{3}}{1 + \\sqrt{3}}$?`,
-                options: [
-                  `$\\dfrac{\\sqrt{3} - 3}{2}$`,
-                  `$\\dfrac{3 - \\sqrt{3}}{2}$`,
-                  `$\\dfrac{3 + \\sqrt{3}}{4}$`,
-                  `$\\sqrt{3} - 1$`
-                ],
-                correctIndex: 1,
-                hint: `Multiplique por $(1 - \\sqrt{3})$. O denominador dará $1 - 3 = -2$. Ajuste os sinais!`,
-                explain: `$\\frac{\\sqrt{3}(1 - \\sqrt{3})}{1^2 - (\\sqrt{3})^2} = \\frac{\\sqrt{3} - 3}{-2}$. Multiplicando cima e baixo por $-1$, obtemos $\\frac{3 - \\sqrt{3}}{2}$.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Resolva o produto notável $(1 + \\sqrt{5})^2$ passo a passo:`,
-                sentence: `Quadrado do primeiro ($1$), mais duas vezes o primeiro pelo segundo ($2\\sqrt{5}$), mais quadrado do segundo ([0]). Somando os termos inteiros, obtemos [1]$+ 2\\sqrt{5}$.`,
-                inputs: [
-                  { label: `Quadrado de √5`, answers: [`5`] },
-                  { label: `Soma inteira (1 + 5)`, answers: [`6`] }
-                ],
-                explain: `$(1 + \\sqrt{5})^2 = 1^2 + 2\\cdot 1 \\cdot \\sqrt{5} + (\\sqrt{5})^2 = 1 + 2\\sqrt{5} + 5 = 6 + 2\\sqrt{5}$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Ao racionalizar $\\dfrac{10}{7 - \\sqrt{5}}$, obtemos $\\dfrac{10(7 + \\sqrt{5})}{D}$. Qual é o valor do novo denominador $D$ antes de simplificar?`,
-                answers: [`44`],
-                hint: `Calcule $7^2 - (\\sqrt{5})^2$.`,
-                explain: `Pelo produto da soma pela diferença: $7^2 - (\\sqrt{5})^2 = 49 - 5 = 44$. (Depois ainda dá para simplificar $10/44 = 5/22$!).`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Por que racionalizamos o denominador de uma fração como $\\frac{1}{\\sqrt{3}}$?`,
-                options: [
-                  `Para alterar o valor original da fração para um número maior`,
-                  `Para eliminar a raiz e transformar o denominador em número racional, facilitando divisões`,
-                  `Porque raízes no numerador não existem`,
-                  `Para transformar números racionais em irracionais`
-                ],
-                correctIndex: 1,
-                explain: `Dividir $1$ por $1,73205...$ manualmente é trabalhoso; após racionalizar para $\\frac{\\sqrt{3}}{3}$, dividir $1,73205...$ por $3$ é muito mais simples, mantendo exatamente o mesmo valor!`
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: `u5`,
-        num: 5,
-        title: `Expressões Algébricas e Equações do 1º Grau`,
-        bncc: `EF08MA06 · EF08MA07 · EF08MA08`,
-        desc: `Termos semelhantes, monômios, equações ax + b = 0, operações inversas e 2 incógnitas.`,
-        lessons: [
-          {
-            id: `u5_l1`,
-            title: `Expressões Algébricas e Monômios`,
-            duration: `1–2 min`,
-            xp: 55,
-            questions: [
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Simplifique a expressão agrupando os termos semelhantes: $10a^2b + 5ab^2 - 6a^2b + 2ab^2 - a^2b$.`,
-                options: [
-                  `$3a^2b + 7ab^2$`,
-                  `$10a^2b^2$`,
-                  `$4a^2b + 7ab^2$`,
-                  `$3a^2b + 3ab^2$`
-                ],
-                correctIndex: 0,
-                hint: `Atenção: $a^2b$ e $ab^2$ têm partes literais DIFERENTES! Agrupe cada tipo separadamente.`,
-                explain: `Em $a^2b$: $10 - 6 - 1 = 3a^2b$. Em $ab^2$: $5 + 2 = 7ab^2$. Como as partes literais são distintas, o resultado final é $3a^2b + 7ab^2$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Um retângulo tem lados medindo $(2x + 3)$ e $(x - 1)$. Qual expressão algébrica representa o seu perímetro?`,
-                visual: `algebra_rect`,
-                options: [
-                  `$3x + 2$`,
-                  `$6x + 4$`,
-                  `$2x^2 + x - 3$`,
-                  `$6x + 8$`
-                ],
-                correctIndex: 1,
-                hint: `Perímetro é a soma dos 4 lados: $2\\cdot(2x + 3) + 2\\cdot(x - 1)$.`,
-                explain: `Somando os 4 lados: $(2x + 3) + (x - 1) + (2x + 3) + (x - 1) = (2+1+2+1)x + (3-1+3-1) = 6x + 4$.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Na multiplicação de monômios $(3x^2y) \\cdot (5xy^3)$, multiplicamos coeficientes e somamos expoentes iguais:`,
-                sentence: `O coeficiente final é $3 \\cdot 5 =$ [0]. O expoente do $x$ fica $2 + 1 = 3$, e o expoente do $y$ fica [1], resultando em $15x^3y^4$.`,
-                inputs: [
-                  { label: `Coeficiente`, answers: [`15`] },
-                  { label: `Expoente de y`, answers: [`4`] }
-                ],
-                explain: `Multiplicamos os coeficientes ($3 \\cdot 5 = 15$) e somamos os expoentes das bases iguais: $x^{2+1} = x^3$ e $y^{1+3} = y^4$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Calcule o valor numérico de $3(x + y) - 2(x - y) + (x - 3y)$ simplificando primeiro e depois usando $x = 5$ e $y = 2$:`,
-                answers: [`14`],
-                hint: `Simplifique: $3x + 3y - 2x + 2y + x - 3y = 2x + 2y$.`,
-                explain: `Simplificando a expressão temos $2x + 2y$. Substituindo $x = 5$ e $y = 2$: $2(5) + 2(2) = 10 + 4 = 14$.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Combine cada expressão com sua forma simplificada:`,
-                pairs: [
-                  { left: `$5xy + 9z - 2xy + 3z$`, right: `$3xy + 12z$` },
-                  { left: `$3d - 8c - 1d$`, right: `$2d - 8c$` },
-                  { left: `$(a + b)\\cdot 5$`, right: `$5a + 5b$` },
-                  { left: `$x + 12$ (para $x=7$)`, right: `$19$` }
-                ],
-                explain: `Só somamos e subtraímos termos com a mesma parte literal! Na multiplicação, aplicamos a distributiva normalmente.`
-              }
-            ]
-          },
-          {
-            id: `u5_l2`,
-            title: `Equações do 1º Grau (1 e 2 Incógnitas)`,
-            duration: `1–2 min`,
-            xp: 60,
-            questions: [
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Analise a equação $2y - 5 = 15$ e encaixe cada elemento no lugar certo:`,
-                chips: [`$2y - 5$`, `$15$`, `$y$`, `$10$`],
-                slots: [
-                  { label: `Primeiro membro`, answer: `$2y - 5$` },
-                  { label: `Segundo membro`, answer: `$15$` },
-                  { label: `Incógnita`, answer: `$y$` },
-                  { label: `Raiz (solução)`, answer: `$10$` }
-                ],
-                explain: `Tudo à esquerda do $=$ é o 1º membro ($2y-5$); à direita é o 2º membro ($15$). A letra é a incógnita ($y$), e a raiz é $y = 10$, pois $2(10) - 5 = 15$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Usando operações inversas, encontre a raiz da equação $4x - 8 = 0$:`,
-                answers: [`2`],
-                hint: `Some $8$ nos dois lados ($4x = 8$) e depois divida por $4$.`,
-                explain: `$4x - 8 = 0 \\Rightarrow 4x = 8 \\Rightarrow x = \\frac{8}{4} = 2$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Escrevendo a equação $2x + 1 = 5$ na forma geral $ax + b = 0$, quais são os coeficientes $a$ e $b$?`,
-                options: [
-                  `$a = 2$ e $b = 1$`,
-                  `$a = 2$ e $b = 5$`,
-                  `$a = 2$ e $b = -4$`,
-                  `$a = 2$ e $b = 4$`
-                ],
-                correctIndex: 2,
-                hint: `Passe o $5$ para o primeiro membro subtraindo: $2x + 1 - 5 = 0$.`,
-                explain: `Igualando a zero: $2x + 1 - 5 = 0 \\Rightarrow 2x - 4 = 0$, ou seja, $2x + (-4) = 0$. Logo, $a = 2$ e $b = -4$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Na equação com duas incógnitas $2x + y = 12$, o par ordenado $(5, 2)$ é uma solução?`,
-                options: [
-                  `Não, pois dá $14$`,
-                  `Sim, pois $2(5) + 2 = 12$ torna a igualdade verdadeira`,
-                  `Não, porque equações com 2 incógnitas não têm solução`,
-                  `Sim, mas apenas quando $x = y$`
-                ],
-                correctIndex: 1,
-                hint: `Substitua $x = 5$ e $y = 2$ na equação e verifique a igualdade.`,
-                explain: `Substituindo $(x, y) = (5, 2)$: $2\\cdot 5 + 2 = 10 + 2 = 12$. Como a igualdade é verdadeira, $(5, 2)$ é solução! Equações $ax + by = c$ possuem infinitas soluções (uma reta no plano cartesiano).`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Em um estacionamento há carros ($x$) e motos ($y$), totalizando $30$ veículos ($x + y = 30$). Se há $18$ carros, quantas motos existem?`,
-                answers: [`12`],
-                explain: `Substituindo $x = 18$ em $x + y = 30$: $18 + y = 30 \\Rightarrow y = 30 - 18 = 12$ motos.`
-              }
-            ]
-          }
-        ]
-      },
-      {
-        id: `u6`,
-        num: 6,
-        title: `Proporcionalidade, Razão e Geometria`,
-        bncc: `EF09MA07 · EF09MA08 · EF09MA12 · EF09MA13`,
-        desc: `Razão, escala, divisão proporcional, Razão Áurea, Teorema de Tales e Pitágoras.`,
-        lessons: [
-          {
-            id: `u6_l1`,
-            title: `Razão, Escala e Proporção`,
-            duration: `1–2 min`,
-            xp: 60,
-            questions: [
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Uma miniatura foi fabricada na escala $1 : 200$. Se a miniatura mede $7\\text{ cm}$ de comprimento, quantos METROS tem o objeto real?`,
-                answers: [`14`, `14m`, `14 m`],
-                hint: `Multiplique $7\\text{ cm}$ por $200$ para achar em centímetros, depois divida por $100$ para converter em metros.`,
-                explain: `$7 \\times 200 = 1\\,400\\text{ cm}$. Como $1\\text{ m} = 100\\text{ cm}$, o objeto real mede $1\\,400 \\div 100 = 14\\text{ m}$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Três amigos contribuíram com $9$, $16$ e $15$ reais numa aposta (total $40$) e ganharam $\\text{R\\$ } 100\\,000{,}00$. Quanto cabe ao amigo que investiu $16$ reais (proporção direta)?`,
-                options: [
-                  `$\\text{R\\$ } 22\\,500{,}00$`,
-                  `$\\text{R\\$ } 37\\,500{,}00$`,
-                  `$\\text{R\\$ } 40\\,000{,}00$`,
-                  `$\\text{R\\$ } 50\\,000{,}00$`
-                ],
-                correctIndex: 2,
-                hint: `Calcule a fração da aposta dele: $\\frac{16}{40}$ de $100\\,000$.`,
-                explain: `Ele pagou $\\frac{16}{40} = \\frac{2}{5} = 40\\%$ da aposta. Logo, recebe $40\\%$ de $\\text{R\\$ } 100\\,000{,}00 = \\text{R\\$ } 40\\,000{,}00$.`
-              },
-              {
-                type: `match`,
-                tag: `Combinação de Pares`,
-                prompt: `Relacione cada conceito de razão e proporção ao seu significado ou valor:`,
-                pairs: [
-                  { left: `Razão $\\frac{40}{20}$`, right: `$2$` },
-                  { left: `Razão centesimal`, right: `Denominador igual a $100$ ($\\%$)` },
-                  { left: `Razão Áurea ($\\varphi$)`, right: `$\\approx 1,618$ (arte e Fibonacci)` },
-                  { left: `Razão $\\frac{\\text{circunferência}}{\\text{diâmetro}}$`, right: `Número irracional $\\pi$` }
-                ],
-                explain: `A razão é a divisão entre duas grandezas. Quando o denominador é $100$, chamamos de porcentagem; quando dividimos o comprimento de qualquer círculo pelo diâmetro, obtemos $\\pi$.`
-              },
-              {
-                type: `blank`,
-                tag: `Preenchimento de Lacunas`,
-                prompt: `Complete sobre grandezas proporcionais:`,
-                sentence: `Duas grandezas são [0] proporcionais quando, ao dobrar uma, a outra também dobra (seu gráfico é uma reta). Já se dobrar uma faz a outra cair pela metade, elas são [1] proporcionais.`,
-                inputs: [
-                  { label: `Mesma direção`, answers: [`diretamente`, `Diretamente`] },
-                  { label: `Direção oposta`, answers: [`inversamente`, `Inversamente`] }
-                ],
-                explain: `Na proporcionalidade direta, a razão $y/x$ é constante; na inversa, o produto $x \\cdot y$ é constante.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Um restaurante cobra $10\\%$ de taxa de serviço. Se a conta foi $\\text{R\\$ } 230{,}00$, qual é o valor apenas da taxa de serviço em reais?`,
-                answers: [`23`, `23,00`, `23.00`],
-                explain: `$\\frac{10}{100} = \\frac{g}{230} \\Rightarrow g = 23$ reais.`
-              }
-            ]
-          },
-          {
-            id: `u6_l2`,
-            title: `Teorema de Tales e Pitágoras`,
-            duration: `1–2 min`,
-            xp: 65,
-            questions: [
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Aplicando o Teorema de Tales em um feixe de retas paralelas cortadas por transversais, temos $\\dfrac{70}{105} = \\dfrac{x}{90}$. Qual é o valor de $x$ em metros?`,
-                visual: `tales_lines`,
-                answers: [`60`, `60m`, `60 m`],
-                hint: `Simplifique $\\frac{70}{105}$ dividindo por 35: vira $\\frac{2}{3}$! Depois faça $\\frac{2}{3} = \\frac{x}{90}$.`,
-                explain: `$\\frac{70}{105} = \\frac{2}{3}$. Igualando: $\\frac{x}{90} = \\frac{2}{3} \\Rightarrow 3x = 180 \\Rightarrow x = 60\\text{ m}$.`
-              },
-              {
-                type: `calc`,
-                tag: `Cálculo Rápido`,
-                prompt: `Em um triângulo retângulo, os catetos medem $b = 6\\text{ cm}$ e $c = 8\\text{ cm}$. Pelo Teorema de Pitágoras ($a^2 = b^2 + c^2$), quanto mede a hipotenusa $a$?`,
-                visual: `pythagoras_tri`,
-                answers: [`10`, `10cm`, `10 cm`],
-                hint: `Calcule $6^2 + 8^2 = 36 + 64$ e tire a raiz quadrada.`,
-                explain: `$a^2 = 6^2 + 8^2 = 36 + 64 = 100 \\Rightarrow a = \\sqrt{100} = 10\\text{ cm}$.`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Ao aplicar o efeito zoom de $33\\%$ em uma foto na tela do computador, as figuras original e ampliada são chamadas de semelhantes porque:`,
-                options: [
-                  `Têm exatamente a mesma área e o mesmo tamanho`,
-                  `Conservam o mesmo formato (ângulos iguais e lados proporcionais)`,
-                  `Mudam os ângulos internos para manter a largura`,
-                  `Perdem a proporcionalidade entre altura e largura`
-                ],
-                correctIndex: 1,
-                explain: `Duas figuras planas são semelhantes quando têm o mesmo formato: os ângulos correspondentes são congruentes e todos os comprimentos variam na mesma proporção.`
-              },
-              {
-                type: `dnd`,
-                tag: `Arraste e Encaixe`,
-                prompt: `Encaixe as relações métricas no triângulo retângulo (hipotenusa $a$, catetos $b, c$, altura $h$, projeções $m, n$):`,
-                chips: [`$b^2 + c^2$`, `$b \\cdot c$`, `$a \\cdot n$`, `$m \\cdot n$`],
-                slots: [
-                  { label: `Pitágoras: $a^2 =$`, answer: `$b^2 + c^2$` },
-                  { label: `Produto catetos: $a \\cdot h =$`, answer: `$b \\cdot c$` },
-                  { label: `Cateto e projeção: $b^2 =$`, answer: `$a \\cdot n$` },
-                  { label: `Altura ao quadrado: $h^2 =$`, answer: `$m \\cdot n$` }
-                ],
-                explain: `Essas quatro relações métricas surgem diretamente da semelhança de triângulos ao traçar a altura relativa à hipotenusa!`
-              },
-              {
-                type: `mc`,
-                tag: `Múltipla Escolha`,
-                prompt: `Se um triângulo possui lados $5\\text{ cm}$, $12\\text{ cm}$ e $13\\text{ cm}$, podemos garantir que ele é retângulo?`,
-                options: [
-                  `Não, pois $5 + 12 > 13$`,
-                  `Sim, pois $13^2 = 169$ e $5^2 + 12^2 = 25 + 144 = 169$`,
-                  `Não, pois só o triângulo $3, 4, 5$ é retângulo`,
-                  `Apenas se todos os lados forem pares`
-                ],
-                correctIndex: 1,
-                explain: `Pela recíproca do Teorema de Pitágoras, como $13^2 = 5^2 + 12^2$ ($169 = 169$), o triângulo é perfeitamente retângulo!`
-              }
-            ]
-          }
-        ]
-      }
-    ];
+    const UNITS = [{"id": "u1", "num": 1, "title": "Conjuntos, Potências e Raízes", "bncc": "EF09MA01 · EF09MA03", "desc": "Racionais, conjuntos numéricos, potenciação, radiciação e raízes.", "lessons": [{"id": "u1_l1", "title": "1. Números Racionais", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Números Racionais**, vire o cartão para revisar a ideia-chave:", "front": "Números Racionais", "back": "$0{,}444\\dots = \\frac{4}{9}$.", "explain": "Cartão de **Números Racionais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual a fração geratriz irredutível de $0{,}444\\dots$ (formato a/b)?", "answers": ["4/9"], "explain": "$0{,}444\\dots = \\frac{4}{9}$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a fração geratriz de $0{,}1222\\dots$?", "options": ["$\\frac{12}{99}$", "$\\frac{12}{90}$", "$\\frac{11}{90}$", "$\\frac{1}{9}$"], "correctIndex": 2, "explain": "$100x - 10x = 12{,}22\\dots - 1{,}22\\dots = 11 \\Rightarrow x = \\frac{11}{90}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em uma sala, $18$ de $25$ alunos passaram. Qual a porcentagem (%)?", "answers": ["72", "72%"], "explain": "$\\frac{18}{25} = \\frac{72}{100} = 72\\%$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Números Racionais**, qual afirmação está correta?", "options": ["$0{,}444\\dots = \\frac{4}{9}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$0{,}444\\dots = \\frac{4}{9}$."}]}, {"id": "u1_l2", "title": "2. Conjuntos numéricos N, Z, Q", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Conjuntos numéricos N, Z, Q**, vire o cartão para revisar a ideia-chave:", "front": "Conjuntos numéricos N, Z, Q", "back": "$\\sqrt{100} = 10$, que é natural e está em $\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$.", "explain": "Cartão de **Conjuntos numéricos N, Z, Q** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "O número $\\sqrt{100}$ pertence a quais conjuntos?", "options": ["Apenas $\\mathbb{I}$", "$\\mathbb{N}, \\mathbb{Z}, \\mathbb{Q}$ e $\\mathbb{R}$", "Apenas $\\mathbb{Z}$", "Apenas $\\mathbb{R}$"], "correctIndex": 1, "explain": "$\\sqrt{100} = 10$, que é natural e está em $\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$.", "visual": "venn"}, {"type": "match", "tag": "Pares", "prompt": "Classifique cada número:", "pairs": [{"left": "$0{,}75$", "right": "Racional ($\\mathbb{Q}$)"}, {"left": "$-2$", "right": "Inteiro ($\\mathbb{Z}$)"}, {"left": "$5$", "right": "Natural ($\\mathbb{N}$)"}, {"left": "$\\sqrt{10}$", "right": "Irracional ($\\mathbb{I}$)"}], "explain": "Cada conjunto tem sua definição exata."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Quantos inteiros há entre $-2{,}5$ e $3{,}2$? Marque $-2$ como início na reta:", "ticks": [-3, -2, -1, 0, 1, 2, 3], "correctValue": -2, "explain": "Os inteiros são $-2, -1, 0, 1, 2, 3$ (6 ao todo)."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Conjuntos numéricos N, Z, Q**, qual afirmação está correta?", "options": ["$\\sqrt{100} = 10$, que é natural e está em $\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\sqrt{100} = 10$, que é natural e está em $\\mathbb{N} \\subset \\mathbb{Z} \\subset \\mathbb{Q} \\subset \\mathbb{R}$."}]}, {"id": "u1_l3", "title": "3. Potenciação", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Potenciação**, vire o cartão para revisar a ideia-chave:", "front": "Potenciação", "back": "Movendo 7 casas para a esquerda: $1{,}4 \\times 10^7$.", "explain": "Cartão de **Potenciação** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Como escrevemos $14\\,000\\,000$ em notação científica?", "options": ["$14\\times 10^6$", "$1{,}4\\times 10^7$", "$0{,}14\\times 10^8$", "$1{,}4\\times 10^6$"], "correctIndex": 1, "explain": "Movendo 7 casas para a esquerda: $1{,}4 \\times 10^7$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto vale $2^3 \\times 2^2$?", "answers": ["32"], "explain": "$2^{3+2} = 2^5 = 32$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto vale $10^0 + 5^1$?", "answers": ["6"], "explain": "Todo número não nulo elevado a $0$ é $1$: $1 + 5 = 6$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Potenciação**, qual afirmação está correta?", "options": ["Movendo 7 casas para a esquerda: $1{,}4 \\times 10^7$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Movendo 7 casas para a esquerda: $1{,}4 \\times 10^7$."}]}, {"id": "u1_l4", "title": "4. Radiciação", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Radiciação**, vire o cartão para revisar a ideia-chave:", "front": "Radiciação", "back": "$\\sqrt[n]{a^m} = a^{m/n} \\Rightarrow x^{2/7}$.", "explain": "Cartão de **Radiciação** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a forma de potência de $\\sqrt[7]{x^2}$?", "options": ["$x^{7/2}$", "$x^{2/7}$", "$7x^2$", "$x^{-5}$"], "correctIndex": 1, "explain": "$\\sqrt[n]{a^m} = a^{m/n} \\Rightarrow x^{2/7}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $\\sqrt{256}$:", "answers": ["16"], "explain": "$16^2 = 256$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $16^{1/2} + \\sqrt[4]{81}$:", "answers": ["7"], "explain": "$4 + 3 = 7$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Radiciação**, qual afirmação está correta?", "options": ["$\\sqrt[n]{a^m} = a^{m/n} \\Rightarrow x^{2/7}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\sqrt[n]{a^m} = a^{m/n} \\Rightarrow x^{2/7}$."}]}, {"id": "u1_l5", "title": "5. Operações com Raizes", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Operações com Raizes**, vire o cartão para revisar a ideia-chave:", "front": "Operações com Raizes", "back": "Multiplica por $(3-\\sqrt{2})$: denominador $9 - 2 = 7$.", "explain": "Cartão de **Operações com Raizes** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Racionalize $\\dfrac{1}{3 + \\sqrt{2}}$:", "options": ["$\\dfrac{3-\\sqrt{2}}{7}$", "$\\dfrac{3+\\sqrt{2}}{7}$", "$\\dfrac{3-\\sqrt{2}}{11}$", "$\\dfrac{1}{5}$"], "correctIndex": 0, "explain": "Multiplica por $(3-\\sqrt{2})$: denominador $9 - 2 = 7$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $3\\sqrt{2} + 5\\sqrt{2}$ (digite o coeficiente de $\\sqrt{2}$):", "answers": ["8"], "explain": "Radicais semelhantes: $(3+5)\\sqrt{2} = 8\\sqrt{2}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto vale $\\sqrt{2} \\times \\sqrt{8}$?", "answers": ["4"], "explain": "$\\sqrt{16} = 4$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Operações com Raizes**, qual afirmação está correta?", "options": ["Multiplica por $(3-\\sqrt{2})$: denominador $9 - 2 = 7$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Multiplica por $(3-\\sqrt{2})$: denominador $9 - 2 = 7$."}]}]}, {"id": "u2", "num": 2, "title": "Reais, Sequências e Álgebra", "bncc": "EF09MA02 · EF08MA06", "desc": "Números reais, sequências, juros, expressões e proporcionalidade.", "lessons": [{"id": "u2_l1", "title": "6. Reais (Q + I)", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Reais (Q + I)**, vire o cartão para revisar a ideia-chave:", "front": "Reais (Q + I)", "back": "$25 < 30 < 36 \\Rightarrow 5 < \\sqrt{30} < 6$.", "explain": "Cartão de **Reais (Q + I)** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Entre quais inteiros consecutivos está $\\sqrt{30}$?", "options": ["$4$ e $5$", "$5$ e $6$", "$6$ e $7$", "$14$ e $16$"], "correctIndex": 1, "explain": "$25 < 30 < 36 \\Rightarrow 5 < \\sqrt{30} < 6$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque o inteiro mais próximo de $\\pi \\approx 3{,}14$:", "ticks": [0, 1, 2, 3, 4, 5], "correctValue": 3, "explain": "$3{,}14$ fica logo depois de $3$."}, {"type": "blank", "tag": "Lacunas", "prompt": "Complete sobre os Reais:", "sentence": "Todo número real é racional ou [0], preenchendo a reta sem nenhum [1].", "inputs": [{"label": "Conjunto", "answers": ["irracional", "Irracional"]}, {"label": "Sem...", "answers": ["buraco", "vazio", "espaço"]}], "explain": "$\\mathbb{R} = \\mathbb{Q} \\cup \\mathbb{I}$ completa toda a reta."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Reais (Q + I)**, qual afirmação está correta?", "options": ["$25 < 30 < 36 \\Rightarrow 5 < \\sqrt{30} < 6$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$25 < 30 < 36 \\Rightarrow 5 < \\sqrt{30} < 6$."}]}, {"id": "u2_l2", "title": "7. Sequências", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Sequências**, vire o cartão para revisar a ideia-chave:", "front": "Sequências", "back": "$2(5) + 1 = 11$.", "explain": "Cartão de **Sequências** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Na sequência $a_n = 2n + 1$, quanto vale $a_5$?", "answers": ["11"], "explain": "$2(5) + 1 = 11$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o 6º termo de Fibonacci: $1, 1, 2, 3, 5, \\dots$?", "answers": ["8"], "explain": "$3 + 5 = 8$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Complete a PA na reta: $-4, -1, 2, \\square, 8$:", "ticks": [-4, -1, 2, 5, 6, 8], "correctValue": 5, "explain": "Razão $+3$: $2 + 3 = 5$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Sequências**, qual afirmação está correta?", "options": ["$2(5) + 1 = 11$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2(5) + 1 = 11$."}]}, {"id": "u2_l3", "title": "8. Juros", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Juros**, vire o cartão para revisar a ideia-chave:", "front": "Juros", "back": "$J = 500 \\times 0{,}10 \\times 2 = 100$ reais.", "explain": "Cartão de **Juros** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Juros simples de $10\\%$ ao mês sobre $\\text{R\\$ } 500$ durante $2$ meses (em R$):", "answers": ["100"], "explain": "$J = 500 \\times 0{,}10 \\times 2 = 100$ reais."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um produto de $\\text{R\\$ } 200$ subiu $15\\%$. Qual o novo preço?", "answers": ["230"], "explain": "$200 + 30 = 230$ reais."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Taxa de serviço de $10\\%$ sobre uma conta de $\\text{R\\$ } 230$:", "answers": ["23"], "explain": "$0{,}10 \\times 230 = 23$ reais."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Juros**, qual afirmação está correta?", "options": ["$J = 500 \\times 0{,}10 \\times 2 = 100$ reais.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$J = 500 \\times 0{,}10 \\times 2 = 100$ reais."}]}, {"id": "u2_l4", "title": "9. Expressões algébricas", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Expressões algébricas**, vire o cartão para revisar a ideia-chave:", "front": "Expressões algébricas", "back": "Em $a^2b$: $10-6-1=3$; em $ab^2$: $5+2=7$.", "explain": "Cartão de **Expressões algébricas** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Simplifique $10a^2b + 5ab^2 - 6a^2b + 2ab^2 - a^2b$:", "options": ["$3a^2b+7ab^2$", "$10a^2b^2$", "$4a^2b+7ab^2$", "$3a^2b+3ab^2$"], "correctIndex": 0, "explain": "Em $a^2b$: $10-6-1=3$; em $ab^2$: $5+2=7$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Perímetro do retângulo de lados $(2x+3)$ e $(x-1)$:", "options": ["$3x+2$", "$6x+4$", "$2x^2-3$", "$6x+8$"], "correctIndex": 1, "explain": "$2(2x+3)+2(x-1) = 6x+4$.", "visual": "algebra_rect"}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Valor numérico de $2x + 2y$ para $x = 5$ e $y = 2$:", "answers": ["14"], "explain": "$2(5) + 2(2) = 14$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Expressões algébricas**, qual afirmação está correta?", "options": ["Em $a^2b$: $10-6-1=3$; em $ab^2$: $5+2=7$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Em $a^2b$: $10-6-1=3$; em $ab^2$: $5+2=7$."}]}, {"id": "u2_l5", "title": "10. Proporcionalidade", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Proporcionalidade**, vire o cartão para revisar a ideia-chave:", "front": "Proporcionalidade", "back": "$7 \\times 200 = 1\\,400\\text{ cm} = 14\\text{ m}$.", "explain": "Cartão de **Proporcionalidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Escala $1:200$: uma miniatura de $7\\text{ cm}$ mede quantos METROS na realidade?", "answers": ["14", "14m", "14 m"], "explain": "$7 \\times 200 = 1\\,400\\text{ cm} = 14\\text{ m}$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Aposta proporcional ($9, 16, 15$ = total $40$) ganha $100\\,000$. Quem pôs $16$ recebe:", "options": ["$22\\,500$", "$37\\,500$", "$40\\,000$", "$50\\,000$"], "correctIndex": 2, "explain": "$\\frac{16}{40} = 40\\%$ de $100\\,000 = 40\\,000$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $x/90 = 2/3$, quanto vale $x$?", "answers": ["60"], "explain": "$3x = 180 \\Rightarrow x = 60$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Proporcionalidade**, qual afirmação está correta?", "options": ["$7 \\times 200 = 1\\,400\\text{ cm} = 14\\text{ m}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$7 \\times 200 = 1\\,400\\text{ cm} = 14\\text{ m}$."}]}]}, {"id": "u3", "num": 3, "title": "Equações, Sistemas e Polinômios", "bncc": "EF08MA08 · EF09MA09", "desc": "Equações, sistemas, produtos notáveis e fatoração.", "lessons": [{"id": "u3_l1", "title": "11. Equações", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Equações**, vire o cartão para revisar a ideia-chave:", "front": "Equações", "back": "$4x = 8 \\Rightarrow x = 2$.", "explain": "Cartão de **Equações** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Resolva $4x - 8 = 0$:", "answers": ["2"], "explain": "$4x = 8 \\Rightarrow x = 2$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Em $2x + 1 = 5$, escrevendo como $ax + b = 0$, quanto valem $a$ e $b$?", "options": ["$a=2, b=1$", "$a=2, b=5$", "$a=2, b=-4$", "$a=2, b=4$"], "correctIndex": 2, "explain": "$2x + 1 - 5 = 0 \\Rightarrow 2x - 4 = 0$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque a raiz de $2y - 5 = 15$ na reta:", "ticks": [4, 6, 8, 10, 12], "correctValue": 10, "explain": "$2y = 20 \\Rightarrow y = 10$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Equações**, qual afirmação está correta?", "options": ["$4x = 8 \\Rightarrow x = 2$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$4x = 8 \\Rightarrow x = 2$."}]}, {"id": "u3_l2", "title": "12. Equações do 1º grau com 2 incógnitas", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Equações do 1º grau com 2 incógnitas**, vire o cartão para revisar a ideia-chave:", "front": "Equações do 1º grau com 2 incógnitas", "back": "$2\\cdot 5 + 2 = 12$ (verdadeira).", "explain": "Cartão de **Equações do 1º grau com 2 incógnitas** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "O par $(5, 2)$ é solução de $2x + y = 12$?", "options": ["Não, dá 14", "Sim, pois $2(5)+2=12$", "Não tem solução", "Só se $x=y$"], "correctIndex": 1, "explain": "$2\\cdot 5 + 2 = 12$ (verdadeira)."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em $x + y = 30$, se $x = 18$, quanto vale $y$?", "answers": ["12"], "explain": "$30 - 18 = 12$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em $3x - y = 10$, se $x = 4$, quanto vale $y$?", "answers": ["2"], "explain": "$12 - y = 10 \\Rightarrow y = 2$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Equações do 1º grau com 2 incógnitas**, qual afirmação está correta?", "options": ["$2\\cdot 5 + 2 = 12$ (verdadeira).", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2\\cdot 5 + 2 = 12$ (verdadeira)."}]}, {"id": "u3_l3", "title": "13. Sistema de Equações", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Sistema de Equações**, vire o cartão para revisar a ideia-chave:", "front": "Sistema de Equações", "back": "Somando as equações: $2x = 14 \\Rightarrow x = 7$.", "explain": "Cartão de **Sistema de Equações** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $x + y = 10$ e $x - y = 4$, quanto vale $x$?", "answers": ["7"], "explain": "Somando as equações: $2x = 14 \\Rightarrow x = 7$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "No mesmo sistema ($x + y = 10$ e $x = 7$), quanto vale $y$?", "answers": ["3"], "explain": "$7 + y = 10 \\Rightarrow y = 3$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Graficamente, a solução única de um sistema linear $2\\times 2$ é:", "options": ["Um círculo", "O ponto de cruzamento das duas retas", "Uma parábola", "Um triângulo"], "correctIndex": 1, "explain": "Duas retas concorrentes se cruzam no ponto $(x,y)$ solução."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Sistema de Equações**, qual afirmação está correta?", "options": ["Somando as equações: $2x = 14 \\Rightarrow x = 7$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Somando as equações: $2x = 14 \\Rightarrow x = 7$."}]}, {"id": "u3_l4", "title": "14. Produtos Notáveis", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Produtos Notáveis**, vire o cartão para revisar a ideia-chave:", "front": "Produtos Notáveis", "back": "$x^2 + 2\\cdot 3x + 9 = x^2+6x+9$.", "explain": "Cartão de **Produtos Notáveis** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Desenvolva $(x + 3)^2$:", "options": ["$x^2+9$", "$x^2+3x+9$", "$x^2+6x+9$", "$2x+6$"], "correctIndex": 2, "explain": "$x^2 + 2\\cdot 3x + 9 = x^2+6x+9$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Usando $a^2 - b^2 = (a+b)(a-b)$, quanto vale $15^2 - 5^2$?", "answers": ["200"], "explain": "$(15+5)(15-5) = 20\\times 10 = 200$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em $(1 + \\sqrt{5})^2 = A + 2\\sqrt{5}$, quanto vale $A$?", "answers": ["6"], "explain": "$1 + 2\\sqrt{5} + 5 = 6 + 2\\sqrt{5}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Produtos Notáveis**, qual afirmação está correta?", "options": ["$x^2 + 2\\cdot 3x + 9 = x^2+6x+9$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$x^2 + 2\\cdot 3x + 9 = x^2+6x+9$."}]}, {"id": "u3_l5", "title": "15. Fatoração de Polinômios", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Fatoração de Polinômios**, vire o cartão para revisar a ideia-chave:", "front": "Fatoração de Polinômios", "back": "Fator comum $3x$: $3x(2x+3)$.", "explain": "Cartão de **Fatoração de Polinômios** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Fatore $6x^2 + 9x$ por fator comum:", "options": ["$3x(2x+3)$", "$6x(x+3)$", "$3(2x+9)$", "$x(6x+9x)$"], "correctIndex": 0, "explain": "Fator comum $3x$: $3x(2x+3)$."}, {"type": "blank", "tag": "Lacunas", "prompt": "Diferença de quadrados:", "sentence": "$x^2 - 49 = (x + $[0]$)(x - $[1]$)$.", "inputs": [{"label": "1º", "answers": ["7"]}, {"label": "2º", "answers": ["7"]}], "explain": "$x^2 - 7^2 = (x+7)(x-7)$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a forma fatorada de $x^2 + 10x + 25$?", "options": ["$(x+5)^2$", "$(x-5)^2$", "$(x+25)^2$", "$x(x+10)$"], "correctIndex": 0, "explain": "Trinômio quadrado perfeito: $(x+5)^2$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Fatoração de Polinômios**, qual afirmação está correta?", "options": ["Fator comum $3x$: $3x(2x+3)$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Fator comum $3x$: $3x(2x+3)$."}]}]}, {"id": "u4", "num": 4, "title": "2º Grau, Funções e Grandezas", "bncc": "EF09MA06 · EF08MA19", "desc": "Equação do 2º grau, funções, área, volume e plano cartesiano.", "lessons": [{"id": "u4_l1", "title": "16. Equação do 2º grau com 1 incógnita", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Equação do 2º grau com 1 incógnita**, vire o cartão para revisar a ideia-chave:", "front": "Equação do 2º grau com 1 incógnita", "back": "$x = \\pm 4$; positiva = $4$.", "explain": "Cartão de **Equação do 2º grau com 1 incógnita** revisado! Agora vamos praticar."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque a raiz POSITIVA de $x^2 - 16 = 0$:", "ticks": [-5, -4, -2, 0, 2, 4, 5], "correctValue": 4, "explain": "$x = \\pm 4$; positiva = $4$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Na equação $x^2 - 5x + 6 = 0$, quanto vale $\\Delta = b^2 - 4ac$?", "answers": ["1"], "explain": "$(-5)^2 - 4(1)(6) = 25 - 24 = 1$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Quais são as raízes de $x^2 - 5x + 6 = 0$?", "options": ["$1$ e $6$", "$2$ e $3$", "$-2$ e $-3$", "$5$ e $6$"], "correctIndex": 1, "explain": "Soma $5$ e Produto $6$: $2$ e $3$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Equação do 2º grau com 1 incógnita**, qual afirmação está correta?", "options": ["$x = \\pm 4$; positiva = $4$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$x = \\pm 4$; positiva = $4$."}]}, {"id": "u4_l2", "title": "17. Função", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Função**, vire o cartão para revisar a ideia-chave:", "front": "Função", "back": "Parábola com concavidade para cima ($a>0$).", "explain": "Cartão de **Função** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual gráfico representa uma função do 2º grau $y = x^2 - 4$?", "options": [{"label": "A", "drawing": "line_linear"}, {"label": "B", "drawing": "parabola_up"}, {"label": "C", "drawing": "parabola_down"}, {"label": "D", "drawing": "circle_const"}], "correctIndex": 1, "explain": "Parábola com concavidade para cima ($a>0$)."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual gráfico representa uma função do 1º grau crescente?", "options": [{"label": "A", "drawing": "parabola_up"}, {"label": "B", "drawing": "line_linear"}, {"label": "C", "drawing": "parabola_down"}, {"label": "D", "drawing": "circle_const"}], "correctIndex": 1, "explain": "Função afim forma uma linha reta (B)."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Dada $f(x) = 3x - 2$, quanto vale $f(4)$?", "answers": ["10"], "explain": "$3(4) - 2 = 10$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Função**, qual afirmação está correta?", "options": ["Parábola com concavidade para cima ($a>0$).", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Parábola com concavidade para cima ($a>0$)."}]}, {"id": "u4_l3", "title": "18. Área", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Área**, vire o cartão para revisar a ideia-chave:", "front": "Área", "back": "$\\frac{D\\cdot d}{2} = \\frac{60}{2} = 30\\text{ cm}^2$.", "explain": "Cartão de **Área** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Área de um losango com diagonais $10\\text{ cm}$ e $6\\text{ cm}$:", "answers": ["30"], "explain": "$\\frac{D\\cdot d}{2} = \\frac{60}{2} = 30\\text{ cm}^2$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Área de um trapézio de bases $8\\text{ m}$ e $4\\text{ m}$, altura $5\\text{ m}$:", "answers": ["30"], "explain": "$\\frac{(8+4)\\cdot 5}{2} = 30\\text{ m}^2$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um quadrado tem área $81\\text{ cm}^2$. Quanto mede seu lado?", "answers": ["9"], "explain": "$\\sqrt{81} = 9\\text{ cm}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Área**, qual afirmação está correta?", "options": ["$\\frac{D\\cdot d}{2} = \\frac{60}{2} = 30\\text{ cm}^2$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\frac{D\\cdot d}{2} = \\frac{60}{2} = 30\\text{ cm}^2$."}]}, {"id": "u4_l4", "title": "19. Volume e Medidas de capacidade", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Volume e Medidas de capacidade**, vire o cartão para revisar a ideia-chave:", "front": "Volume e Medidas de capacidade", "back": "$50 \\times 20 \\times 30 = 30\\,000\\text{ cm}^3$.", "explain": "Cartão de **Volume e Medidas de capacidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um aquário de $50\\text{ cm}\\times 20\\text{ cm}\\times 30\\text{ cm}$ tem quantos $\\text{cm}^3$?", "answers": ["30000"], "explain": "$50 \\times 20 \\times 30 = 30\\,000\\text{ cm}^3$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Sabendo que $1\\,000\\text{ cm}^3 = 1\\text{ litro}$, quantos litros cabem em $30\\,000\\text{ cm}^3$?", "answers": ["30"], "explain": "$30\\,000 \\div 1\\,000 = 30$ litros."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos litros cabem em $2\\text{ m}^3$? ($1\\text{ m}^3 = 1\\,000\\text{ L}$)", "answers": ["2000"], "explain": "$2 \\times 1\\,000 = 2\\,000\\text{ L}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Volume e Medidas de capacidade**, qual afirmação está correta?", "options": ["$50 \\times 20 \\times 30 = 30\\,000\\text{ cm}^3$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$50 \\times 20 \\times 30 = 30\\,000\\text{ cm}^3$."}]}, {"id": "u4_l5", "title": "20. Grandezas e medidas no plano cartesiano", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Grandezas e medidas no plano cartesiano**, vire o cartão para revisar a ideia-chave:", "front": "Grandezas e medidas no plano cartesiano", "back": "Coordenadas $(+,+)$ ficam no 1º Quadrante.", "explain": "Cartão de **Grandezas e medidas no plano cartesiano** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Em qual quadrante fica o ponto $(3, 5)$ (ambos positivos)?", "options": ["1º Quadrante", "2º Quadrante", "3º Quadrante", "4º Quadrante"], "correctIndex": 0, "explain": "Coordenadas $(+,+)$ ficam no 1º Quadrante."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual a distância horizontal entre os pontos $(2, 4)$ e $(9, 4)$?", "answers": ["7"], "explain": "$9 - 2 = 7$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Um ponto sobre o eixo $x$ tem sempre coordenada $y$ igual a:", "options": ["$1$", "$0$", "$-1$", "$x$"], "correctIndex": 1, "explain": "No eixo das abscissas ($x$), $y = 0$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Grandezas e medidas no plano cartesiano**, qual afirmação está correta?", "options": ["Coordenadas $(+,+)$ ficam no 1º Quadrante.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Coordenadas $(+,+)$ ficam no 1º Quadrante."}]}]}, {"id": "u5", "num": 5, "title": "Estatística e Probabilidade", "bncc": "EF08MA22 · EF09MA22", "desc": "Estatística, gráficos, tendência central e probabilidade.", "lessons": [{"id": "u5_l1", "title": "21. Estatística", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Estatística**, vire o cartão para revisar a ideia-chave:", "front": "Estatística", "back": "Amostra representa uma parte da população.", "explain": "Cartão de **Estatística** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a diferença entre população e amostra em uma pesquisa?", "options": ["População é tudo; amostra é um subconjunto", "São a mesma coisa", "Amostra é maior que população", "População é só números pares"], "correctIndex": 0, "explain": "Amostra representa uma parte da população."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $40$ alunos de $200$ preferem Matemática, qual a frequência relativa em %?", "answers": ["20", "20%"], "explain": "$\\frac{40}{200} = 0{,}20 = 20\\%$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Amplitude do conjunto $4, 9, 12, 20$ (maior menos menor):", "answers": ["16"], "explain": "$20 - 4 = 16$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Estatística**, qual afirmação está correta?", "options": ["Amostra representa uma parte da população.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Amostra representa uma parte da população."}]}, {"id": "u5_l2", "title": "22. Representação gráfica dos dados de uma pesquisa", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Representação gráfica dos dados de uma pesquisa**, vire o cartão para revisar a ideia-chave:", "front": "Representação gráfica dos dados de uma pesquisa", "back": "Gráfico de linhas mostra tendências ao longo do tempo.", "explain": "Cartão de **Representação gráfica dos dados de uma pesquisa** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual gráfico é mais indicado para mostrar a evolução da temperatura ao longo dos meses?", "options": ["Setores", "Linhas", "Pictograma", "Tabela"], "correctIndex": 1, "explain": "Gráfico de linhas mostra tendências ao longo do tempo."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em um gráfico de setores, metade do círculo ($180^\\circ$) representa quantos %?", "answers": ["50", "50%"], "explain": "$180^\\circ / 360^\\circ = 50\\%$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual elemento NÃO pode faltar para ler corretamente um gráfico?", "options": ["Título e legenda/eixos", "Cores neon", "Sombra 3D", "Apenas números"], "correctIndex": 0, "explain": "Título e eixos/legendas dão significado aos dados."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Representação gráfica dos dados de uma pesquisa**, qual afirmação está correta?", "options": ["Gráfico de linhas mostra tendências ao longo do tempo.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Gráfico de linhas mostra tendências ao longo do tempo."}]}, {"id": "u5_l3", "title": "23. medidas de tendência central", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **medidas de tendência central**, vire o cartão para revisar a ideia-chave:", "front": "medidas de tendência central", "back": "Termo central ordenado: $7$.", "explain": "Cartão de **medidas de tendência central** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule a mediana de $2, 5, 7, 12, 20$:", "answers": ["7"], "explain": "Termo central ordenado: $7$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a moda de $13, 14, 14, 15, 14, 13$?", "options": ["$13$", "$14$", "$15$", "$13{,}8$"], "correctIndex": 1, "explain": "$14$ é o valor mais frequente."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é a média de $10, 12, 14, 16$?", "answers": ["13"], "explain": "$(10+12+14+16)\\div 4 = 52\\div 4 = 13$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **medidas de tendência central**, qual afirmação está correta?", "options": ["Termo central ordenado: $7$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Termo central ordenado: $7$."}]}, {"id": "u5_l4", "title": "24. Probabilidade", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Probabilidade**, vire o cartão para revisar a ideia-chave:", "front": "Probabilidade", "back": "São 4 naipes iguais: $52 \\div 4 = 13$.", "explain": "Cartão de **Probabilidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em um baralho de 52 cartas, quantas são de copas?", "answers": ["13"], "explain": "São 4 naipes iguais: $52 \\div 4 = 13$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Probabilidade (%) de sair número par em um dado de 6 faces:", "answers": ["50", "50%"], "explain": "3 pares ($2,4,6$) em 6 = $50\\%$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "A soma das probabilidades de um evento ocorrer e não ocorrer é sempre:", "options": ["$0$", "$0{,}5$", "$1$", "$100$"], "correctIndex": 2, "explain": "$P(A) + P(\\bar{A}) = 1$ ($100\\%$)."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Probabilidade**, qual afirmação está correta?", "options": ["São 4 naipes iguais: $52 \\div 4 = 13$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "São 4 naipes iguais: $52 \\div 4 = 13$."}]}, {"id": "u5_l5", "title": "25. Misturando Estatística e Probabilidade", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Misturando Estatística e Probabilidade**, vire o cartão para revisar a ideia-chave:", "front": "Misturando Estatística e Probabilidade", "back": "$\\frac{5}{20} = \\frac{1}{4} = 25\\%$.", "explain": "Cartão de **Misturando Estatística e Probabilidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Pesquisa com 20 alunos: 5 usam óculos. Sorteando 1 aluno, qual a chance (%) de usar óculos?", "answers": ["25", "25%"], "explain": "$\\frac{5}{20} = \\frac{1}{4} = 25\\%$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Numa tabela, 8 tiraram A, 12 tiraram B e 20 tiraram C. Chance (%) de sortear alguém que tirou B:", "answers": ["30", "30%"], "explain": "Total $40$; $\\frac{12}{40} = 0{,}30 = 30\\%$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Quando um dado não viciado é lançado 600 vezes, espera-se cerca de quantas vezes o número 1?", "options": ["$10$", "$60$", "$100$", "$300$"], "correctIndex": 2, "explain": "$600 \\times \\frac{1}{6} = 100$ vezes."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Misturando Estatística e Probabilidade**, qual afirmação está correta?", "options": ["$\\frac{5}{20} = \\frac{1}{4} = 25\\%$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\frac{5}{20} = \\frac{1}{4} = 25\\%$."}]}]}, {"id": "u6", "num": 6, "title": "Contagem e Geometria Básica", "bncc": "EF08MA03 · EF08MA15", "desc": "Contagem, combinatória, construções, lugares e triângulos.", "lessons": [{"id": "u6_l1", "title": "26. Princípio Fundamental da Contagem", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Princípio Fundamental da Contagem**, vire o cartão para revisar a ideia-chave:", "front": "Princípio Fundamental da Contagem", "back": "$3 \\times 4 = 12$.", "explain": "Cartão de **Princípio Fundamental da Contagem** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Com $3$ camisetas e $4$ calças, quantos visuais diferentes podemos montar?", "answers": ["12"], "explain": "$3 \\times 4 = 12$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantas senhas de 2 dígitos podem ser formadas com os algarismos $1, 2, 3$ (podendo repetir)?", "answers": ["9"], "explain": "$3 \\times 3 = 9$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Para ir de A a B há 2 caminhos e de B a C há 5 caminhos. Quantas rotas de A até C?", "answers": ["10"], "explain": "$2 \\times 5 = 10$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Princípio Fundamental da Contagem**, qual afirmação está correta?", "options": ["$3 \\times 4 = 12$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$3 \\times 4 = 12$."}]}, {"id": "u6_l2", "title": "27. Análise Combinatória", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Análise Combinatória**, vire o cartão para revisar a ideia-chave:", "front": "Análise Combinatória", "back": "$3! = 3 \\times 2 \\times 1 = 6$.", "explain": "Cartão de **Análise Combinatória** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "De quantas formas 3 amigos ($A, B, C$) podem formar uma fila? ($3!$)", "answers": ["6"], "explain": "$3! = 3 \\times 2 \\times 1 = 6$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto vale $4!$ (fatorial de 4)?", "answers": ["24"], "explain": "$4 \\times 3 \\times 2 \\times 1 = 24$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Quando a ordem NÃO importa (ex: escolher dupla de uma turma), usamos:", "options": ["Permutação", "Combinação", "Arranjo", "Potência"], "correctIndex": 1, "explain": "Na combinação, a ordem dos escolhidos não altera o grupo."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Análise Combinatória**, qual afirmação está correta?", "options": ["$3! = 3 \\times 2 \\times 1 = 6$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$3! = 3 \\times 2 \\times 1 = 6$."}]}, {"id": "u6_l3", "title": "28. Construções geométricas", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Construções geométricas**, vire o cartão para revisar a ideia-chave:", "front": "Construções geométricas", "back": "O compasso traça arcos e circunferências.", "explain": "Cartão de **Construções geométricas** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual instrumento traça circunferências e transporta medidas na construção geométrica?", "options": ["Transferidor", "Compasso", "Calculadora", "Esquadro"], "correctIndex": 1, "explain": "O compasso traça arcos e circunferências."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "A reta perpendicular que passa exatamente pelo ponto médio de um segmento chama-se:", "options": ["Bissetriz", "Mediatriz", "Diagonal", "Hipotenusa"], "correctIndex": 1, "explain": "Mediatriz corta o segmento ao meio a $90^\\circ$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "A semirreta que divide um ângulo em dois ângulos iguais chama-se:", "options": ["Bissetriz", "Mediatriz", "Corda", "Tangente"], "correctIndex": 0, "explain": "Bissetriz divide o ângulo ao meio."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Construções geométricas**, qual afirmação está correta?", "options": ["O compasso traça arcos e circunferências.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "O compasso traça arcos e circunferências."}]}, {"id": "u6_l4", "title": "29. Lugares Geométricos", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Lugares Geométricos**, vire o cartão para revisar a ideia-chave:", "front": "Lugares Geométricos", "back": "Definição exata de circunferência!", "explain": "Cartão de **Lugares Geométricos** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "O lugar geométrico dos pontos que estão à mesma distância $r$ de um ponto $O$ é:", "options": ["Uma reta", "Uma circunferência", "Um triângulo", "Um quadrado"], "correctIndex": 1, "explain": "Definição exata de circunferência!"}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "O lugar geométrico dos pontos equidistantes dos extremos $A$ e $B$ de um segmento é a:", "options": ["Mediatriz de $AB$", "Bissetriz", "Altura", "Base"], "correctIndex": 0, "explain": "Qualquer ponto da mediatriz tem mesma distância a $A$ e $B$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se um ponto está na bissetriz de um ângulo de $70^\\circ$, quanto mede cada metade?", "answers": ["35"], "explain": "$70 \\div 2 = 35^\\circ$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Lugares Geométricos**, qual afirmação está correta?", "options": ["Definição exata de circunferência!", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Definição exata de circunferência!"}]}, {"id": "u6_l5", "title": "30. Triângulos", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Triângulos**, vire o cartão para revisar a ideia-chave:", "front": "Triângulos", "back": "Triângulo B tem um ângulo de $90^\\circ$.", "explain": "Cartão de **Triângulos** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho mostra um triângulo retângulo?", "options": [{"label": "A", "drawing": "tri_equi"}, {"label": "B", "drawing": "tri_rect"}, {"label": "C", "drawing": "quad_trap"}, {"label": "D", "drawing": "cube_3d"}], "correctIndex": 1, "explain": "Triângulo B tem um ângulo de $90^\\circ$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em um triângulo, dois ângulos medem $50^\\circ$ e $60^\\circ$. Quanto mede o terceiro?", "answers": ["70"], "explain": "$180 - (50+60) = 70^\\circ$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Um triângulo com os 3 lados de medidas diferentes chama-se:", "options": ["Equilátero", "Isósceles", "Escaleno", "Retângulo"], "correctIndex": 2, "explain": "Escaleno = 3 lados diferentes."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Triângulos**, qual afirmação está correta?", "options": ["Triângulo B tem um ângulo de $90^\\circ$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Triângulo B tem um ângulo de $90^\\circ$."}]}]}, {"id": "u7", "num": 7, "title": "Transformações, Tales e Pitágoras", "bncc": "EF09MA12 · EF09MA13", "desc": "Quadriláteros, transformações, semelhança, Tales e Pitágoras.", "lessons": [{"id": "u7_l1", "title": "31. Quadriláteros", "duration": "2–4 min", "xp": 85, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Quadriláteros**, vire o cartão para revisar a ideia-chave:", "front": "Quadriláteros", "back": "Um quadrilátero se divide em 2 triângulos: $2\\times 180 = 360^\\circ$.", "explain": "Cartão de **Quadriláteros** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é a soma dos ângulos internos de qualquer quadrilátero?", "answers": ["360"], "explain": "Um quadrilátero se divide em 2 triângulos: $2\\times 180 = 360^\\circ$."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual figura tem apenas UM par de lados paralelos (trapézio)?", "options": [{"label": "A", "drawing": "tri_equi"}, {"label": "B", "drawing": "quad_trap"}, {"label": "C", "drawing": "cube_3d"}, {"label": "D", "drawing": "circle_const"}], "correctIndex": 1, "explain": "Figura B é um trapézio."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual quadrilátero tem os 4 lados iguais e os 4 ângulos retos?", "options": ["Losango", "Retângulo", "Quadrado", "Trapézio"], "correctIndex": 2, "explain": "O quadrado reúne as duas propriedades."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Quadriláteros**, qual afirmação está correta?", "options": ["Um quadrilátero se divide em 2 triângulos: $2\\times 180 = 360^\\circ$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Um quadrilátero se divide em 2 triângulos: $2\\times 180 = 360^\\circ$."}]}, {"id": "u7_l2", "title": "32. Transformações geométricas", "duration": "2–4 min", "xp": 85, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Transformações geométricas**, vire o cartão para revisar a ideia-chave:", "front": "Transformações geométricas", "back": "Rotação de $+90^\\circ$ leva o eixo $+x$ para $+y$: $(0, 2)$.", "explain": "Cartão de **Transformações geométricas** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Se girarmos o ponto $(2, 0)$ em $90^\\circ$ anti-horário ao redor da origem, ele vai para:", "options": ["$(0, 2)$", "$(-2, 0)$", "$(0, -2)$", "$(2, 2)$"], "correctIndex": 0, "explain": "Rotação de $+90^\\circ$ leva o eixo $+x$ para $+y$: $(0, 2)$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual transformação altera o tamanho mantendo o formato (semelhança)?", "options": ["Homotetia", "Translação", "Rotação", "Reflexão"], "correctIndex": 0, "explain": "Homotetia amplia ou reduz proporcionalmente."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Na reflexão em torno do eixo $y$, o ponto $(4, 3)$ vai para:", "options": ["$(-4, 3)$", "$(4, -3)$", "$(-4, -3)$", "$(3, 4)$"], "correctIndex": 0, "explain": "Inverte o sinal de $x$: $(-4, 3)$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Transformações geométricas**, qual afirmação está correta?", "options": ["Rotação de $+90^\\circ$ leva o eixo $+x$ para $+y$: $(0, 2)$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Rotação de $+90^\\circ$ leva o eixo $+x$ para $+y$: $(0, 2)$."}]}, {"id": "u7_l3", "title": "33. Semelhança de figuras", "duration": "2–4 min", "xp": 85, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Semelhança de figuras**, vire o cartão para revisar a ideia-chave:", "front": "Semelhança de figuras", "back": "Semelhança preserva ângulos e proporcionalidade.", "explain": "Cartão de **Semelhança de figuras** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Duas figuras semelhantes têm obrigatoriamente:", "options": ["Mesma área", "Ângulos iguais e lados proporcionais", "Mesmo perímetro", "Lados iguais"], "correctIndex": 1, "explain": "Semelhança preserva ângulos e proporcionalidade."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um triângulo de lados $3, 4, 5$ é ampliado na razão $2$. Quanto medirá o maior lado?", "answers": ["10"], "explain": "$5 \\times 2 = 10$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se dois triângulos são semelhantes com razão $k = 3$, um lado de $4\\text{ cm}$ corresponde a:", "answers": ["12"], "explain": "$4 \\times 3 = 12\\text{ cm}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Semelhança de figuras**, qual afirmação está correta?", "options": ["Semelhança preserva ângulos e proporcionalidade.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Semelhança preserva ângulos e proporcionalidade."}]}, {"id": "u7_l4", "title": "34. Teorema de Tales", "duration": "2–4 min", "xp": 85, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Teorema de Tales**, vire o cartão para revisar a ideia-chave:", "front": "Teorema de Tales", "back": "$\\frac{2}{3} = \\frac{x}{90} \\Rightarrow x = 60$.", "explain": "Cartão de **Teorema de Tales** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Pelo Teorema de Tales, se $\\frac{70}{105} = \\frac{x}{90}$, quanto vale $x$?", "answers": ["60"], "explain": "$\\frac{2}{3} = \\frac{x}{90} \\Rightarrow x = 60$.", "visual": "tales_lines"}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Num feixe de paralelas, $\\frac{4}{6} = \\frac{x}{9}$. Quanto vale $x$?", "answers": ["6"], "explain": "$6x = 36 \\Rightarrow x = 6$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "O Teorema de Tales relaciona segmentos formados por:", "options": ["Retas paralelas cortadas por transversais", "Círculos concêntricos", "Cubos e esferas", "Apenas ângulos obtusos"], "correctIndex": 0, "explain": "Feixe de paralelas e transversais gera segmentos proporcionais."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Teorema de Tales**, qual afirmação está correta?", "options": ["$\\frac{2}{3} = \\frac{x}{90} \\Rightarrow x = 60$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\frac{2}{3} = \\frac{x}{90} \\Rightarrow x = 60$."}]}, {"id": "u7_l5", "title": "35. Teorema de Pitágoras", "duration": "2–4 min", "xp": 85, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Teorema de Pitágoras**, vire o cartão para revisar a ideia-chave:", "front": "Teorema de Pitágoras", "back": "$\\sqrt{6^2+8^2} = \\sqrt{100} = 10$.", "explain": "Cartão de **Teorema de Pitágoras** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Catetos $b=6$ e $c=8$. Quanto mede a hipotenusa $a$?", "answers": ["10"], "explain": "$\\sqrt{6^2+8^2} = \\sqrt{100} = 10$.", "visual": "pythagoras_tri"}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Catetos $3$ e $4$. Quanto mede a hipotenusa?", "answers": ["5"], "explain": "$\\sqrt{9+16} = \\sqrt{25} = 5$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Um triângulo de lados $5, 12, 13$ é retângulo?", "options": ["Não", "Sim, pois $13^2 = 5^2 + 12^2$", "Só se for isósceles", "Impossível"], "correctIndex": 1, "explain": "$169 = 25 + 144$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Teorema de Pitágoras**, qual afirmação está correta?", "options": ["$\\sqrt{6^2+8^2} = \\sqrt{100} = 10$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\sqrt{6^2+8^2} = \\sqrt{100} = 10$."}]}]}, {"id": "u8", "num": 8, "title": "Métricas, Círculo e Grandezas", "bncc": "EF09MA11 · EF09MA14", "desc": "Relações métricas, aplicações, circunferência, ângulos e unidades.", "lessons": [{"id": "u8_l1", "title": "36. Relações métricas no triângulo", "duration": "2–4 min", "xp": 90, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Relações métricas no triângulo**, vire o cartão para revisar a ideia-chave:", "front": "Relações métricas no triângulo", "back": "$10h = 48 \\Rightarrow h = 4{,}8$.", "explain": "Cartão de **Relações métricas no triângulo** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se a hipotenusa é $a=10$ e os catetos são $b=6$ e $c=8$, quanto mede a altura $h$ ($a\\cdot h = b\\cdot c$)?", "answers": ["4,8", "4.8"], "explain": "$10h = 48 \\Rightarrow h = 4{,}8$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se as projeções dos catetos são $m=4$ e $n=9$, quanto vale a altura $h$ ($h^2 = m\\cdot n$)?", "answers": ["6"], "explain": "$h^2 = 4\\times 9 = 36 \\Rightarrow h = 6$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $a = 25$ e a projeção $n = 9$, quanto vale o cateto $b$ ($b^2 = a\\cdot n$)?", "answers": ["15"], "explain": "$b^2 = 25 \\times 9 = 225 \\Rightarrow b = 15$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Relações métricas no triângulo**, qual afirmação está correta?", "options": ["$10h = 48 \\Rightarrow h = 4{,}8$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$10h = 48 \\Rightarrow h = 4{,}8$."}]}, {"id": "u8_l2", "title": "37. Aplicações do teorema de Pitágoras", "duration": "2–4 min", "xp": 90, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Aplicações do teorema de Pitágoras**, vire o cartão para revisar a ideia-chave:", "front": "Aplicações do teorema de Pitágoras", "back": "$h^2 + 3^2 = 5^2 \\Rightarrow h^2 = 16 \\Rightarrow h = 4\\text{ m}$.", "explain": "Cartão de **Aplicações do teorema de Pitágoras** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Uma escada de $5\\text{ m}$ está apoiada a $3\\text{ m}$ da parede. A que altura ela alcança?", "answers": ["4"], "explain": "$h^2 + 3^2 = 5^2 \\Rightarrow h^2 = 16 \\Rightarrow h = 4\\text{ m}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual a diagonal de um retângulo de lados $6\\text{ cm}$ e $8\\text{ cm}$?", "answers": ["10"], "explain": "$d = \\sqrt{6^2+8^2} = 10\\text{ cm}$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "A diagonal de um quadrado de lado $L$ vale sempre:", "options": ["$2L$", "$L\\sqrt{2}$", "$L^2$", "$L/2$"], "correctIndex": 1, "explain": "$d^2 = L^2 + L^2 = 2L^2 \\Rightarrow d = L\\sqrt{2}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Aplicações do teorema de Pitágoras**, qual afirmação está correta?", "options": ["$h^2 + 3^2 = 5^2 \\Rightarrow h^2 = 16 \\Rightarrow h = 4\\text{ m}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$h^2 + 3^2 = 5^2 \\Rightarrow h^2 = 16 \\Rightarrow h = 4\\text{ m}$."}]}, {"id": "u8_l3", "title": "38. Circunferencia e círculo", "duration": "2–4 min", "xp": 90, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Circunferencia e círculo**, vire o cartão para revisar a ideia-chave:", "front": "Circunferencia e círculo", "back": "$2 \\times 6 = 12\\text{ cm}$.", "explain": "Cartão de **Circunferencia e círculo** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se o raio mede $6\\text{ cm}$, quanto mede o diâmetro?", "answers": ["12"], "explain": "$2 \\times 6 = 12\\text{ cm}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Com $\\pi \\approx 3$, qual o comprimento ($C = 2\\pi r$) de uma circunferência de raio $5\\text{ cm}$?", "answers": ["30"], "explain": "$2 \\times 3 \\times 5 = 30\\text{ cm}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Com $\\pi \\approx 3$, qual a área ($A = \\pi r^2$) de um círculo de raio $4\\text{ m}$?", "answers": ["48"], "explain": "$3 \\times 4^2 = 3 \\times 16 = 48\\text{ m}^2$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Circunferencia e círculo**, qual afirmação está correta?", "options": ["$2 \\times 6 = 12\\text{ cm}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2 \\times 6 = 12\\text{ cm}$."}]}, {"id": "u8_l4", "title": "39. Ângulos em uma circunferência", "duration": "2–4 min", "xp": 90, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Ângulos em uma circunferência**, vire o cartão para revisar a ideia-chave:", "front": "Ângulos em uma circunferência", "back": "O ângulo inscrito vale metade do central: $80 \\div 2 = 40^\\circ$.", "explain": "Cartão de **Ângulos em uma circunferência** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um ângulo central mede $80^\\circ$. Quanto mede o ângulo inscrito correspondente?", "answers": ["40"], "explain": "O ângulo inscrito vale metade do central: $80 \\div 2 = 40^\\circ$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se um ângulo inscrito mede $35^\\circ$, quanto mede o arco (ângulo central) correspondente?", "answers": ["70"], "explain": "O central é o dobro do inscrito: $2 \\times 35 = 70^\\circ$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Todo ângulo inscrito apoiado em um diâmetro ($180^\\circ$) mede quantos graus?", "answers": ["90"], "explain": "Metade de $180^\\circ$ é $90^\\circ$ (ângulo reto)."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Ângulos em uma circunferência**, qual afirmação está correta?", "options": ["O ângulo inscrito vale metade do central: $80 \\div 2 = 40^\\circ$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "O ângulo inscrito vale metade do central: $80 \\div 2 = 40^\\circ$."}]}, {"id": "u8_l5", "title": "40. Unidade de medida de outras grandezas", "duration": "2–4 min", "xp": 90, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Unidade de medida de outras grandezas**, vire o cartão para revisar a ideia-chave:", "front": "Unidade de medida de outras grandezas", "back": "$2 \\times 1\\,000 = 2\\,000\\text{ MB}$.", "explain": "Cartão de **Unidade de medida de outras grandezas** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um arquivo tem $2\\text{ GB}$. Sabendo que $1\\text{ GB} \\approx 1\\,000\\text{ MB}$, quantos MB são?", "answers": ["2000"], "explain": "$2 \\times 1\\,000 = 2\\,000\\text{ MB}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um carro a $72\\text{ km/h}$ percorre quantos metros por segundo? (divida por $3{,}6$)", "answers": ["20"], "explain": "$72 \\div 3{,}6 = 20\\text{ m/s}$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual unidade mede energia elétrica consumida em casa?", "options": ["Quilowatt-hora (kWh)", "Quilograma (kg)", "Hertz (Hz)", "Metro (m)"], "correctIndex": 0, "explain": "O consumo residencial é medido em kWh."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Unidade de medida de outras grandezas**, qual afirmação está correta?", "options": ["$2 \\times 1\\,000 = 2\\,000\\text{ MB}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2 \\times 1\\,000 = 2\\,000\\text{ MB}$."}]}]}];
 
-
-    const UNITS_BLOCO_1 = [
-      {
-        id: 'b1_u1', num: 1, title: 'Sistemas Numéricos e Naturais', bncc: 'EF06MA01 · EF06MA03',
-        desc: 'Sistemas de numeração, números naturais e as 4 operações fundamentais.',
-        lessons: [
-          {
-            id: 'b1_u1_l1', title: 'Sistemas e Naturais', duration: '1–2 min', xp: 40,
-            questions: [
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'No sistema de numeração romano, qual número corresponde ao símbolo $XIV$?', options: ['$14$', '$16$', '$24$', '$41$'], correctIndex: 0, explain: '$X = 10$ e $IV = 5 - 1 = 4$. Juntando: $10 + 4 = 14$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é o sucessor do número natural $999$?', answers: ['1000'], explain: 'O sucessor de $999$ é $999 + 1 = 1\,000$.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'No número $4\,582$, qual é o valor posicional do algarismo $5$?', options: ['$5$', '$50$', '$500$', '$5\,000$'], correctIndex: 2, explain: 'O $5$ está na casa das centenas, valendo $500$.' }
-            ]
-          },
-          {
-            id: 'b1_u1_l2', title: 'As 4 Operações Naturais', duration: '1–2 min', xp: 45,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Calcule $125 + 75 - 40$:', answers: ['160'], explain: '$125 + 75 = 200$, e $200 - 40 = 160$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Em uma divisão exata, o dividendo é $144$ e o divisor é $12$. Qual é o quociente?', answers: ['12'], explain: '$144 \div 12 = 12$, pois $12 \times 12 = 144$.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'Qual é o resultado da potência $2^4$?', options: ['$8$', '$12$', '$16$', '$24$'], correctIndex: 2, explain: '$2^4 = 2 \times 2 \times 2 \times 2 = 16$.' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'b1_u2', num: 2, title: 'Múltiplos, Divisores e Expressões', bncc: 'EF06MA05 · EF06MA06',
-        desc: 'Fatoração prima, MMC, MDC, operações inversas e expressões numéricas.',
-        lessons: [
-          {
-            id: 'b1_u2_l1', title: 'Fatoração, MMC e MDC', duration: '1–2 min', xp: 45,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é o MMC (Mínimo Múltiplo Comum) entre $6$ e $8$?', answers: ['24'], explain: 'Múltiplos de 6: 6, 12, 18, 24... De 8: 8, 16, 24... O menor comum é $24$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é o MDC (Máximo Divisor Comum) entre $12$ e $18$?', answers: ['6'], explain: 'Divisores de 12: 1, 2, 3, 4, 6, 12. De 18: 1, 2, 3, 6, 9, 18. O maior comum é $6$.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'Qual é a fatoração em números primos do número $30$?', options: ['$2 \times 15$', '$2 \times 3 \times 5$', '$3 \times 10$', '$5 \times 6$'], correctIndex: 1, explain: '$2, 3$ e $5$ são todos primos, e $2 \times 3 \times 5 = 30$.' }
-            ]
-          },
-          {
-            id: 'b1_u2_l2', title: 'Expressões Numéricas', duration: '1–2 min', xp: 45,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Resolva respeitando a ordem das operações: $5 + 3 \times 4$:', answers: ['17'], explain: 'Multiplicação vem antes da soma: $3 \times 4 = 12$, depois $5 + 12 = 17$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Resolva: $20 - (4 + 6) \div 2$:', answers: ['15'], explain: 'Parênteses primeiro: $4 + 6 = 10$. Divisão: $10 \div 2 = 5$. Por fim: $20 - 5 = 15$.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'Qual símbolo de agrupamento deve ser resolvido POR ÚLTIMO em $\{[()] \}$?', options: ['Parênteses $()$', 'Colchetes $[]$', 'Chaves $\{\}$', 'Multiplicação'], correctIndex: 2, explain: 'Resolvemos de dentro para fora: primeiro $()$, depois $[]$ e por último $\{\}$.' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'b1_u3', num: 3, title: 'Frações, Decimais e Porcentagem', bncc: 'EF06MA07 · EF06MA13',
-        desc: 'Operações com frações, números decimais e porcentagens do dia a dia.',
-        lessons: [
-          {
-            id: 'b1_u3_l1', title: 'Frações e Decimais', duration: '1–2 min', xp: 50,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Quanto é $\frac{1}{4} + \frac{2}{4}$? (digite como fração a/b)', answers: ['3/4'], explain: 'Com denominadores iguais, somamos os numeradores: $\frac{1+2}{4} = \frac{3}{4}$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Quanto é $2{,}5 + 1{,}75$? (use vírgula)', answers: ['4,25', '4.25'], explain: '$2{,}50 + 1{,}75 = 4{,}25$.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'Qual é a forma decimal da fração $\frac{1}{2}$?', options: ['$0{,}2$', '$0{,}5$', '$1{,}2$', '$0{,}25$'], correctIndex: 1, explain: '$1 \div 2 = 0{,}5$.' }
-            ]
-          },
-          {
-            id: 'b1_u3_l2', title: 'Porcentagem Prática', duration: '1–2 min', xp: 50,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Quanto é $50\%$ de $80$?', answers: ['40'], explain: '$50\%$ é a metade: $80 \div 2 = 40$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Um caderno de $\text{R\$ } 40{,}00$ teve $10\%$ de desconto. Quanto passou a custar?', answers: ['36'], explain: '$10\%$ de $40$ é $4$. Logo, $40 - 4 = 36$ reais.' },
-              { type: 'mc', tag: 'Múltipla Escolha', prompt: 'A fração $\frac{1}{4}$ equivale a qual porcentagem?', options: ['$10\%$', '$20\%$', '$25\%$', '$40\%$'], correctIndex: 2, explain: '$1 \div 4 = 0{,}25 = 25\%$.' }
-            ]
-          }
-        ]
-      },
-      {
-        id: 'b1_u4', num: 4, title: 'Inteiros, Proporção e Equações', bncc: 'EF07MA04 · EF07MA17',
-        desc: 'Números inteiros, regra de 3 simples e introdução às equações.',
-        lessons: [
-          {
-            id: 'b1_u4_l1', title: 'Inteiros (Z) e Regra de 3', duration: '1–2 min', xp: 50,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Calcule $(-8) + (+12)$:', answers: ['4', '+4'], explain: 'Sinais diferentes: subtrai e mantém o sinal do maior módulo ($12 - 8 = +4$).' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Se $3$ cadernos custam $24$ reais, quanto custam $5$ cadernos iguais?', answers: ['40'], explain: 'Cada caderno custa $24 \div 3 = 8$ reais. Logo, $5 \times 8 = 40$ reais.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é o valor de $x$ em $x + 7 = 19$?', answers: ['12'], explain: '$x = 19 - 7 = 12$.' }
-            ]
-          },
-          {
-            id: 'b1_u4_l2', title: 'Perímetro, Área e Dados', duration: '1–2 min', xp: 50,
-            questions: [
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é o perímetro de um quadrado cujo lado mede $9\text{ cm}$?', answers: ['36'], explain: 'Um quadrado tem 4 lados iguais: $4 \times 9 = 36\text{ cm}$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Qual é a área de um retângulo de base $8\text{ cm}$ e altura $5\text{ cm}$?', answers: ['40'], explain: 'Área do retângulo = $\text{base} \times \text{altura} = 8 \times 5 = 40\text{ cm}^2$.' },
-              { type: 'calc', tag: 'Cálculo Rápido', prompt: 'Ao lançar um dado comum de 6 lados, quantas são as chances (em fração a/b) de sair o número $6$?', answers: ['1/6'], explain: 'Há 1 face com o número 6 em um total de 6 faces: $\frac{1}{6}$.' }
-            ]
-          }
-        ]
-      }
-    ];
+    const UNITS_BLOCO_1 = [{"id": "b1_u1", "num": 1, "title": "Sistemas e Naturais", "bncc": "EF06MA01 · EF06MA03", "desc": "Sistemas numéricos, naturais, soma, subtração e multiplicação.", "lessons": [{"id": "b1_u1_l1", "title": "1. Sistemas Numéricos", "duration": "2–4 min", "xp": 45, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Sistemas Numéricos**, vire o cartão para revisar a ideia-chave:", "front": "Sistemas Numéricos", "back": "$X=10$ e $IV=4$, logo $10+4=14$.", "explain": "Cartão de **Sistemas Numéricos** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "No sistema romano, qual valor representa $XIV$?", "options": ["$14$", "$16$", "$24$", "$41$"], "correctIndex": 0, "explain": "$X=10$ e $IV=4$, logo $10+4=14$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "No número $4\\,582$, qual o valor posicional do algarismo $5$?", "answers": ["500"], "explain": "O $5$ está na ordem das centenas ($500$)."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque na reta numérica o número correspondente a $X - III$:", "ticks": [3, 4, 5, 6, 7, 8], "correctValue": 7, "explain": "$10 - 3 = 7$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Sistemas Numéricos**, qual afirmação está correta?", "options": ["$X=10$ e $IV=4$, logo $10+4=14$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$X=10$ e $IV=4$, logo $10+4=14$."}]}, {"id": "b1_u1_l2", "title": "2. Números naturais", "duration": "2–4 min", "xp": 45, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Números naturais**, vire o cartão para revisar a ideia-chave:", "front": "Números naturais", "back": "Sucessor de $4$ é $4 + 1 = 5$.", "explain": "Cartão de **Números naturais** revisado! Agora vamos praticar."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Clique no sucessor do número natural $4$:", "ticks": [0, 1, 2, 3, 4, 5, 6], "correctValue": 5, "explain": "Sucessor de $4$ é $4 + 1 = 5$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é o antecessor de $1\\,000$?", "answers": ["999"], "explain": "$1\\,000 - 1 = 999$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual conjunto contém apenas números naturais?", "options": ["$-2, 0, 1$", "$0, 5, 12$", "$1/2, 3, 4$", "$0{,}5, 2$"], "correctIndex": 1, "explain": "Naturais ($\\mathbb{N}$) são inteiros não negativos: $0, 5, 12$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Números naturais**, qual afirmação está correta?", "options": ["Sucessor de $4$ é $4 + 1 = 5$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Sucessor de $4$ é $4 + 1 = 5$."}]}, {"id": "b1_u1_l3", "title": "3. Adição com naturais", "duration": "2–4 min", "xp": 45, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Adição com naturais**, vire o cartão para revisar a ideia-chave:", "front": "Adição com naturais", "back": "$125 + 75 = 200$.", "explain": "Cartão de **Adição com naturais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $125 + 75$:", "answers": ["200"], "explain": "$125 + 75 = 200$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em uma turma há $18$ meninos e $17$ meninas. Quantos alunos há ao todo?", "answers": ["35"], "explain": "$18 + 17 = 35$ alunos."}, {"type": "blank", "tag": "Lacunas", "prompt": "Complete sobre a adição:", "sentence": "O elemento neutro da adição é o [0], e trocar a ordem das parcelas é a propriedade [1].", "inputs": [{"label": "Elemento neutro", "answers": ["0", "zero"]}, {"label": "Propriedade", "answers": ["comutativa", "Comutativa"]}], "explain": "Somar $0$ não altera o valor, e $a+b=b+a$ é comutativa."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Adição com naturais**, qual afirmação está correta?", "options": ["$125 + 75 = 200$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$125 + 75 = 200$."}]}, {"id": "b1_u1_l4", "title": "4. Subtração com naturais", "duration": "2–4 min", "xp": 45, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Subtração com naturais**, vire o cartão para revisar a ideia-chave:", "front": "Subtração com naturais", "back": "$200 - 65 = 135$.", "explain": "Cartão de **Subtração com naturais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $200 - 65$:", "answers": ["135"], "explain": "$200 - 65 = 135$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Você tinha $\\text{R\\$ } 50$ e gastou $\\text{R\\$ } 18$. Quanto sobrou?", "answers": ["32"], "explain": "$50 - 18 = 32$ reais."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Se $A - B = 14$ e $B = 9$, quanto vale $A$?", "options": ["$5$", "$21$", "$23$", "$25$"], "correctIndex": 2, "explain": "Pela operação inversa: $A = 14 + 9 = 23$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Subtração com naturais**, qual afirmação está correta?", "options": ["$200 - 65 = 135$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$200 - 65 = 135$."}]}, {"id": "b1_u1_l5", "title": "5. Multiplicação com números naturais", "duration": "2–4 min", "xp": 45, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Multiplicação com números naturais**, vire o cartão para revisar a ideia-chave:", "front": "Multiplicação com números naturais", "back": "$10\\times 5 + 4\\times 5 = 50 + 20 = 70$.", "explain": "Cartão de **Multiplicação com números naturais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $14 \\times 5$:", "answers": ["70"], "explain": "$10\\times 5 + 4\\times 5 = 50 + 20 = 70$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Uma caixa tem $12$ lápis. Quantos lápis há em $6$ caixas?", "answers": ["72"], "explain": "$12 \\times 6 = 72$ lápis."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é o elemento neutro da multiplicação?", "options": ["$0$", "$1$", "$2$", "$10$"], "correctIndex": 1, "explain": "Multiplicar qualquer número por $1$ mantém o mesmo valor."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Multiplicação com números naturais**, qual afirmação está correta?", "options": ["$10\\times 5 + 4\\times 5 = 50 + 20 = 70$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$10\\times 5 + 4\\times 5 = 50 + 20 = 70$."}]}]}, {"id": "b1_u2", "num": 2, "title": "Potência, Divisão e Expressões", "bncc": "EF06MA04 · EF06MA06", "desc": "Potenciação, divisão, fatoração, MMC, MDC e expressões.", "lessons": [{"id": "b1_u2_l1", "title": "6. Potenciação com números naturais", "duration": "2–4 min", "xp": 50, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Potenciação com números naturais**, vire o cartão para revisar a ideia-chave:", "front": "Potenciação com números naturais", "back": "$2 \\times 2 \\times 2 \\times 2 = 16$.", "explain": "Cartão de **Potenciação com números naturais** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Quanto vale $2^4$?", "options": ["$8$", "$12$", "$16$", "$24$"], "correctIndex": 2, "explain": "$2 \\times 2 \\times 2 \\times 2 = 16$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $5^2 + 3^2$:", "answers": ["34"], "explain": "$25 + 9 = 34$."}, {"type": "blank", "tag": "Lacunas", "prompt": "Complete os nomes em $5^3 = 125$:", "sentence": "O $5$ é a [0] e o $3$ é o [1].", "inputs": [{"label": "Nome do 5", "answers": ["base", "Base"]}, {"label": "Nome do 3", "answers": ["expoente", "Expoente"]}], "explain": "Base é o fator repetido e expoente indica quantas vezes se repete."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Potenciação com números naturais**, qual afirmação está correta?", "options": ["$2 \\times 2 \\times 2 \\times 2 = 16$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2 \\times 2 \\times 2 \\times 2 = 16$."}]}, {"id": "b1_u2_l2", "title": "7. Divisão de números naturais", "duration": "2–4 min", "xp": 50, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Divisão de números naturais**, vire o cartão para revisar a ideia-chave:", "front": "Divisão de números naturais", "back": "$12 \\times 12 = 144$.", "explain": "Cartão de **Divisão de números naturais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $144 \\div 12$:", "answers": ["12"], "explain": "$12 \\times 12 = 144$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Dividindo $35$ balas igualmente entre $4$ crianças, quantas balas sobram de resto?", "answers": ["3"], "explain": "$4 \\times 8 = 32$; sobram $35 - 32 = 3$ balas."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual número nunca pode ser divisor?", "options": ["$1$", "$0$", "$2$", "$10$"], "correctIndex": 1, "explain": "Não existe divisão por zero."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Divisão de números naturais**, qual afirmação está correta?", "options": ["$12 \\times 12 = 144$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$12 \\times 12 = 144$."}]}, {"id": "b1_u2_l3", "title": "8. Múltiplos e divisores", "duration": "2–4 min", "xp": 50, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Múltiplos e divisores**, vire o cartão para revisar a ideia-chave:", "front": "Múltiplos e divisores", "back": "$7 \\times 4 = 28$.", "explain": "Cartão de **Múltiplos e divisores** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual destes números é múltiplo de $7$?", "options": ["$20$", "$28$", "$36$", "$45$"], "correctIndex": 1, "explain": "$7 \\times 4 = 28$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos divisores naturais tem o número $6$?", "answers": ["4"], "explain": "Os divisores de $6$ são $1, 2, 3$ e $6$ (4 divisores)."}, {"type": "match", "tag": "Pares", "prompt": "Combine cada termo ao exemplo:", "pairs": [{"left": "Divisor de $15$", "right": "$5$"}, {"left": "Múltiplo de $9$", "right": "$27$"}, {"left": "Número primo", "right": "$13$"}, {"left": "Par e primo", "right": "$2$"}], "explain": "Divisores e múltiplos exatos!"}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Múltiplos e divisores**, qual afirmação está correta?", "options": ["$7 \\times 4 = 28$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$7 \\times 4 = 28$."}]}, {"id": "b1_u2_l4", "title": "9. Fatoração", "duration": "2–4 min", "xp": 50, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Fatoração**, vire o cartão para revisar a ideia-chave:", "front": "Fatoração", "back": "$2, 3$ e $5$ são primos e $2\\cdot 3\\cdot 5=30$.", "explain": "Cartão de **Fatoração** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a fatoração prima de $30$?", "options": ["$2 \\times 15$", "$2 \\times 3 \\times 5$", "$3 \\times 10$", "$5 \\times 6$"], "correctIndex": 1, "explain": "$2, 3$ e $5$ são primos e $2\\cdot 3\\cdot 5=30$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual número natural tem fatoração $2^2 \\times 3$?", "answers": ["12"], "explain": "$4 \\times 3 = 12$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual destes números é primo?", "options": ["$9$", "$15$", "$17$", "$21$"], "correctIndex": 2, "explain": "$17$ só divide por $1$ e por ele mesmo."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Fatoração**, qual afirmação está correta?", "options": ["$2, 3$ e $5$ são primos e $2\\cdot 3\\cdot 5=30$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2, 3$ e $5$ são primos e $2\\cdot 3\\cdot 5=30$."}]}, {"id": "b1_u2_l5", "title": "10. MMC e MDC", "duration": "2–4 min", "xp": 50, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **MMC e MDC**, vire o cartão para revisar a ideia-chave:", "front": "MMC e MDC", "back": "Múltiplos comuns: $24, 48\\dots$ O menor é $24$.", "explain": "Cartão de **MMC e MDC** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é o MMC entre $6$ e $8$?", "answers": ["24"], "explain": "Múltiplos comuns: $24, 48\\dots$ O menor é $24$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é o MDC entre $12$ e $18$?", "answers": ["6"], "explain": "O maior divisor comum de $12$ e $18$ é $6$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Dois ônibus saem juntos às 8h: um a cada $10\\text{ min}$ e outro a cada $15\\text{ min}$. Depois de quantos minutos saem juntos de novo?", "answers": ["30"], "explain": "$\\text{MMC}(10, 15) = 30$ minutos."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **MMC e MDC**, qual afirmação está correta?", "options": ["Múltiplos comuns: $24, 48\\dots$ O menor é $24$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Múltiplos comuns: $24, 48\\dots$ O menor é $24$."}]}]}, {"id": "b1_u3", "num": 3, "title": "Frações, Decimais e Porcentagem", "bncc": "EF06MA07 · EF06MA13", "desc": "Operações inversas, expressões, frações, decimais e %.", "lessons": [{"id": "b1_u3_l1", "title": "11. Operações inversas*", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Operações inversas***, vire o cartão para revisar a ideia-chave:", "front": "Operações inversas*", "back": "Inverso da multiplicação é divisão: $27 \\div 3 = 9$.", "explain": "Cartão de **Operações inversas*** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Pensei em um número, multipliquei por $3$ e deu $27$. Qual é o número?", "answers": ["9"], "explain": "Inverso da multiplicação é divisão: $27 \\div 3 = 9$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Somei $14$ a um número e obtive $30$. Qual era o número?", "answers": ["16"], "explain": "$30 - 14 = 16$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é a operação inversa da potenciação (para bases positivas)?", "options": ["Multiplicação", "Radiciação", "Subtração", "Divisão"], "correctIndex": 1, "explain": "A radiciação desfaz a potenciação (ex: $5^2=25$ e $\\sqrt{25}=5$)."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Operações inversas***, qual afirmação está correta?", "options": ["Inverso da multiplicação é divisão: $27 \\div 3 = 9$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Inverso da multiplicação é divisão: $27 \\div 3 = 9$."}]}, {"id": "b1_u3_l2", "title": "12. Expressões numéricas*", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Expressões numéricas***, vire o cartão para revisar a ideia-chave:", "front": "Expressões numéricas*", "back": "Multiplicação primeiro: $3 \\times 4 = 12$, depois $5 + 12 = 17$.", "explain": "Cartão de **Expressões numéricas*** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Resolva: $5 + 3 \\times 4$:", "answers": ["17"], "explain": "Multiplicação primeiro: $3 \\times 4 = 12$, depois $5 + 12 = 17$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Resolva: $20 - (4 + 6) \\div 2$:", "answers": ["15"], "explain": "$4+6=10 \\Rightarrow 10\\div 2=5 \\Rightarrow 20-5=15$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual agrupamento é resolvido por último em $\\{[()]\\}$?", "options": ["$()$", "$[]$", "$\\{\\}$", "Tanto faz"], "correctIndex": 2, "explain": "Ordem: parênteses $()$, colchetes $[]$ e chaves $\\{\\}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Expressões numéricas***, qual afirmação está correta?", "options": ["Multiplicação primeiro: $3 \\times 4 = 12$, depois $5 + 12 = 17$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Multiplicação primeiro: $3 \\times 4 = 12$, depois $5 + 12 = 17$."}]}, {"id": "b1_u3_l3", "title": "13. Frações", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Frações**, vire o cartão para revisar a ideia-chave:", "front": "Frações", "back": "Figura B mostra $3$ partes pintadas de $4$.", "explain": "Cartão de **Frações** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho representa a fração $\\frac{3}{4}$ pintada?", "options": [{"label": "A", "drawing": "frac_1_4"}, {"label": "B", "drawing": "frac_3_4"}, {"label": "C", "drawing": "frac_2_4"}, {"label": "D", "drawing": "frac_1_3"}], "correctIndex": 1, "explain": "Figura B mostra $3$ partes pintadas de $4$."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual figura mostra $\\frac{1}{3}$ pintado?", "options": [{"label": "A", "drawing": "frac_1_3"}, {"label": "B", "drawing": "frac_1_4"}, {"label": "C", "drawing": "frac_2_4"}, {"label": "D", "drawing": "frac_3_4"}], "correctIndex": 0, "explain": "Figura A divide o círculo em $3$ partes iguais e pinta $1$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque na reta onde fica a fração $\\frac{1}{2}$:", "ticks": ["0", "0,25", "0,5", "0,75", "1"], "correctValue": "0,5", "explain": "$\\frac{1}{2} = 0{,}5$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Frações**, qual afirmação está correta?", "options": ["Figura B mostra $3$ partes pintadas de $4$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Figura B mostra $3$ partes pintadas de $4$."}]}, {"id": "b1_u3_l4", "title": "14. Operações com frações", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Operações com frações**, vire o cartão para revisar a ideia-chave:", "front": "Operações com frações", "back": "$\\frac{1+2}{4} = \\frac{3}{4}$.", "explain": "Cartão de **Operações com frações** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto é $\\frac{1}{4} + \\frac{2}{4}$? (formato a/b)", "answers": ["3/4"], "explain": "$\\frac{1+2}{4} = \\frac{3}{4}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto é $\\frac{5}{6} - \\frac{2}{6}$ simplificado? (a/b)", "answers": ["1/2"], "explain": "$\\frac{3}{6} = \\frac{1}{2}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $\\frac{2}{3} \\times \\frac{3}{5}$ simplificado (a/b):", "answers": ["2/5"], "explain": "$\\frac{6}{15} = \\frac{2}{5}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Operações com frações**, qual afirmação está correta?", "options": ["$\\frac{1+2}{4} = \\frac{3}{4}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\frac{1+2}{4} = \\frac{3}{4}$."}]}, {"id": "b1_u3_l5", "title": "15. Números Decimais", "duration": "2–4 min", "xp": 55, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Números Decimais**, vire o cartão para revisar a ideia-chave:", "front": "Números Decimais", "back": "$2{,}50 + 1{,}75 = 4{,}25$.", "explain": "Cartão de **Números Decimais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto é $2{,}5 + 1{,}75$?", "answers": ["4,25", "4.25"], "explain": "$2{,}50 + 1{,}75 = 4{,}25$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque na reta o número decimal $1{,}5$:", "ticks": ["0", "0,5", "1", "1,5", "2"], "correctValue": "1,5", "explain": "$1{,}5$ fica exatamente entre $1$ e $2$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto é $0{,}4 \\times 10$?", "answers": ["4"], "explain": "Multiplicar por $10$ move a vírgula 1 casa à direita: $4$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Números Decimais**, qual afirmação está correta?", "options": ["$2{,}50 + 1{,}75 = 4{,}25$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2{,}50 + 1{,}75 = 4{,}25$."}]}]}, {"id": "b1_u4", "num": 4, "title": "Sequências e Inteiros (Z)", "bncc": "EF07MA04 · EF07MA10", "desc": "Sequências, números inteiros e operações com sinais.", "lessons": [{"id": "b1_u4_l1", "title": "16. Porcentagem", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Porcentagem**, vire o cartão para revisar a ideia-chave:", "front": "Porcentagem", "back": "Metade de $80$ é $40$.", "explain": "Cartão de **Porcentagem** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto é $50\\%$ de $80$?", "answers": ["40"], "explain": "Metade de $80$ é $40$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um caderno de $\\text{R\\$ } 40$ teve $10\\%$ de desconto. Quanto custa agora?", "answers": ["36"], "explain": "$10\\%$ de $40$ é $4$; $40 - 4 = 36$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "A fração $\\frac{1}{4}$ equivale a qual porcentagem?", "options": ["$10\\%$", "$20\\%$", "$25\\%$", "$40\\%$"], "correctIndex": 2, "explain": "$1 \\div 4 = 0{,}25 = 25\\%$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Porcentagem**, qual afirmação está correta?", "options": ["Metade de $80$ é $40$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Metade de $80$ é $40$."}]}, {"id": "b1_u4_l2", "title": "17. Sequências", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Sequências**, vire o cartão para revisar a ideia-chave:", "front": "Sequências", "back": "Soma $4$ a cada passo: $15 + 4 = 19$.", "explain": "Cartão de **Sequências** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o próximo termo de $3, 7, 11, 15, \\dots$?", "answers": ["19"], "explain": "Soma $4$ a cada passo: $15 + 4 = 19$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o próximo termo de $2, 4, 8, 16, \\dots$?", "answers": ["32"], "explain": "Multiplica por $2$ a cada passo: $16 \\times 2 = 32$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Complete a sequência na reta: $0, 3, 6, \\square, 12$:", "ticks": [3, 6, 8, 9, 10, 12], "correctValue": 9, "explain": "De 3 em 3: $6 + 3 = 9$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Sequências**, qual afirmação está correta?", "options": ["Soma $4$ a cada passo: $15 + 4 = 19$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Soma $4$ a cada passo: $15 + 4 = 19$."}]}, {"id": "b1_u4_l3", "title": "18. Números inteiros", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Números inteiros**, vire o cartão para revisar a ideia-chave:", "front": "Números inteiros", "back": "$2 - 5 = -3^\\circ\\text{C}$.", "explain": "Cartão de **Números inteiros** revisado! Agora vamos praticar."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "A temperatura era $2^\\circ\\text{C}$ e caiu $5^\\circ\\text{C}$. Marque a nova temperatura:", "ticks": [-4, -3, -2, -1, 0, 1, 2], "correctValue": -3, "explain": "$2 - 5 = -3^\\circ\\text{C}$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Qual é o oposto de $+4$ na reta?", "ticks": [-5, -4, -2, 0, 2, 4, 5], "correctValue": -4, "explain": "O oposto de $+4$ é $-4$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é maior: $-10$ ou $-2$?", "options": ["$-10$", "$-2$", "Iguais", "Nenhum"], "correctIndex": 1, "explain": "$-2$ está mais à direita na reta, logo $-2 > -10$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Números inteiros**, qual afirmação está correta?", "options": ["$2 - 5 = -3^\\circ\\text{C}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2 - 5 = -3^\\circ\\text{C}$."}]}, {"id": "b1_u4_l4", "title": "19. Soma e subtração com inteiros", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Soma e subtração com inteiros**, vire o cartão para revisar a ideia-chave:", "front": "Soma e subtração com inteiros", "back": "$12 - 8 = +4$.", "explain": "Cartão de **Soma e subtração com inteiros** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $(-8) + (+12)$:", "answers": ["4", "+4"], "explain": "$12 - 8 = +4$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $(-7) - (-10)$:", "answers": ["3", "+3"], "explain": "$(-7) + (+10) = +3$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um saldo de $-15$ recebeu $+9$. Qual o novo saldo?", "answers": ["-6"], "explain": "$-15 + 9 = -6$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Soma e subtração com inteiros**, qual afirmação está correta?", "options": ["$12 - 8 = +4$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$12 - 8 = +4$."}]}, {"id": "b1_u4_l5", "title": "20. Multiplicação e divisão com inteiros", "duration": "2–4 min", "xp": 60, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Multiplicação e divisão com inteiros**, vire o cartão para revisar a ideia-chave:", "front": "Multiplicação e divisão com inteiros", "back": "Sinais iguais dão positivo: $+30$.", "explain": "Cartão de **Multiplicação e divisão com inteiros** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $(-6) \\times (-5)$:", "answers": ["30", "+30"], "explain": "Sinais iguais dão positivo: $+30$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $(-24) \\div (+4)$:", "answers": ["-6"], "explain": "Sinais diferentes dão negativo: $-6$."}, {"type": "blank", "tag": "Lacunas", "prompt": "Regra dos sinais:", "sentence": "Produto de sinais iguais é [0]; de sinais diferentes é [1].", "inputs": [{"label": "Iguais", "answers": ["positivo", "Positivo"]}, {"label": "Diferentes", "answers": ["negativo", "Negativo"]}], "explain": "Sinais iguais = $+$, sinais diferentes = $-$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Multiplicação e divisão com inteiros**, qual afirmação está correta?", "options": ["Sinais iguais dão positivo: $+30$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Sinais iguais dão positivo: $+30$."}]}]}, {"id": "b1_u5", "num": 5, "title": "Racionais, Proporção e Equações", "bncc": "EF07MA12 · EF07MA18", "desc": "Racionais, razão, proporção, regra de 3 e equações.", "lessons": [{"id": "b1_u5_l1", "title": "21. Expressões numéricas com números inteiros", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Expressões numéricas com números inteiros**, vire o cartão para revisar a ideia-chave:", "front": "Expressões numéricas com números inteiros", "back": "$-3\\times 2 = -6$, depois $10 - 6 = 4$.", "explain": "Cartão de **Expressões numéricas com números inteiros** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $10 + (-3) \\times 2$:", "answers": ["4"], "explain": "$-3\\times 2 = -6$, depois $10 - 6 = 4$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Calcule $(-2)^2 + (-5)$:", "answers": ["-1"], "explain": "$(-2)^2 = +4$, então $4 - 5 = -1$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Resolva $(-10 + 4) \\div 2$:", "answers": ["-3"], "explain": "$-6 \\div 2 = -3$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Expressões numéricas com números inteiros**, qual afirmação está correta?", "options": ["$-3\\times 2 = -6$, depois $10 - 6 = 4$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$-3\\times 2 = -6$, depois $10 - 6 = 4$."}]}, {"id": "b1_u5_l2", "title": "22. Os números racionais", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Os números racionais**, vire o cartão para revisar a ideia-chave:", "front": "Os números racionais", "back": "$\\sqrt{2}$ é irracional; todos os outros podem virar fração de inteiros.", "explain": "Cartão de **Os números racionais** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual número NÃO é racional?", "options": ["$-3$", "$0{,}75$", "$\\sqrt{2}$", "$\\frac{2}{3}$"], "correctIndex": 2, "explain": "$\\sqrt{2}$ é irracional; todos os outros podem virar fração de inteiros."}, {"type": "match", "tag": "Pares", "prompt": "Combine os equivalentes em $\\mathbb{Q}$:", "pairs": [{"left": "$0{,}5$", "right": "$1/2$"}, {"left": "$75\\%$", "right": "$3/4$"}, {"left": "$-0{,}2$", "right": "$-1/5$"}, {"left": "$1{,}5$", "right": "$3/2$"}], "explain": "Mesmos racionais em formas diferentes!"}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque $-0{,}5$ na reta numérica:", "ticks": ["-1", "-0,5", "0", "0,5", "1"], "correctValue": "-0,5", "explain": "$-0{,}5$ fica na metade entre $-1$ e $0$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Os números racionais**, qual afirmação está correta?", "options": ["$\\sqrt{2}$ é irracional; todos os outros podem virar fração de inteiros.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$\\sqrt{2}$ é irracional; todos os outros podem virar fração de inteiros."}]}, {"id": "b1_u5_l3", "title": "23. Razão e Proporção", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Razão e Proporção**, vire o cartão para revisar a ideia-chave:", "front": "Razão e Proporção", "back": "$40 \\div 20 = 2$.", "explain": "Cartão de **Razão e Proporção** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é a razão $\\frac{40}{20}$?", "answers": ["2"], "explain": "$40 \\div 20 = 2$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Em $2$ xícaras de farinha para $1$ de açúcar, se usarmos $6$ de farinha, quanto de açúcar vai?", "options": ["$2$", "$3$", "$4$", "$6$"], "correctIndex": 1, "explain": "Triplicou a farinha, triplica o açúcar ($3$)."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $\\frac{3}{4} = \\frac{x}{12}$, quanto vale $x$?", "answers": ["9"], "explain": "Multiplicando por $3$: $3 \\times 3 = 9$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Razão e Proporção**, qual afirmação está correta?", "options": ["$40 \\div 20 = 2$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$40 \\div 20 = 2$."}]}, {"id": "b1_u5_l4", "title": "24. Números proporcionais", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Números proporcionais**, vire o cartão para revisar a ideia-chave:", "front": "Números proporcionais", "back": "Total $3$ partes ($10$ cada); maior = $2 \\times 10 = 20$.", "explain": "Cartão de **Números proporcionais** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Divida $30$ em partes proporcionais a $1$ e $2$. Qual é a maior parte?", "answers": ["20"], "explain": "Total $3$ partes ($10$ cada); maior = $2 \\times 10 = 20$."}, {"type": "blank", "tag": "Lacunas", "prompt": "Proporcionalidade:", "sentence": "Se dobrar uma grandeza dobra a outra, são [0] proporcionais; se cair pela metade, são [1] proporcionais.", "inputs": [{"label": "1ª", "answers": ["diretamente", "Diretamente"]}, {"label": "2ª", "answers": ["inversamente", "Inversamente"]}], "explain": "Direta acompanha no mesmo sentido; inversa em sentido oposto."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $x$ e $6$ são diretamente proporcionais a $5$ e $3$, quanto vale $x$?", "answers": ["10"], "explain": "$\\frac{x}{5} = \\frac{6}{3} = 2 \\Rightarrow x = 10$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Números proporcionais**, qual afirmação está correta?", "options": ["Total $3$ partes ($10$ cada); maior = $2 \\times 10 = 20$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Total $3$ partes ($10$ cada); maior = $2 \\times 10 = 20$."}]}, {"id": "b1_u5_l5", "title": "25. Regra de 3 simples", "duration": "2–4 min", "xp": 65, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Regra de 3 simples**, vire o cartão para revisar a ideia-chave:", "front": "Regra de 3 simples", "back": "1 caderno = $8$ reais; $5 \\times 8 = 40$.", "explain": "Cartão de **Regra de 3 simples** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $3$ cadernos custam $24$ reais, quanto custam $5$ cadernos?", "answers": ["40"], "explain": "1 caderno = $8$ reais; $5 \\times 8 = 40$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um carro anda $180\\text{ km}$ em $3\\text{ h}$. Em $5\\text{ h}$ na mesma velocidade, quantos km anda?", "answers": ["300"], "explain": "$60\\text{ km/h} \\times 5 = 300\\text{ km}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se $4$ torneiras enchem um tanque em $6\\text{ h}$, em quantas horas $2$ torneiras iguais enchem?", "answers": ["12"], "explain": "Metade das torneiras leva o dobro do tempo: $12\\text{ h}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Regra de 3 simples**, qual afirmação está correta?", "options": ["1 caderno = $8$ reais; $5 \\times 8 = 40$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "1 caderno = $8$ reais; $5 \\times 8 = 40$."}]}]}, {"id": "b1_u6", "num": 6, "title": "Geometria Plana e Sólidos", "bncc": "EF06MA18 · EF07MA20", "desc": "Fundamentos, simetrias, transformações e sólidos 3D.", "lessons": [{"id": "b1_u6_l1", "title": "26. Equações", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Equações**, vire o cartão para revisar a ideia-chave:", "front": "Equações", "back": "$x = 19 - 7 = 12$.", "explain": "Cartão de **Equações** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o valor de $x$ em $x + 7 = 19$?", "answers": ["12"], "explain": "$x = 19 - 7 = 12$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Resolva $3x = 21$:", "answers": ["7"], "explain": "$x = 21 \\div 3 = 7$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Marque na reta o valor de $x$ em $2x + 1 = 7$:", "ticks": [0, 1, 2, 3, 4, 5], "correctValue": 3, "explain": "$2x = 6 \\Rightarrow x = 3$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Equações**, qual afirmação está correta?", "options": ["$x = 19 - 7 = 12$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$x = 19 - 7 = 12$."}]}, {"id": "b1_u6_l2", "title": "27. Fundamentos da geometria", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Fundamentos da geometria**, vire o cartão para revisar a ideia-chave:", "front": "Fundamentos da geometria", "back": "Retas paralelas nunca se cruzam.", "explain": "Cartão de **Fundamentos da geometria** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho mostra retas paralelas?", "options": [{"label": "A", "drawing": "perp_lines"}, {"label": "B", "drawing": "parallel_lines"}, {"label": "C", "drawing": "angle_acute"}, {"label": "D", "drawing": "tri_rect"}], "correctIndex": 1, "explain": "Retas paralelas nunca se cruzam."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho mostra retas perpendiculares ($90^\\circ$)?", "options": [{"label": "A", "drawing": "perp_lines"}, {"label": "B", "drawing": "parallel_lines"}, {"label": "C", "drawing": "angle_obtuse"}, {"label": "D", "drawing": "circle_const"}], "correctIndex": 0, "explain": "Retas perpendiculares se cruzam formando $90^\\circ$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual é o trio de conceitos primitivos da Geometria?", "options": ["Ponto, reta e plano", "Quadrado, cubo e esfera", "Metro, litro e grama", "Soma, produto e resto"], "correctIndex": 0, "explain": "Ponto, reta e plano são os entes primitivos."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Fundamentos da geometria**, qual afirmação está correta?", "options": ["Retas paralelas nunca se cruzam.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Retas paralelas nunca se cruzam."}]}, {"id": "b1_u6_l3", "title": "28. Figuras planas e simetrias", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Figuras planas e simetrias**, vire o cartão para revisar a ideia-chave:", "front": "Figuras planas e simetrias", "back": "Figura B possui um par de lados paralelos (trapézio).", "explain": "Cartão de **Figuras planas e simetrias** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual destas figuras é um trapézio?", "options": [{"label": "A", "drawing": "tri_equi"}, {"label": "B", "drawing": "quad_trap"}, {"label": "C", "drawing": "circle_const"}, {"label": "D", "drawing": "cube_3d"}], "correctIndex": 1, "explain": "Figura B possui um par de lados paralelos (trapézio)."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos eixos de simetria tem um quadrado?", "answers": ["4"], "explain": "2 diagonais + 2 linhas médias = 4 eixos."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual polígono tem 3 lados e 3 ângulos?", "options": ["Quadrilátero", "Triângulo", "Pentágono", "Hexágono"], "correctIndex": 1, "explain": "Triângulo = 3 lados."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Figuras planas e simetrias**, qual afirmação está correta?", "options": ["Figura B possui um par de lados paralelos (trapézio).", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Figura B possui um par de lados paralelos (trapézio)."}]}, {"id": "b1_u6_l4", "title": "29. Representação e transformação de figuras", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Representação e transformação de figuras**, vire o cartão para revisar a ideia-chave:", "front": "Representação e transformação de figuras", "back": "Translação apenas desloca a figura no plano.", "explain": "Cartão de **Representação e transformação de figuras** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Deslizar uma figura sem girar nem mudar o tamanho é uma:", "options": ["Rotação", "Translação", "Ampliação", "Distorção"], "correctIndex": 1, "explain": "Translação apenas desloca a figura no plano."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Espelhar uma figura em relação a um eixo chama-se:", "options": ["Reflexão", "Translação", "Divisão", "Perímetro"], "correctIndex": 0, "explain": "Reflexão cria a imagem espelhada."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Girar uma figura em $90^\\circ$ em torno de um ponto é:", "options": ["Rotação", "Translação", "Soma", "Redução"], "correctIndex": 0, "explain": "Giro em torno de um ponto = rotação."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Representação e transformação de figuras**, qual afirmação está correta?", "options": ["Translação apenas desloca a figura no plano.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Translação apenas desloca a figura no plano."}]}, {"id": "b1_u6_l5", "title": "30. Sólidos geométricos", "duration": "2–4 min", "xp": 70, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Sólidos geométricos**, vire o cartão para revisar a ideia-chave:", "front": "Sólidos geométricos", "back": "O cubo (C) possui 3 dimensões.", "explain": "Cartão de **Sólidos geométricos** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual figura é um sólido geométrico (3D)?", "options": [{"label": "A", "drawing": "tri_equi"}, {"label": "B", "drawing": "quad_trap"}, {"label": "C", "drawing": "cube_3d"}, {"label": "D", "drawing": "circle_const"}], "correctIndex": 2, "explain": "O cubo (C) possui 3 dimensões."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantas faces tem um cubo?", "answers": ["6"], "explain": "Um cubo (dado) tem $6$ faces quadradas."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos vértices tem uma pirâmide de base quadrada?", "answers": ["5"], "explain": "4 vértices na base + 1 no topo = $5$ vértices."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Sólidos geométricos**, qual afirmação está correta?", "options": ["O cubo (C) possui 3 dimensões.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "O cubo (C) possui 3 dimensões."}]}]}, {"id": "b1_u7", "num": 7, "title": "Álgebra e Medidas Espaciais", "bncc": "EF07MA13 · EF07MA31", "desc": "Álgebra, comprimento, perímetro, área e volume.", "lessons": [{"id": "b1_u7_l1", "title": "31. Introdução a álgebra", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Introdução a álgebra**, vire o cartão para revisar a ideia-chave:", "front": "Introdução a álgebra", "back": "Dobro de $x$ é $2x$, mais $5$: $2x+5$.", "explain": "Cartão de **Introdução a álgebra** revisado! Agora vamos praticar."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Como escrevemos \"o dobro de um número mais 5\"?", "options": ["$x+2+5$", "$2x+5$", "$x^2+5$", "$2(x+5)$"], "correctIndex": 1, "explain": "Dobro de $x$ é $2x$, mais $5$: $2x+5$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quanto vale $3x + 2$ quando $x = 4$?", "answers": ["14"], "explain": "$3(4) + 2 = 12 + 2 = 14$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Simplifique $5a + 2a - a$ (coeficiente de $a$):", "answers": ["6"], "explain": "$5 + 2 - 1 = 6a$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Introdução a álgebra**, qual afirmação está correta?", "options": ["Dobro de $x$ é $2x$, mais $5$: $2x+5$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "Dobro de $x$ é $2x$, mais $5$: $2x+5$."}]}, {"id": "b1_u7_l2", "title": "32. Comprimento/distância", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Comprimento/distância**, vire o cartão para revisar a ideia-chave:", "front": "Comprimento/distância", "back": "$1\\text{ m} = 100\\text{ cm} \\Rightarrow 3\\text{ m} = 300\\text{ cm}$.", "explain": "Cartão de **Comprimento/distância** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos centímetros existem em $3\\text{ metros}$?", "answers": ["300"], "explain": "$1\\text{ m} = 100\\text{ cm} \\Rightarrow 3\\text{ m} = 300\\text{ cm}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Converta $2{,}5\\text{ km}$ para metros:", "answers": ["2500"], "explain": "$2{,}5 \\times 1\\,000 = 2\\,500\\text{ m}$."}, {"type": "numberline_pick", "tag": "Reta Numérica", "prompt": "Na régua em cm, marque o ponto que equivale a $40\\text{ mm}$:", "ticks": [1, 2, 3, 4, 5, 6], "correctValue": 4, "explain": "$40\\text{ mm} = 4\\text{ cm}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Comprimento/distância**, qual afirmação está correta?", "options": ["$1\\text{ m} = 100\\text{ cm} \\Rightarrow 3\\text{ m} = 300\\text{ cm}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$1\\text{ m} = 100\\text{ cm} \\Rightarrow 3\\text{ m} = 300\\text{ cm}$."}]}, {"id": "b1_u7_l3", "title": "33. Perímetro", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Perímetro**, vire o cartão para revisar a ideia-chave:", "front": "Perímetro", "back": "$4 \\times 9 = 36\\text{ cm}$.", "explain": "Cartão de **Perímetro** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o perímetro de um quadrado de lado $9\\text{ cm}$?", "answers": ["36"], "explain": "$4 \\times 9 = 36\\text{ cm}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual o perímetro de um triângulo de lados $5\\text{ cm}, 7\\text{ cm}$ e $8\\text{ cm}$?", "answers": ["20"], "explain": "$5 + 7 + 8 = 20\\text{ cm}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Um retângulo tem lados $10\\text{ m}$ e $4\\text{ m}$. Qual o perímetro?", "answers": ["28"], "explain": "$10 + 4 + 10 + 4 = 28\\text{ m}$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Perímetro**, qual afirmação está correta?", "options": ["$4 \\times 9 = 36\\text{ cm}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$4 \\times 9 = 36\\text{ cm}$."}]}, {"id": "b1_u7_l4", "title": "34. Área", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Área**, vire o cartão para revisar a ideia-chave:", "front": "Área", "back": "$8 \\times 5 = 40\\text{ cm}^2$.", "explain": "Cartão de **Área** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Área de um retângulo $8\\text{ cm} \\times 5\\text{ cm}$:", "answers": ["40"], "explain": "$8 \\times 5 = 40\\text{ cm}^2$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Área de um quadrado de lado $6\\text{ m}$:", "answers": ["36"], "explain": "$6 \\times 6 = 36\\text{ m}^2$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Área de um triângulo de base $10\\text{ cm}$ e altura $4\\text{ cm}$:", "answers": ["20"], "explain": "$\\frac{10 \\times 4}{2} = 20\\text{ cm}^2$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Área**, qual afirmação está correta?", "options": ["$8 \\times 5 = 40\\text{ cm}^2$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$8 \\times 5 = 40\\text{ cm}^2$."}]}, {"id": "b1_u7_l5", "title": "35. Volume e Capacidade", "duration": "2–4 min", "xp": 75, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Volume e Capacidade**, vire o cartão para revisar a ideia-chave:", "front": "Volume e Capacidade", "back": "$2 \\times 3 \\times 4 = 24\\text{ m}^3$.", "explain": "Cartão de **Volume e Capacidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Volume de uma caixa $2\\text{ m} \\times 3\\text{ m} \\times 4\\text{ m}$ (em $\\text{m}^3$):", "answers": ["24"], "explain": "$2 \\times 3 \\times 4 = 24\\text{ m}^3$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos mililitros (mL) há em $2\\text{ litros}$?", "answers": ["2000"], "explain": "$1\\text{ L} = 1\\,000\\text{ mL} \\Rightarrow 2\\text{ L} = 2\\,000\\text{ mL}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Volume de um cubo de aresta $3\\text{ cm}$ (em $\\text{cm}^3$):", "answers": ["27"], "explain": "$3^3 = 27\\text{ cm}^3$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Volume e Capacidade**, qual afirmação está correta?", "options": ["$2 \\times 3 \\times 4 = 24\\text{ m}^3$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2 \\times 3 \\times 4 = 24\\text{ m}^3$."}]}]}, {"id": "b1_u8", "num": 8, "title": "Grandezas, Ângulos e Dados", "bncc": "EF07MA23 · EF07MA36", "desc": "Grandezas, ângulos, massa, estatística e probabilidade.", "lessons": [{"id": "b1_u8_l1", "title": "36. Mais grandezas", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Mais grandezas**, vire o cartão para revisar a ideia-chave:", "front": "Mais grandezas", "back": "$2\\times 60 + 30 = 150$ minutos.", "explain": "Cartão de **Mais grandezas** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos minutos existem em $2\\text{ horas e meia}$?", "answers": ["150"], "explain": "$2\\times 60 + 30 = 150$ minutos."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos segundos há em $3\\text{ minutos}$?", "answers": ["180"], "explain": "$3 \\times 60 = 180$ segundos."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual grandeza medimos em Hertz ($\text{Hz}$)?", "options": ["Massa", "Frequência", "Volume", "Comprimento"], "correctIndex": 1, "explain": "Hertz mede frequência (ciclos por segundo)."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Mais grandezas**, qual afirmação está correta?", "options": ["$2\\times 60 + 30 = 150$ minutos.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$2\\times 60 + 30 = 150$ minutos."}]}, {"id": "b1_u8_l2", "title": "37. Ângulos", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Ângulos**, vire o cartão para revisar a ideia-chave:", "front": "Ângulos", "back": "O quadradinho no vértice indica $90^\\circ$.", "explain": "Cartão de **Ângulos** revisado! Agora vamos praticar."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho representa um ângulo reto ($90^\\circ$)?", "options": [{"label": "A", "drawing": "angle_acute"}, {"label": "B", "drawing": "angle_right"}, {"label": "C", "drawing": "angle_obtuse"}, {"label": "D", "drawing": "angle_straight"}], "correctIndex": 1, "explain": "O quadradinho no vértice indica $90^\\circ$."}, {"type": "visual_mc", "tag": "Escolha pelo Desenho", "prompt": "Qual desenho mostra um ângulo agudo (menor que $90^\\circ$)?", "options": [{"label": "A", "drawing": "angle_acute"}, {"label": "B", "drawing": "angle_right"}, {"label": "C", "drawing": "angle_obtuse"}, {"label": "D", "drawing": "angle_straight"}], "correctIndex": 0, "explain": "Ângulo A é mais fechado que $90^\\circ$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos graus mede um ângulo raso (meia volta)?", "answers": ["180"], "explain": "Meia volta = $180^\\circ$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Ângulos**, qual afirmação está correta?", "options": ["O quadradinho no vértice indica $90^\\circ$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "O quadradinho no vértice indica $90^\\circ$."}]}, {"id": "b1_u8_l3", "title": "38. Massa", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Massa**, vire o cartão para revisar a ideia-chave:", "front": "Massa", "back": "$3{,}5 \\times 1\\,000 = 3\\,500\\text{ g}$.", "explain": "Cartão de **Massa** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Quantos gramas existem em $3{,}5\\text{ kg}$?", "answers": ["3500"], "explain": "$3{,}5 \\times 1\\,000 = 3\\,500\\text{ g}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Uma tonelada equivale a quantos quilogramas?", "answers": ["1000"], "explain": "$1\\text{ t} = 1\\,000\\text{ kg}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Se um pacote pesa $250\\text{ g}$, quantos pacotes formam $1\\text{ kg}$?", "answers": ["4"], "explain": "$1\\,000 \\div 250 = 4$ pacotes."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Massa**, qual afirmação está correta?", "options": ["$3{,}5 \\times 1\\,000 = 3\\,500\\text{ g}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$3{,}5 \\times 1\\,000 = 3\\,500\\text{ g}$."}]}, {"id": "b1_u8_l4", "title": "39. Estatística", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Estatística**, vire o cartão para revisar a ideia-chave:", "front": "Estatística", "back": "$(6+8+10)\\div 3 = 8$.", "explain": "Cartão de **Estatística** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Qual é a média das notas $6$, $8$ e $10$?", "answers": ["8"], "explain": "$(6+8+10)\\div 3 = 8$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Qual gráfico usa fatias circulares para mostrar porcentagens?", "options": ["Colunas", "Linhas", "Setores (Pizza)", "Histograma"], "correctIndex": 2, "explain": "Gráfico de setores (pizza) mostra partes de um todo."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Em uma pesquisa, 12 preferem futebol, 8 vôlei e 5 basquete. Quantos responderam?", "answers": ["25"], "explain": "$12 + 8 + 5 = 25$."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Estatística**, qual afirmação está correta?", "options": ["$(6+8+10)\\div 3 = 8$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "$(6+8+10)\\div 3 = 8$."}]}, {"id": "b1_u8_l5", "title": "40. Probabilidade", "duration": "2–4 min", "xp": 80, "questions": [{"type": "flashcard", "tag": "Flashcard", "prompt": "Antes de praticar **Probabilidade**, vire o cartão para revisar a ideia-chave:", "front": "Probabilidade", "back": "1 face favorável em 6 possíveis: $\\frac{1}{6}$.", "explain": "Cartão de **Probabilidade** revisado! Agora vamos praticar."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Ao lançar um dado de 6 lados, qual a chance (fração a/b) de sair $6$?", "answers": ["1/6"], "explain": "1 face favorável em 6 possíveis: $\\frac{1}{6}$."}, {"type": "calc", "tag": "Cálculo Rápido", "prompt": "Ao jogar uma moeda, qual a probabilidade (%) de dar cara?", "answers": ["50", "50%"], "explain": "1 em 2 = $50\\%$."}, {"type": "mc", "tag": "Múltipla Escolha", "prompt": "Em uma urna com $3$ bolas azuis e $7$ vermelhas, qual cor tem MAIOR chance de sair?", "options": ["Azul", "Vermelha", "Mesma chance", "Impossível"], "correctIndex": 1, "explain": "$7$ bolas vermelhas > $3$ azuis."}, {"type": "mc", "tag": "Fixação", "prompt": "Sobre **Probabilidade**, qual afirmação está correta?", "options": ["1 face favorável em 6 possíveis: $\\frac{1}{6}$.", "Nenhuma das alternativas anteriores", "Basta pular sem verificar", "Não se aplica aos números reais"], "correctIndex": 0, "explain": "1 face favorável em 6 possíveis: $\\frac{1}{6}$."}]}]}];
 
     function renderChibiProf(mood = 'happy', size = 64) {
       const mouth = mood === 'celebrate'
@@ -2495,6 +1760,31 @@
       });
     }
 
+
+    function renderOptionDrawing(kind) {
+      const svgs = {
+        frac_3_4: `<svg width="84" height="84" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#2e1a28" stroke-width="2.5"/><path d="M40 40 L40 8 A32 32 0 1 1 8 40 Z" fill="#c2207f"/><line x1="40" y1="8" x2="40" y2="72" stroke="#2e1a28" stroke-width="2"/><line x1="8" y1="40" x2="72" y2="40" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        frac_2_4: `<svg width="84" height="84" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#2e1a28" stroke-width="2.5"/><path d="M40 40 L40 8 A32 32 0 0 1 40 72 Z" fill="#7c52aa"/><line x1="40" y1="8" x2="40" y2="72" stroke="#2e1a28" stroke-width="2"/><line x1="8" y1="40" x2="72" y2="40" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        frac_1_4: `<svg width="84" height="84" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#2e1a28" stroke-width="2.5"/><path d="M40 40 L40 8 A32 32 0 0 1 72 40 Z" fill="#0096cc"/><line x1="40" y1="8" x2="40" y2="72" stroke="#2e1a28" stroke-width="2"/><line x1="8" y1="40" x2="72" y2="40" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        frac_1_3: `<svg width="84" height="84" viewBox="0 0 80 80"><circle cx="40" cy="40" r="32" fill="#FFFFFF" stroke="#2e1a28" stroke-width="2.5"/><path d="M40 40 L40 8 A32 32 0 0 1 67.7 56 Z" fill="#15803d"/><line x1="40" y1="40" x2="40" y2="8" stroke="#2e1a28" stroke-width="2"/><line x1="40" y1="40" x2="67.7" y2="56" stroke="#2e1a28" stroke-width="2"/><line x1="40" y1="40" x2="12.3" y2="56" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        angle_right: `<svg width="84" height="72" viewBox="0 0 84 72"><polyline points="20,12 20,56 68,56" fill="none" stroke="#c2207f" stroke-width="4" stroke-linecap="round"/><rect x="20" y="42" width="14" height="14" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        angle_acute: `<svg width="84" height="72" viewBox="0 0 84 72"><polyline points="56,16 20,56 70,56" fill="none" stroke="#7c52aa" stroke-width="4" stroke-linecap="round"/><path d="M36 56 A16 16 0 0 0 31 44" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        angle_obtuse: `<svg width="84" height="72" viewBox="0 0 84 72"><polyline points="12,20 36,56 74,56" fill="none" stroke="#0096cc" stroke-width="4" stroke-linecap="round"/><path d="M50 56 A14 14 0 0 0 28 44" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        angle_straight: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="10" y1="50" x2="74" y2="50" stroke="#15803d" stroke-width="4" stroke-linecap="round"/><circle cx="42" cy="50" r="4" fill="#2e1a28"/><path d="M28 50 A14 14 0 0 1 56 50" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        tri_rect: `<svg width="84" height="72" viewBox="0 0 84 72"><polygon points="18,14 18,58 68,58" fill="#dbf4fc" stroke="#0096cc" stroke-width="3" stroke-linejoin="round"/><rect x="18" y="46" width="12" height="12" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`,
+        tri_equi: `<svg width="84" height="72" viewBox="0 0 84 72"><polygon points="42,12 68,58 16,58" fill="#fde7f4" stroke="#c2207f" stroke-width="3" stroke-linejoin="round"/></svg>`,
+        quad_trap: `<svg width="84" height="72" viewBox="0 0 84 72"><polygon points="24,18 60,18 72,56 12,56" fill="#fef3c7" stroke="#b45309" stroke-width="3" stroke-linejoin="round"/></svg>`,
+        cube_3d: `<svg width="84" height="72" viewBox="0 0 84 72"><polygon points="22,22 50,22 50,50 22,50" fill="#efe7f9" stroke="#7c52aa" stroke-width="2.5"/><polygon points="22,22 36,10 64,10 50,22" fill="#e9d5ff" stroke="#7c52aa" stroke-width="2.5"/><polygon points="50,22 64,10 64,38 50,50" fill="#d8b4fe" stroke="#7c52aa" stroke-width="2.5"/></svg>`,
+        parabola_up: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="10" y1="54" x2="74" y2="54" stroke="#907898" stroke-width="1.5"/><line x1="42" y1="8" x2="42" y2="66" stroke="#907898" stroke-width="1.5"/><path d="M18 14 Q42 74 66 14" fill="none" stroke="#c2207f" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        parabola_down: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="10" y1="54" x2="74" y2="54" stroke="#907898" stroke-width="1.5"/><line x1="42" y1="8" x2="42" y2="66" stroke="#907898" stroke-width="1.5"/><path d="M18 60 Q42 0 66 60" fill="none" stroke="#7c52aa" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        line_linear: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="10" y1="54" x2="74" y2="54" stroke="#907898" stroke-width="1.5"/><line x1="42" y1="8" x2="42" y2="66" stroke="#907898" stroke-width="1.5"/><line x1="16" y1="60" x2="68" y2="14" stroke="#0096cc" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        circle_const: `<svg width="84" height="72" viewBox="0 0 84 72"><circle cx="42" cy="36" r="24" fill="#dcfce7" stroke="#15803d" stroke-width="3.5"/></svg>`,
+        parallel_lines: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="12" y1="24" x2="72" y2="24" stroke="#c2207f" stroke-width="3.5" stroke-linecap="round"/><line x1="12" y1="48" x2="72" y2="48" stroke="#c2207f" stroke-width="3.5" stroke-linecap="round"/></svg>`,
+        perp_lines: `<svg width="84" height="72" viewBox="0 0 84 72"><line x1="42" y1="10" x2="42" y2="62" stroke="#7c52aa" stroke-width="3.5" stroke-linecap="round"/><line x1="14" y1="36" x2="70" y2="36" stroke="#7c52aa" stroke-width="3.5" stroke-linecap="round"/><rect x="42" y="26" width="10" height="10" fill="none" stroke="#2e1a28" stroke-width="2"/></svg>`
+      };
+      return svgs[kind] || '';
+    }
+
     function renderVisualSVG(type) {
       if (type === `venn`) {
         return `
@@ -2700,7 +1990,7 @@
         if (appState.hearts < appState.maxHearts) btnRecover.classList.remove(`hidden`);
         else btnRecover.classList.add(`hidden`);
       }
-      if (soundLabel) soundLabel.textContent = appState.soundEnabled ? `Som ligado` : `Som mudo`;
+      if (soundLabel) soundLabel.textContent = appState.soundEnabled ? `Som` : `Mudo`;
       if (btnSound) btnSound.setAttribute(`aria-pressed`, appState.soundEnabled ? `true` : `false`);
     }
 
@@ -2882,6 +2172,7 @@
     function prepareQuestionState(q) {
       session.answered = false;
       session.selectedOption = null;
+      session.pickedLineVal = null;
       session.matchLeftPick = null;
       session.matchedPairs = [];
       session.dndSlots = {};
@@ -2933,7 +2224,52 @@
       if (!container) return;
 
       let interactionHtml = ``;
-      if (q.type === `mc`) {
+      if (q.type === `flashcard`) {
+        interactionHtml = `
+          <div class="flashcard-scene">
+            <div id="fc-inner" class="flashcard-inner" onclick="flipFlashcard()">
+              <div class="flashcard-face flashcard-front">
+                <span class="badge badge-bubblegum">Toque para virar o Flashcard</span>
+                <div style="font-size:1.15rem;font-weight:900;color:var(--on-surface);">${formatMathText(q.front)}</div>
+              </div>
+              <div class="flashcard-face flashcard-back">
+                <span class="badge badge-positive">Resumo do Prof. Chibi</span>
+                <div style="font-size:1rem;font-weight:700;color:var(--on-surface);">${formatMathText(q.back)}</div>
+              </div>
+            </div>
+          </div>
+          <div style="display:flex;justify-content:center;">
+            <button type="button" class="btn btn-surface" onclick="flipFlashcard()">
+              <i data-lucide="refresh-cw" style="width:16px;height:16px;" aria-hidden="true"></i>
+              <span>Virar Cartão</span>
+            </button>
+          </div>
+        `;
+      } else if (q.type === `visual_mc`) {
+        const opts = q.options.map((opt, idx) => `
+          <button type="button" class="visual-opt-card" id="vopt-${idx}" onclick="selectVisualOption(${idx})">
+            <div>${renderOptionDrawing(opt.drawing)}</div>
+            <span style="font-weight:800;font-size:0.9rem;">${formatMathText(opt.label)}</span>
+          </button>
+        `).join(``);
+        interactionHtml = `<div class="visual-options-grid">${opts}</div>`;
+      } else if (q.type === `numberline_pick`) {
+        const ticksHtml = q.ticks.map((tk, idx) => `
+          <button type="button" class="nl-tick-btn" id="nltick-${idx}" onclick="pickNumberLine(${idx})">
+            <span class="nl-dot"></span>
+            <span class="nl-lbl tabular">${tk}</span>
+          </button>
+        `).join(``);
+        interactionHtml = `
+          <div class="nl-interactive-wrap">
+            <p style="margin:0;font-size:0.85rem;font-weight:700;color:var(--on-surface-variant);">Toque em um ponto da reta numérica abaixo:</p>
+            <div class="nl-ticks-row">
+              <div class="nl-rail"></div>
+              ${ticksHtml}
+            </div>
+          </div>
+        `;
+      } else if (q.type === `mc`) {
         const opts = q.options.map((opt, idx) => `
           <button type="button" class="option-card" id="opt-${idx}" onclick="selectMcOption(${idx})">
             <span class="option-key">${idx + 1}</span>
@@ -3027,6 +2363,10 @@
 
       const verifyBtnHtml = q.type === `match`
         ? `<span id="match-progress-hint" class="badge badge-grape">0 / ${q.pairs.length} pares combinados</span>`
+        : q.type === `flashcard`
+        ? `<button type="button" id="btn-verify" class="btn btn-positive" onclick="completeFlashcard()">
+             <span>Entendi! (+10 XP)</span>
+           </button>`
         : `<button type="button" id="btn-verify" class="btn btn-primary" onclick="checkAnswer()">
              <span>Verificar Resposta</span>
            </button>`;
@@ -3058,6 +2398,45 @@
       session.hintVisible = !session.hintVisible;
       if (session.hintVisible) box.classList.remove(`hidden`);
       else box.classList.add(`hidden`);
+    }
+
+    function flipFlashcard() {
+      const el = document.getElementById('fc-inner');
+      if (el) el.classList.toggle('flipped');
+    }
+
+    function completeFlashcard() {
+      if (session.answered) return;
+      const q = session.questions[session.qIndex];
+      const fc = document.getElementById('fc-inner');
+      if (fc && !fc.classList.contains('flipped')) fc.classList.add('flipped');
+      finalizeQuestionOutcome(true, q.explain || q.back);
+    }
+
+    function selectVisualOption(idx) {
+      if (session.answered) return;
+      session.selectedOption = idx;
+      const q = session.questions[session.qIndex];
+      q.options.forEach((_, i) => {
+        const el = document.getElementById(`vopt-${i}`);
+        if (el) {
+          if (i === idx) el.classList.add(`selected`);
+          else el.classList.remove(`selected`);
+        }
+      });
+    }
+
+    function pickNumberLine(idx) {
+      if (session.answered) return;
+      const q = session.questions[session.qIndex];
+      session.pickedLineVal = q.ticks[idx];
+      q.ticks.forEach((_, i) => {
+        const el = document.getElementById(`nltick-${i}`);
+        if (el) {
+          if (i === idx) el.classList.add(`picked`);
+          else el.classList.remove(`picked`);
+        }
+      });
     }
 
     function selectMcOption(idx) {
@@ -3242,7 +2621,35 @@
 
       const feedbackSlot = document.getElementById(`feedback-slot`);
 
-      if (q.type === `mc`) {
+      if (q.type === `visual_mc`) {
+        if (session.selectedOption === null) {
+          if (feedbackSlot) feedbackSlot.innerHTML = `<div class="hint-box">Toque em um dos desenhos antes de verificar.</div>`;
+          return;
+        }
+        const isCorrect = session.selectedOption === q.correctIndex;
+        q.options.forEach((_, idx) => {
+          const el = document.getElementById(`vopt-${idx}`);
+          if (!el) return;
+          el.disabled = true;
+          if (idx === q.correctIndex) el.classList.add(`correct`);
+          else if (idx === session.selectedOption && !isCorrect) el.classList.add(`wrong`);
+        });
+        finalizeQuestionOutcome(isCorrect, q.explain);
+      } else if (q.type === `numberline_pick`) {
+        if (session.pickedLineVal === null || session.pickedLineVal === undefined) {
+          if (feedbackSlot) feedbackSlot.innerHTML = `<div class="hint-box">Marque um ponto na reta numérica antes de verificar.</div>`;
+          return;
+        }
+        const isCorrect = String(session.pickedLineVal) === String(q.correctValue);
+        q.ticks.forEach((tk, idx) => {
+          const el = document.getElementById(`nltick-${idx}`);
+          if (!el) return;
+          el.disabled = true;
+          if (String(tk) === String(q.correctValue)) el.classList.add(`correct`);
+          else if (String(tk) === String(session.pickedLineVal) && !isCorrect) el.classList.add(`wrong`);
+        });
+        finalizeQuestionOutcome(isCorrect, q.explain);
+      } else if (q.type === `mc`) {
         if (session.selectedOption === null) {
           if (feedbackSlot) {
             feedbackSlot.innerHTML = `<div class="hint-box">Escolha uma das alternativas antes de verificar.</div>`;
