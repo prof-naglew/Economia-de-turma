@@ -839,21 +839,69 @@
         return Array.isArray(aluno && aluno.broches) ? aluno.broches : [];
       }
 
+      function detectarBlocoAluno(aluno) {
+        if (!aluno) return 'ambos';
+        const turma = db.turmas.find(t => t.id === aluno.turmaId);
+        if (!turma) return 'ambos';
+        const ano = String(turma.ano || '');
+        if (ano === '6' || ano === '7') return 'b1';
+        if (ano === '8' || ano === '9') return 'b2';
+        const nome = String(turma.nome || '');
+        if (/\b[67]|6º|7º|6o|7o/i.test(nome)) return 'b1';
+        if (/\b[89]|8º|9º|8o|9o|EM|Médio/i.test(nome)) return 'b2';
+        return 'ambos';
+      }
+
+      function detectarAnoAluno(aluno) {
+        if (!aluno) return '';
+        const turma = db.turmas.find(t => t.id === aluno.turmaId);
+        if (!turma) return '';
+        const ano = String(turma.ano || '');
+        if (['6', '7', '8', '9'].includes(ano)) return ano;
+        const nome = String(turma.nome || '');
+        const m = nome.match(/\b([6789])|([6789])[ºo]/i);
+        return m ? (m[1] || m[2]) : '';
+      }
+
+      function calcularNotaRoteiros(aluno) {
+        const ano = detectarAnoAluno(aluno);
+        const set = new Set(getBrochesAluno(aluno));
+        let b1 = 0, b2 = 0;
+        set.forEach(id => {
+          if (String(id).startsWith('b1_')) b1++;
+          else if (String(id).startsWith('b2_')) b2++;
+        });
+        let p1 = 1.2, p2 = 1.2;
+        if (ano === '6') { p1 = 1.2; p2 = 2.4; }
+        else if (ano === '7') { p1 = 0.6; p2 = 2.4; }
+        else if (ano === '8') { p1 = 0.3; p2 = 1.2; }
+        else if (ano === '9') { p1 = 0.3; p2 = 0.6; }
+        const nota = +(b1 * p1 + b2 * p2).toFixed(2);
+        return nota.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+      }
+
       function abrirModalBrochesAluno(alunoId) {
         const aluno = db.usuarios.find(u => u.id === alunoId);
         if (!aluno) return;
         if (!Array.isArray(aluno.broches)) aluno.broches = [];
+        const blocoPrincipal = detectarBlocoAluno(aluno);
+        let mostrarB1 = blocoPrincipal !== 'b2';
+        let mostrarB2 = blocoPrincipal !== 'b1';
         let ultimaAcao = null;
 
         function drawModal(prevScroll = 0) {
           const set = new Set(aluno.broches);
-          const total = BROCHES_BLOCO_1.length + BROCHES_BLOCO_2.length;
           const allList = [...BROCHES_BLOCO_1, ...BROCHES_BLOCO_2];
+          const b1Done = BROCHES_BLOCO_1.filter(b => set.has(b.id)).length;
+          const b2Done = BROCHES_BLOCO_2.filter(b => set.has(b.id)).length;
+          const totalAtivo = blocoPrincipal === 'b1' ? BROCHES_BLOCO_1.length : blocoPrincipal === 'b2' ? BROCHES_BLOCO_2.length : allList.length;
+          const doneAtivo = blocoPrincipal === 'b1' ? b1Done : blocoPrincipal === 'b2' ? b2Done : set.size;
+
           abrirModal(`
             <div class="flex items-center justify-between mb-2">
               <div>
                 <h3 class="font-bold text-base">Roteiros de ${escapeHtml(aluno.apelido)}</h3>
-                <p class="text-[11px] text-gray-400">${set.size} de ${total} concluídos • Toque para alternar</p>
+                <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• Toque para alternar</span></p>
               </div>
               <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
             </div>
@@ -864,30 +912,40 @@
               </div>
             ` : ''}
             <div class="flex flex-wrap gap-1.5 mb-3">
-              <button id="btn-b-all-1" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-amarelo">Tudo Bloco I</button>
-              <button id="btn-b-all-2" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-purple-300">Tudo Bloco II</button>
+              ${mostrarB1 ? `<button id="btn-b-all-1" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-amarelo">Tudo Bloco I</button>` : ''}
+              ${mostrarB2 ? `<button id="btn-b-all-2" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-purple-300">Tudo Bloco II</button>` : ''}
               <button id="btn-b-clear" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-red-300">Limpar</button>
             </div>
-            <div id="roteiros-scroll-box" class="max-h-[55vh] overflow-y-auto pr-1 space-y-4">
+            <div id="roteiros-scroll-box" class="max-h-[55vh] overflow-y-auto pr-1 space-y-3">
               <div>
-                <div class="text-xs font-extrabold text-red-300 mb-2">Bloco I (Vermelho e Amarelo • ${BROCHES_BLOCO_1.filter(b => set.has(b.id)).length}/${BROCHES_BLOCO_1.length})</div>
-                <div class="grid grid-cols-5 sm:grid-cols-6 gap-2">
-                  ${BROCHES_BLOCO_1.map(b => `
-                    <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                      ${renderBrocheImg(b, 1, set.has(b.id), 'w-11 h-11')}
-                    </button>
-                  `).join('')}
-                </div>
+                <button type="button" id="btn-tog-b1" class="w-full flex items-center justify-between text-xs font-extrabold text-red-300 py-1.5 px-2 rounded-xl hover:bg-white/5">
+                  <span>${mostrarB1 ? '▾' : '▸'} Bloco I (Vermelho e Amarelo • ${b1Done}/${BROCHES_BLOCO_1.length})</span>
+                  ${blocoPrincipal === 'b2' && !mostrarB1 ? '<span class="text-[10px] text-gray-400 font-normal">Oculto • tocar para abrir</span>' : ''}
+                </button>
+                ${mostrarB1 ? `
+                  <div class="grid grid-cols-5 sm:grid-cols-6 gap-2 mt-2">
+                    ${BROCHES_BLOCO_1.map(b => `
+                      <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
+                        ${renderBrocheImg(b, 1, set.has(b.id), 'w-11 h-11')}
+                      </button>
+                    `).join('')}
+                  </div>
+                ` : ''}
               </div>
               <div>
-                <div class="text-xs font-extrabold text-purple-300 mb-2">Bloco II (Roxo e Amarelo • ${BROCHES_BLOCO_2.filter(b => set.has(b.id)).length}/${BROCHES_BLOCO_2.length})</div>
-                <div class="grid grid-cols-5 sm:grid-cols-6 gap-2">
-                  ${BROCHES_BLOCO_2.map(b => `
-                    <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                      ${renderBrocheImg(b, 2, set.has(b.id), 'w-11 h-11')}
-                    </button>
-                  `).join('')}
-                </div>
+                <button type="button" id="btn-tog-b2" class="w-full flex items-center justify-between text-xs font-extrabold text-purple-300 py-1.5 px-2 rounded-xl hover:bg-white/5">
+                  <span>${mostrarB2 ? '▾' : '▸'} Bloco II (Roxo e Amarelo • ${b2Done}/${BROCHES_BLOCO_2.length})</span>
+                  ${blocoPrincipal === 'b1' && !mostrarB2 ? '<span class="text-[10px] text-gray-400 font-normal">Oculto • tocar para abrir</span>' : ''}
+                </button>
+                ${mostrarB2 ? `
+                  <div class="grid grid-cols-5 sm:grid-cols-6 gap-2 mt-2">
+                    ${BROCHES_BLOCO_2.map(b => `
+                      <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
+                        ${renderBrocheImg(b, 2, set.has(b.id), 'w-11 h-11')}
+                      </button>
+                    `).join('')}
+                  </div>
+                ` : ''}
               </div>
             </div>
           `);
@@ -895,6 +953,16 @@
           if (box && prevScroll > 0) box.scrollTop = prevScroll;
 
           document.getElementById('btn-fechar-modal').onclick = () => { fecharModal(); render(); };
+          document.getElementById('btn-tog-b1').onclick = () => {
+            const curScroll = box ? box.scrollTop : 0;
+            mostrarB1 = !mostrarB1;
+            drawModal(curScroll);
+          };
+          document.getElementById('btn-tog-b2').onclick = () => {
+            const curScroll = box ? box.scrollTop : 0;
+            mostrarB2 = !mostrarB2;
+            drawModal(curScroll);
+          };
           const btnDesf = document.getElementById('btn-desfazer-roteiro');
           if (btnDesf && ultimaAcao) {
             btnDesf.onclick = () => {
@@ -922,7 +990,8 @@
               drawModal(curScroll);
             };
           });
-          document.getElementById('btn-b-all-1').onclick = () => {
+          const bAll1 = document.getElementById('btn-b-all-1');
+          if (bAll1) bAll1.onclick = () => {
             const curScroll = box ? box.scrollTop : 0;
             const s = new Set(aluno.broches);
             BROCHES_BLOCO_1.forEach(b => s.add(b.id));
@@ -931,7 +1000,8 @@
             salvarEstado();
             drawModal(curScroll);
           };
-          document.getElementById('btn-b-all-2').onclick = () => {
+          const bAll2 = document.getElementById('btn-b-all-2');
+          if (bAll2) bAll2.onclick = () => {
             const curScroll = box ? box.scrollTop : 0;
             const s = new Set(aluno.broches);
             BROCHES_BLOCO_2.forEach(b => s.add(b.id));
@@ -1274,13 +1344,14 @@
       }
 
       function abrirModalEditarAluno(aluno) {
-        let avSel = aluno.avatarId;
         let apelidoVal = aluno.apelido;
-        const cargosTurma = cargosDaTurma(aluno.turmaId);
+        let turmaSelId = aluno.turmaId;
+        let avSel = aluno.avatarId;
         const cargoAtual = cargosTurma.find(c => getOcupanteCargo(c, aluno.turmaId) === aluno.id);
         let cargoSel = cargoAtual ? String(cargoAtual.id) : '';
 
         function renderEd() {
+          const cargosDaSel = cargosDaTurma(turmaSelId);
           const avsHtml = AVATARES.map(a => `
             <button type="button" data-av-ed="${a.id}" class="btn-av-ed w-10 h-10 rounded-full flex items-center justify-center border-2 transition ${avSel === a.id ? 'border-[#FFD600] bg-yellow-400/20 text-amarelo' : 'border-white/10 bg-white/5 text-white/80'}">
               ${svgIcon(a.icon, 'w-4 h-4')}
@@ -1293,10 +1364,14 @@
             </div>
             <label class="block text-xs text-gray-400 mb-1">Apelido</label>
             <input id="inp-ed-alu-nome" value="${escapeHtml(apelidoVal)}" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm text-white mb-3" />
+            <label class="block text-xs text-gray-400 mb-1">Turma (mantém saldo, roteiros e histórico)</label>
+            <select id="inp-ed-alu-turma" class="w-full glass-pill rounded-xl px-3 py-2 text-xs text-white mb-3">
+              ${turmasOrdenadas().map(t => `<option value="${t.id}" class="bg-[#18181D]" ${t.id === turmaSelId ? 'selected' : ''}>${escapeHtml(t.nome)}</option>`).join('')}
+            </select>
             <label class="block text-xs text-gray-400 mb-1">Cargo</label>
             <select id="inp-ed-alu-cargo" class="w-full glass-pill rounded-xl px-3 py-2 text-xs text-white mb-3">
               <option value="" class="bg-[#18181D]">Sem cargo</option>
-              ${cargosTurma.map(c => `<option value="${c.id}" class="bg-[#18181D]" ${String(c.id) === cargoSel ? 'selected' : ''}>${escapeHtml(c.titulo)}</option>`).join('')}
+              ${cargosDaSel.map(c => `<option value="${c.id}" class="bg-[#18181D]" ${String(c.id) === cargoSel ? 'selected' : ''}>${escapeHtml(c.titulo)}</option>`).join('')}
             </select>
             <label class="block text-xs text-gray-400 mb-1.5">Avatar</label>
             <div class="flex flex-wrap gap-1.5 mb-4">${avsHtml}</div>
@@ -1304,9 +1379,16 @@
             <button id="btn-del-ed-alu" class="w-full bg-red-900/60 border border-red-400/40 text-red-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5">${svgIcon('trash', 'w-4 h-4')} <span>Excluir Aluno</span></button>
           `);
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('inp-ed-alu-turma').onchange = (e) => {
+            apelidoVal = document.getElementById('inp-ed-alu-nome').value;
+            turmaSelId = Number(e.target.value);
+            cargoSel = '';
+            renderEd();
+          };
           document.querySelectorAll('.btn-av-ed').forEach(b => {
             b.onclick = () => {
               apelidoVal = document.getElementById('inp-ed-alu-nome').value;
+              turmaSelId = Number(document.getElementById('inp-ed-alu-turma').value);
               cargoSel = document.getElementById('inp-ed-alu-cargo').value;
               avSel = b.dataset.avEd;
               renderEd();
@@ -1314,20 +1396,26 @@
           });
           document.getElementById('btn-save-ed-alu').onclick = () => {
             const nome = document.getElementById('inp-ed-alu-nome').value.trim();
+            const novaTurmaId = Number(document.getElementById('inp-ed-alu-turma').value);
             const cId = document.getElementById('inp-ed-alu-cargo').value;
             if (!nome) { toast('Digite um apelido.', 'erro'); return; }
+            const antigaTurmaId = aluno.turmaId;
+            cargosDaTurma(antigaTurmaId).forEach(c => {
+              if (getOcupanteCargo(c, antigaTurmaId) === aluno.id) setOcupanteCargo(c, antigaTurmaId, null);
+            });
             aluno.apelido = nome;
             aluno.avatarId = avSel;
-            cargosTurma.forEach(c => {
-              if (getOcupanteCargo(c, aluno.turmaId) === aluno.id) setOcupanteCargo(c, aluno.turmaId, null);
+            aluno.turmaId = novaTurmaId;
+            cargosDaTurma(novaTurmaId).forEach(c => {
+              if (getOcupanteCargo(c, novaTurmaId) === aluno.id) setOcupanteCargo(c, novaTurmaId, null);
             });
             if (cId) {
               const cg = db.cargos.find(c => c.id === Number(cId));
-              if (cg) setOcupanteCargo(cg, aluno.turmaId, aluno.id);
+              if (cg) setOcupanteCargo(cg, novaTurmaId, aluno.id);
             }
             salvarEstado();
             fecharModal();
-            toast('Aluno atualizado!', 'sucesso');
+            toast(novaTurmaId !== antigaTurmaId ? 'Aluno transferido de turma com todos os dados!' : 'Aluno atualizado!', 'sucesso');
             render();
           };
           document.getElementById('btn-del-ed-alu').onclick = () => {
@@ -1361,7 +1449,7 @@
           });
         }
 
-        function renderDialog() {
+        function renderDialog(focarUltimo = false) {
           const linhasHtml = rascunhos.map((r, idx) => `
             <div class="glass-pill rounded-2xl p-3 mb-2.5">
               <div class="flex items-center justify-between mb-1.5">
@@ -1381,7 +1469,7 @@
               <h3 class="font-bold text-lg">Adicionar Alunos — ${turma ? escapeHtml(turma.nome) : ''}</h3>
               <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
             </div>
-            <div class="max-h-64 overflow-y-auto pr-0.5 mb-3">${linhasHtml}</div>
+            <div id="alunos-rascunhos-box" class="max-h-64 overflow-y-auto pr-0.5 mb-3">${linhasHtml}</div>
             <button type="button" id="btn-add-outro-aluno" class="w-full glass-accent-purple text-white text-xs font-bold py-2.5 rounded-xl mb-2.5">+ Adicionar outro aluno</button>
             <button type="button" id="btn-salvar-alunos" class="w-full glass-gold-btn font-bold py-3 rounded-xl">Salvar Alunos</button>
           `);
@@ -1394,10 +1482,16 @@
               renderDialog();
             };
           });
+          if (focarUltimo) {
+            const rBox = document.getElementById('alunos-rascunhos-box');
+            if (rBox) rBox.scrollTop = rBox.scrollHeight;
+            const lastInp = document.getElementById(`alu-nome-${rascunhos.length - 1}`);
+            if (lastInp) lastInp.focus();
+          }
           document.getElementById('btn-add-outro-aluno').onclick = () => {
             lerLinhas();
             rascunhos.push({ apelido: '', cargoId: '' });
-            renderDialog();
+            renderDialog(true);
           };
           document.getElementById('btn-salvar-alunos').onclick = () => {
             lerLinhas();
@@ -1436,6 +1530,15 @@
 
       const BIO_KEY = 'economia_turma_bio_id';
       const BIO_ENABLED_KEY = 'economia_turma_bio_enabled_v1';
+      const BIO_LOGIN_KEY = 'economia_turma_bio_login_v1';
+      function salvarContaBioLogin() {
+        if (session.contaAtiva && session.contaAtiva.papel !== 'admin') {
+          try { localStorage.setItem(BIO_LOGIN_KEY, session.contaAtiva.login.toLowerCase()); } catch (e) {}
+        }
+      }
+      function getContaBioLogin() {
+        try { return localStorage.getItem(BIO_LOGIN_KEY) || ''; } catch (e) { return ''; }
+      }
       function isBiometriaAtivaLocal() {
         try { return localStorage.getItem(BIO_ENABLED_KEY) === '1'; } catch (e) { return false; }
       }
@@ -1474,6 +1577,7 @@
         });
         if (cred && cred.rawId) {
           try { localStorage.setItem(BIO_KEY, bufferToBase64(cred.rawId)); } catch (e) {}
+          salvarContaBioLogin();
           return true;
         }
         return false;
@@ -1573,36 +1677,90 @@
         salvarEstado();
       }
 
-      function abrirModalAlterarPin(aoConcluir) {
-        abrirModal(`
-          <div class="flex items-center justify-between mb-3">
-            <h3 class="font-bold text-base flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Cadastrar Senha Numérica</span></h3>
+      function renderPinKeypadHtml(pinVal, titulo, subtitulo, btnLabel) {
+        const slots = [0, 1, 2, 3].map(i => {
+          const filled = i < pinVal.length;
+          return `<div class="w-12 h-14 rounded-2xl glass-pill flex items-center justify-center text-2xl font-extrabold ${filled ? 'border-[#FFD600] text-amarelo' : 'text-gray-500'}">${filled ? '*' : ''}</div>`;
+        }).join('');
+        const keys = ['1','2','3','4','5','6','7','8','9','Limpar','0','⌫'].map(k => `
+          <button type="button" data-pin-key="${k}" class="btn-pin-key glass-pill hover:border-[#FFD600]/60 py-3 rounded-2xl text-base font-extrabold text-white active:scale-95 transition">${k}</button>
+        `).join('');
+        return `
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-bold text-base flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>${titulo}</span></h3>
             <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
           </div>
-          <p class="text-xs text-gray-300 mb-3">A biometria está desativada. Cadastre uma senha numérica de <strong>4 dígitos</strong> — ela será solicitada sempre que sair do Modo Aluno para o Modo Professor.</p>
-          <input id="inp-novo-pin4" type="password" inputmode="numeric" maxlength="4" placeholder="•••• (4 dígitos)" class="w-full glass-pill rounded-xl px-4 py-3 text-center text-lg tracking-[0.5em] text-white mb-4 outline-none focus:border-[#FFD600]" />
-          <button id="btn-salvar-pin4" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl">Salvar Senha de 4 Dígitos</button>
-        `);
-        const inp = document.getElementById('inp-novo-pin4');
-        const btn = document.getElementById('btn-salvar-pin4');
-        if (inp) {
-          inp.focus();
-          inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); });
-          inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
+          <p class="text-xs text-gray-300 mb-3">${subtitulo}</p>
+          <div class="flex items-center justify-center gap-3 mb-1.5">${slots}</div>
+          <div class="text-center text-[11px] text-gray-400 mb-3">Apenas 4 dígitos (${pinVal.length}/4)</div>
+          <div class="grid grid-cols-3 gap-2 mb-3">${keys}</div>
+          <button id="btn-confirmar-pin4" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl">${btnLabel}</button>
+        `;
+      }
+
+      function montarTecladoPin4(titulo, subtitulo, btnLabel, onSubmit) {
+        let pinVal = '';
+        let keyHandler = null;
+        function fecharPin() {
+          if (keyHandler) document.removeEventListener('keydown', keyHandler);
+          fecharModal();
         }
-        document.getElementById('btn-fechar-modal').onclick = fecharModal;
-        btn.onclick = () => {
-          const val = (inp ? inp.value : '').trim();
-          if (!/^\d{4}$/.test(val)) {
-            toast('Digite exatamente 4 números.', 'erro');
-            if (inp) inp.focus();
+        function drawPin() {
+          abrirModal(renderPinKeypadHtml(pinVal, titulo, subtitulo, btnLabel));
+          document.getElementById('btn-fechar-modal').onclick = fecharPin;
+          document.querySelectorAll('.btn-pin-key').forEach(b => {
+            b.onclick = () => {
+              const k = b.dataset.pinKey;
+              if (k === 'Limpar') pinVal = '';
+              else if (k === '⌫') pinVal = pinVal.slice(0, -1);
+              else if (pinVal.length < 4 && /^\d$/.test(k)) pinVal += k;
+              drawPin();
+            };
+          });
+          document.getElementById('btn-confirmar-pin4').onclick = () => {
+            if (pinVal.length !== 4) {
+              toast('Digite exatamente 4 dígitos.', 'erro');
+              return;
+            }
+            const res = onSubmit(pinVal, () => { pinVal = ''; drawPin(); }, fecharPin);
+            if (res === true) fecharPin();
+          };
+        }
+        keyHandler = (e) => {
+          if (document.getElementById('modal-backdrop')?.classList.contains('hidden')) {
+            document.removeEventListener('keydown', keyHandler);
             return;
           }
-          setPinProfessor(val);
-          fecharModal();
-          toast('Senha numérica de 4 dígitos cadastrada! Ela será pedida ao voltar do Modo Aluno.', 'sucesso');
-          if (typeof aoConcluir === 'function') aoConcluir();
+          if (/^\d$/.test(e.key) && pinVal.length < 4) {
+            e.preventDefault();
+            pinVal += e.key;
+            drawPin();
+          } else if (e.key === 'Backspace') {
+            e.preventDefault();
+            pinVal = pinVal.slice(0, -1);
+            drawPin();
+          } else if (e.key === 'Enter') {
+            e.preventDefault();
+            const btn = document.getElementById('btn-confirmar-pin4');
+            if (btn) btn.click();
+          }
         };
+        document.addEventListener('keydown', keyHandler);
+        drawPin();
+      }
+
+      function abrirModalAlterarPin(aoConcluir) {
+        montarTecladoPin4(
+          'Cadastrar Senha Numérica',
+          'A biometria está desativada. Cadastre uma senha numérica de <strong>4 dígitos</strong> para proteger o retorno do Modo Aluno para o Modo Professor.',
+          'Salvar Senha de 4 Dígitos',
+          (val, _reset, fecharPin) => {
+            setPinProfessor(val);
+            fecharPin();
+            toast('Senha numérica de 4 dígitos cadastrada! Ela será pedida ao voltar do Modo Aluno.', 'sucesso');
+            if (typeof aoConcluir === 'function') aoConcluir();
+          }
+        );
       }
 
       function pedirPinProfessor() {
@@ -1615,33 +1773,21 @@
             });
             return;
           }
-          abrirModal(`
-            <div class="flex items-center justify-between mb-3">
-              <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('lock', 'w-5 h-5 text-amarelo')} <span>Acesso do Professor</span></h3>
-              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
-            </div>
-            <p class="text-xs text-gray-300 mb-3">Digite sua senha numérica de 4 dígitos para voltar ao Modo Professor.</p>
-            <input id="inp-check-pin4" type="password" inputmode="numeric" maxlength="4" placeholder="••••" class="w-full glass-pill rounded-xl px-4 py-3 text-center text-lg tracking-[0.5em] text-white mb-4 outline-none focus:border-[#FFD600]" />
-            <button id="btn-confirmar-pin4" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl">Desbloquear</button>
-          `);
-          const inp = document.getElementById('inp-check-pin4');
-          const btn = document.getElementById('btn-confirmar-pin4');
-          if (inp) {
-            inp.focus();
-            inp.addEventListener('input', () => { inp.value = inp.value.replace(/\D/g, '').slice(0, 4); });
-            inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); btn.click(); } });
-          }
-          document.getElementById('btn-fechar-modal').onclick = fecharModal;
-          btn.onclick = () => {
-            const val = (inp ? inp.value : '').trim();
-            if (val === pinSalvo) {
-              concluirEntradaProfessor(false);
-              sugerirBiometriaSeNecessario();
-            } else {
-              toast('Senha numérica incorreta.', 'erro');
-              if (inp) { inp.value = ''; inp.focus(); }
+          montarTecladoPin4(
+            'Acesso do Professor',
+            'Digite sua senha numérica de 4 dígitos para voltar ao Modo Professor.',
+            'Desbloquear',
+            (val, resetPin, fecharPin) => {
+              if (val === pinSalvo) {
+                fecharPin();
+                concluirEntradaProfessor(false);
+                sugerirBiometriaSeNecessario();
+              } else {
+                toast('Senha numérica incorreta.', 'erro');
+                resetPin();
+              }
             }
-          };
+          );
           return;
         }
         let bioCadastrada = false;
@@ -1669,7 +1815,6 @@
             toast('Leitor biométrico indisponível aqui. Use o botão abaixo.', 'erro');
           }
         };
-
       }
 
       function regraPresencaAtual() {
@@ -1691,7 +1836,7 @@
 
       function abrirModalChamada(turma) {
         const alunos = alunosDaTurmaOrdenados(turma.id);
-        const dataRef = session.dataSelecionada;
+        let dataRef = session.dataSelecionada;
         const regraP = regraPresencaAtual();
         if (!alunos.length) {
           abrirModal(`
@@ -1709,10 +1854,11 @@
           };
           return;
         }
-        const jaPresentes = new Set(alunos.filter(a => alunoTemPresencaNaData(a.id, dataRef)).map(a => a.id));
         const selecionados = new Set();
 
         function renderChamada() {
+          const jaPresentes = new Set(alunos.filter(a => alunoTemPresencaNaData(a.id, dataRef)).map(a => a.id));
+          const ehRetroCh = dataRef !== hojeISO();
           const lista = alunos.map(a => {
             const jaFoi = jaPresentes.has(a.id);
             const marcado = jaFoi || selecionados.has(a.id);
@@ -1729,7 +1875,14 @@
               <h3 class="font-bold text-lg flex items-center gap-2">${svgIcon('clipboardCheck', 'w-5 h-5 text-amarelo')} <span>Chamada — ${escapeHtml(turma.nome)}</span></h3>
               <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
             </div>
-            <p class="text-xs text-gray-400 mb-3">${formatarDataCurta(dataRef)} • ${regraP.ativa && regraP.valor > 0 ? `Cada presença vale <strong class="text-amarelo">+${fmtMoeda(regraP.valor)}</strong>` : 'Presença sem pontuação configurada'}</p>
+            <p class="text-xs text-gray-400 mb-2">${regraP.ativa && regraP.valor > 0 ? `Cada presença vale <strong class="text-amarelo">+${fmtMoeda(regraP.valor)}</strong>` : 'Presença sem pontuação configurada'}</p>
+            <div class="glass-pill rounded-2xl p-2 mb-3 flex items-center justify-between gap-2 ${ehRetroCh ? '!border-[#FFD600]/60' : ''}">
+              <button type="button" id="btn-ch-dia-ant" class="glass-pill px-2.5 py-1 rounded-xl text-xs font-bold">&larr;</button>
+              <input id="inp-ch-data" type="date" max="${hojeISO()}" value="${dataRef}" class="bg-transparent text-xs font-bold text-amarelo text-center outline-none" />
+              ${ehRetroCh
+                ? `<button type="button" id="btn-ch-hoje" class="glass-gold-btn px-2.5 py-1 rounded-xl text-[11px] font-bold">Hoje</button>`
+                : `<span class="text-[11px] text-gray-400 px-2">Hoje</span>`}
+            </div>
             <div class="flex gap-2 mb-3">
               <button id="btn-ch-todos" class="flex-1 glass-pill py-1.5 rounded-xl text-xs font-bold">Marcar todos</button>
               <button id="btn-ch-nenhum" class="flex-1 glass-pill py-1.5 rounded-xl text-xs font-bold">Desmarcar</button>
@@ -1739,6 +1892,30 @@
           `);
 
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.getElementById('btn-ch-dia-ant').onclick = () => {
+            const d = new Date(dataRef + 'T12:00:00');
+            d.setDate(d.getDate() - 1);
+            dataRef = d.toISOString().slice(0, 10);
+            session.dataSelecionada = dataRef;
+            selecionados.clear();
+            renderChamada();
+          };
+          document.getElementById('inp-ch-data').onchange = (e) => {
+            if (!e.target.value) return;
+            dataRef = e.target.value;
+            session.dataSelecionada = dataRef;
+            selecionados.clear();
+            renderChamada();
+          };
+          const btnChHoje = document.getElementById('btn-ch-hoje');
+          if (btnChHoje) {
+            btnChHoje.onclick = () => {
+              dataRef = hojeISO();
+              session.dataSelecionada = dataRef;
+              selecionados.clear();
+              renderChamada();
+            };
+          }
           document.getElementById('btn-ch-todos').onclick = () => {
             alunos.forEach(a => { if (!jaPresentes.has(a.id)) selecionados.add(a.id); });
             renderChamada();
@@ -1899,6 +2076,11 @@
               <label class="block text-xs text-gray-400 mb-1">Senha</label>
               <input id="inp-login-pass" type="password" placeholder="••••••" class="w-full glass-pill rounded-xl px-3.5 py-2.5 text-sm text-white mb-4 outline-none focus:border-[#FFD600]" />
               <button id="btn-entrar-login" class="w-full glass-gold-btn font-extrabold py-3 rounded-2xl mb-2.5">Entrar</button>
+              ${(() => {
+                let temBio = false;
+                try { temBio = Boolean(localStorage.getItem(BIO_KEY) && getContaBioLogin()); } catch (e) {}
+                return temBio ? `<button id="btn-login-digital" class="w-full glass-pill border border-[#FFD600]/40 text-amarelo text-xs font-extrabold py-2.5 rounded-xl mb-2.5 flex items-center justify-center gap-2">${svgIcon('shield', 'w-4 h-4')} <span>Entrar com Digital (${escapeHtml(getContaBioLogin())})</span></button>` : '';
+              })()}
               <button id="btn-criar-conta-login" class="w-full glass-accent-purple text-white text-xs font-bold py-2.5 rounded-xl">Criar conta (escolher escola)</button>
             </div>
           </div>
@@ -1906,6 +2088,32 @@
       }
 
       function bindLogin() {
+        const btnBioLogin = document.getElementById('btn-login-digital');
+        if (btnBioLogin) {
+          btnBioLogin.onclick = async () => {
+            const loginSalvo = getContaBioLogin();
+            if (!loginSalvo) return;
+            try {
+              const ok = await verificarBiometriaWeb();
+              if (!ok) { toast('Digital não confirmada.', 'erro'); return; }
+              await sincronizarComNuvem(true);
+              const conta = (db.contas || []).find(c => c.login.toLowerCase() === loginSalvo);
+              if (!conta) { toast('Conta não encontrada.', 'erro'); return; }
+              session.contaAtiva = conta;
+              session.escolaAtualId = conta.escola_id;
+              await carregarEstadoDaNuvem(conta.escola_id);
+              const tAtual = turmaDoHorarioAtual();
+              if (tAtual) { session.turmaAtualId = tAtual.id; session.escolhendoTurma = false; }
+              else { session.escolhendoTurma = true; }
+              session.modo = 'professor';
+              session.abaProfessor = 'turma';
+              toast('Digital confirmada!', 'sucesso');
+              render();
+            } catch (err) {
+              toast('Não foi possível validar a digital neste navegador.', 'erro');
+            }
+          };
+        }
         const inpUser = document.getElementById('inp-login-user');
         const inpPass = document.getElementById('inp-login-pass');
         const btnEntrar = document.getElementById('btn-entrar-login');
@@ -2004,6 +2212,9 @@
             return;
           }
           session.contaAtiva = conta;
+          if (conta.papel !== 'admin') {
+            try { localStorage.setItem(BIO_LOGIN_KEY, conta.login.toLowerCase()); } catch (e) {}
+          }
           if (conta.papel === 'admin') {
             session.modo = 'admin';
           } else {
@@ -2351,24 +2562,11 @@
           `;
         }
         const alunos = alunosDaTurmaOrdenados(turma.id);
-        const hoje = hojeISO();
-        const ehRetro = session.dataSelecionada !== hoje;
         return `
-          <div class="glass-card rounded-2xl p-2.5 mb-3 flex items-center justify-between gap-2 ${ehRetro ? '!border-[#FFD600]/60' : ''}">
-            <button id="btn-dia-anterior" class="glass-pill px-3 py-1.5 rounded-xl text-xs font-bold">&larr;</button>
-            <button id="btn-abrir-cal" class="flex items-center gap-2 text-xs font-bold px-3 py-1.5 rounded-xl hover:bg-white/5">
-              ${svgIcon('calendar', 'w-4 h-4 text-amarelo')}
-              <span>${ehRetro ? 'Retroativo: ' : 'Hoje: '}${formatarDataCurta(session.dataSelecionada)}</span>
-            </button>
-            ${ehRetro
-              ? `<button id="btn-voltar-hoje" class="glass-gold-btn px-3 py-1.5 rounded-xl text-xs font-bold">Hoje</button>`
-              : `<span class="text-[11px] text-gray-400 px-2">Atual</span>`
-            }
-          </div>
           <div class="flex items-center justify-between mb-4">
             <div>
               <h2 class="font-extrabold text-lg">Alunos (${alunos.length})</h2>
-              <p class="text-xs text-gray-400">Total da turma: <span class="text-amarelo font-bold">${fmtMoeda(totalTokensTurma(turma.id))}</span> • ${formatarDataCurta(session.dataSelecionada)}</p>
+              <p class="text-xs text-gray-400">Total da turma: <span class="text-amarelo font-bold">${fmtMoeda(totalTokensTurma(turma.id))}</span></p>
             </div>
             <div class="flex gap-1.5 flex-wrap justify-end">
               <button id="btn-trilha-prof" class="glass-pill text-purple-200 px-3 py-2 rounded-2xl text-xs font-bold flex items-center gap-1">${svgIcon('compass', 'w-3.5 h-3.5 text-amarelo')} <span>MateMAGICA</span></button>
@@ -2398,7 +2596,10 @@
                     ${cargo ? `<span class="text-[10px] text-gray-400 truncate w-full mt-0.5">${escapeHtml(cargo.titulo)}</span>` : ''}
                     <div class="mt-2.5 glass-accent-purple text-amarelo font-extrabold text-xs px-3 py-1 rounded-full flex items-center gap-1">${iconeMoedaImg('w-3.5 h-3.5')} <span>${fmtMoeda(a.saldo)}</span></div>
                     ${pontosDoAlunoNaData(a.id, session.dataSelecionada) > 0 ? `<div class="mt-1 text-[10px] text-emerald-300 font-semibold">+${pontosDoAlunoNaData(a.id, session.dataSelecionada)} no dia</div>` : ''}
-                    <span data-broches-aluno="${a.id}" class="btn-broches-aluno mt-2 glass-pill text-[10px] font-bold px-2.5 py-1 rounded-full text-purple-200 hover:border-[#FFD600]/60">Roteiros ${getBrochesAluno(a).length}/${BROCHES_BLOCO_1.length + BROCHES_BLOCO_2.length}</span>
+                    <div class="mt-2 flex items-center justify-center gap-1.5 w-full">
+                      <span data-broches-aluno="${a.id}" class="btn-broches-aluno glass-pill text-[10px] font-bold px-2.5 py-1 rounded-full text-purple-200 hover:border-[#FFD600]/60">Nota: ${calcularNotaRoteiros(a)}</span>
+                      <span data-edit-aluno="${a.id}" title="Editar ou mudar de turma" class="btn-edit-aluno-card glass-pill text-[10px] font-bold px-2 py-1 rounded-full text-amarelo hover:border-[#FFD600]/60">&#9998;</span>
+                    </div>
                   </button>
                 `;
               }).join('')}
@@ -2914,14 +3115,24 @@
               <h3 class="font-bold text-lg">Nova Turma</h3>
               <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
             </div>
+            <label class="block text-xs text-gray-400 mb-1">Nome da turma</label>
             <input id="inp-turma-nome" placeholder="Ex.: 8º Ano B" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-3 text-white" />
+            <label class="block text-xs text-gray-400 mb-1">Ano escolar (define os roteiros)</label>
+            <select id="inp-turma-ano" class="w-full glass-pill rounded-xl px-3 py-2.5 text-xs text-white mb-4">
+              <option value="" class="bg-[#18181D]">Identificar pelo nome</option>
+              <option value="6" class="bg-[#18181D]">6º ano (Bloco I)</option>
+              <option value="7" class="bg-[#18181D]">7º ano (Bloco I)</option>
+              <option value="8" class="bg-[#18181D]">8º ano (Bloco II)</option>
+              <option value="9" class="bg-[#18181D]">9º ano (Bloco II)</option>
+            </select>
             <button id="btn-save-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl">Criar Turma</button>
           `);
           document.getElementById('btn-fechar-modal').onclick = fecharModal;
           document.getElementById('btn-save-turma').onclick = () => {
             const nome = document.getElementById('inp-turma-nome').value.trim();
+            const ano = document.getElementById('inp-turma-ano').value;
             if (!nome) return;
-            db.turmas.push({ id: genId(), nome, ativa: true });
+            db.turmas.push({ id: genId(), nome, ano, ativa: true });
             salvarEstado();
             fecharModal();
             toast('Turma criada!', 'sucesso');
@@ -3268,20 +3479,13 @@
             });
             return;
           }
-          document.getElementById('btn-abrir-cal').onclick = abrirModalCalendario;
-          document.getElementById('btn-dia-anterior').onclick = () => {
-            const d = new Date(session.dataSelecionada + 'T12:00:00');
-            d.setDate(d.getDate() - 1);
-            session.dataSelecionada = d.toISOString().slice(0, 10);
-            render();
-          };
-          const btnVoltarHoje = document.getElementById('btn-voltar-hoje');
-          if (btnVoltarHoje) {
-            btnVoltarHoje.onclick = () => {
-              session.dataSelecionada = hojeISO();
-              render();
+          document.querySelectorAll('.btn-edit-aluno-card').forEach(b => {
+            b.onclick = (ev) => {
+              ev.stopPropagation();
+              const al = db.usuarios.find(u => u.id === Number(b.dataset.editAluno));
+              if (al) abrirModalEditarAluno(al);
             };
-          }
+          });
           const btnTrilhaProf = document.getElementById('btn-trilha-prof');
           if (btnTrilhaProf) btnTrilhaProf.onclick = () => abrirTrilhaBloco2(null);
           document.querySelectorAll('.btn-broches-aluno').forEach(b => {
@@ -3502,16 +3706,26 @@
                     <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
                   </div>
                   <label class="block text-xs text-gray-400 mb-1">Nome da turma</label>
-                  <input id="inp-edit-turma-nome" value="${escapeHtml(turma.nome)}" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-4 text-white outline-none focus:border-[#FFD600]" />
-                  <button id="btn-save-edit-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl mb-2.5">Salvar Nome</button>
+                  <input id="inp-edit-turma-nome" value="${escapeHtml(turma.nome)}" class="w-full glass-pill rounded-xl px-3 py-2.5 text-sm mb-3 text-white outline-none focus:border-[#FFD600]" />
+                  <label class="block text-xs text-gray-400 mb-1">Ano escolar (define os roteiros)</label>
+                  <select id="inp-edit-turma-ano" class="w-full glass-pill rounded-xl px-3 py-2.5 text-xs text-white mb-4">
+                    <option value="" class="bg-[#18181D]" ${!turma.ano ? 'selected' : ''}>Identificar pelo nome</option>
+                    <option value="6" class="bg-[#18181D]" ${String(turma.ano) === '6' ? 'selected' : ''}>6º ano (Bloco I)</option>
+                    <option value="7" class="bg-[#18181D]" ${String(turma.ano) === '7' ? 'selected' : ''}>7º ano (Bloco I)</option>
+                    <option value="8" class="bg-[#18181D]" ${String(turma.ano) === '8' ? 'selected' : ''}>8º ano (Bloco II)</option>
+                    <option value="9" class="bg-[#18181D]" ${String(turma.ano) === '9' ? 'selected' : ''}>9º ano (Bloco II)</option>
+                  </select>
+                  <button id="btn-save-edit-turma" class="w-full glass-gold-btn font-bold py-2.5 rounded-xl mb-2.5">Salvar Turma</button>
                   <button id="btn-add-alunos-turma-cfg" class="w-full glass-accent-purple text-white font-bold py-2.5 rounded-xl text-xs mb-2.5">+ Adicionar Estudantes</button>
                   <button id="btn-del-turma" class="w-full bg-red-900/50 border border-red-400/30 text-red-200 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1.5">${svgIcon('trash', 'w-4 h-4')} <span>Excluir Turma</span></button>
                 `);
                 document.getElementById('btn-fechar-modal').onclick = fecharModal;
                 document.getElementById('btn-save-edit-turma').onclick = () => {
                   const novo = document.getElementById('inp-edit-turma-nome').value.trim();
+                  const ano = document.getElementById('inp-edit-turma-ano').value;
                   if (!novo) return;
                   turma.nome = novo;
+                  turma.ano = ano;
                   salvarEstado();
                   fecharModal();
                   toast('Turma atualizada!', 'sucesso');
@@ -3977,33 +4191,43 @@
 
             ${(() => {
               const conquistados = new Set(getBrochesAluno(aluno));
-              const totalB = BROCHES_BLOCO_1.length + BROCHES_BLOCO_2.length;
+              const blk = detectarBlocoAluno(aluno);
+              const showB1 = blk !== 'b2';
+              const showB2 = blk !== 'b1';
+              const b1Done = BROCHES_BLOCO_1.filter(b => conquistados.has(b.id)).length;
+              const b2Done = BROCHES_BLOCO_2.filter(b => conquistados.has(b.id)).length;
+              const doneB = (showB1 ? b1Done : 0) + (showB2 ? b2Done : 0);
+              const totalB = (showB1 ? BROCHES_BLOCO_1.length : 0) + (showB2 ? BROCHES_BLOCO_2.length : 0);
               return `
                 <div class="glass-card rounded-3xl p-4 space-y-3">
                   <div class="flex items-center justify-between">
                     <h3 class="font-extrabold text-sm flex items-center gap-1.5">${svgIcon('star', 'w-4 h-4 text-amarelo')} <span>Roteiros concluídos</span></h3>
-                    <span class="glass-pill text-[11px] font-bold px-2.5 py-0.5 rounded-full text-amarelo">${conquistados.size} / ${totalB}</span>
+                    <span class="glass-pill text-[11px] font-bold px-2.5 py-0.5 rounded-full text-amarelo">Nota: ${calcularNotaRoteiros(aluno)}</span>
                   </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-red-300 mb-1.5">Bloco I (${BROCHES_BLOCO_1.filter(b => conquistados.has(b.id)).length}/${BROCHES_BLOCO_1.length})</div>
-                    <div class="flex flex-wrap gap-1.5">
-                      ${BROCHES_BLOCO_1.map(b => `
-                        <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                          ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-9 h-9')}
-                        </button>
-                      `).join('')}
+                  ${showB1 ? `
+                    <div>
+                      <div class="text-[11px] font-bold text-red-300 mb-1.5">Bloco I (${b1Done}/${BROCHES_BLOCO_1.length})</div>
+                      <div class="flex flex-wrap gap-1.5">
+                        ${BROCHES_BLOCO_1.map(b => `
+                          <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
+                            ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-9 h-9')}
+                          </button>
+                        `).join('')}
+                      </div>
                     </div>
-                  </div>
-                  <div>
-                    <div class="text-[11px] font-bold text-purple-300 mb-1.5">Bloco II (${BROCHES_BLOCO_2.filter(b => conquistados.has(b.id)).length}/${BROCHES_BLOCO_2.length})</div>
-                    <div class="flex flex-wrap gap-2">
-                      ${BROCHES_BLOCO_2.map(b => `
-                        <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                          ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-9 h-9')}
-                        </button>
-                      `).join('')}
+                  ` : ''}
+                  ${showB2 ? `
+                    <div>
+                      <div class="text-[11px] font-bold text-purple-300 mb-1.5">Bloco II (${b2Done}/${BROCHES_BLOCO_2.length})</div>
+                      <div class="flex flex-wrap gap-2">
+                        ${BROCHES_BLOCO_2.map(b => `
+                          <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
+                            ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-9 h-9')}
+                          </button>
+                        `).join('')}
+                      </div>
                     </div>
-                  </div>
+                  ` : ''}
                 </div>
               `;
             })()}
