@@ -192,6 +192,7 @@
       transition: filter 0.25s ease, transform 0.25s ease;
     }
   </style>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body class="min-h-screen flex flex-col">
   <div class="ambient-bg">
@@ -269,9 +270,65 @@
         } catch (e) {}
       }
 
+      let _supaClientCache = { url: '', key: '', client: null };
+      function getSupaClient() {
+        const cfg = getCloudCfg();
+        if (!cfg.url || !cfg.key || !window.supabase || typeof window.supabase.createClient !== 'function') return null;
+        if (_supaClientCache.client && _supaClientCache.url === cfg.url && _supaClientCache.key === cfg.key) {
+          return _supaClientCache.client;
+        }
+        const client = window.supabase.createClient(cfg.url, cfg.key, {
+          auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+        });
+        _supaClientCache = { url: cfg.url, key: cfg.key, client };
+        return client;
+      }
+
       async function supaFetch(path, opts = {}) {
         const cfg = getCloudCfg();
         if (!cfg.url || !cfg.key) return null;
+        const client = getSupaClient();
+        if (client) {
+          const [tablePart, queryPart = ''] = path.split('?');
+          const params = new URLSearchParams(queryPart);
+          const method = (opts.method || 'GET').toUpperCase();
+          const body = opts.body ? JSON.parse(opts.body) : null;
+          let q;
+          if (method === 'GET') {
+            q = client.from(tablePart).select(params.get('select') || '*');
+            for (const [k, v] of params.entries()) {
+              if (k !== 'select' && k !== 'order' && v.startsWith('eq.')) {
+                q = q.eq(k, v.slice(3));
+              }
+            }
+            const ord = params.get('order');
+            if (ord) {
+              const [col, dir] = ord.split('.');
+              q = q.order(col, { ascending: dir !== 'desc' });
+            }
+          } else if (method === 'POST') {
+            const onConf = params.get('on_conflict');
+            if (onConf) {
+              q = client.from(tablePart).upsert(body, { onConflict: onConf });
+            } else {
+              q = client.from(tablePart).insert(body);
+            }
+            const prefer = opts.headers && (opts.headers['Prefer'] || opts.headers['prefer']);
+            if (prefer && prefer.includes('return=representation')) {
+              q = q.select();
+            }
+          } else if (method === 'DELETE') {
+            q = client.from(tablePart).delete();
+            for (const [k, v] of params.entries()) {
+              if (v.startsWith('eq.')) q = q.eq(k, v.slice(3));
+            }
+          }
+          if (q) {
+            const { data, error } = await q;
+            if (error) throw new Error(error.message || `HTTP ${error.code || 400}`);
+            return data;
+          }
+        }
         const headers = {
           'apikey': cfg.key,
           'Content-Type': 'application/json',
