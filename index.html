@@ -256,17 +256,35 @@
         return texto;
       }
 
+      function normalizeSupaUrl(raw) {
+        let u = (raw || '').trim().replace(/^SUPABASE_URL\s*=\s*/i, '').replace(/^["']|["']$/g, '').trim();
+        if (!u) return '';
+        u = u.replace(/^https?:\/\//i, (m) => m.toLowerCase());
+        if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+        return u.replace(/\/+$/, '');
+      }
+      function normalizeSupaKey(raw) {
+        return (raw || '').trim().replace(/^SUPABASE_(PUBLISHABLE_KEY|ANON_KEY)\s*=\s*/i, '').replace(/^["']|["']$/g, '').trim();
+      }
+      const DEFAULT_CLOUD_URL = 'https://eseoqxzpfudlchehrwuy.supabase.co';
+      const DEFAULT_CLOUD_KEY = 'sb_publishable_ZIPAPngHGdnvhd1Y4IQJjA_fOpQWW0J';
+
       function getCloudCfg() {
         try {
           const raw = localStorage.getItem(CLOUD_KEY);
-          if (raw) return JSON.parse(raw);
+          if (raw) {
+            const p = JSON.parse(raw);
+            const u = normalizeSupaUrl(p.url);
+            const k = normalizeSupaKey(p.key);
+            if (u && k) return { url: u, key: k };
+          }
         } catch (e) {}
-        return { url: '', key: '' };
+        return { url: DEFAULT_CLOUD_URL, key: DEFAULT_CLOUD_KEY };
       }
 
       function saveCloudCfg(url, key) {
         try {
-          localStorage.setItem(CLOUD_KEY, JSON.stringify({ url: url.trim().replace(/\/+$/, ''), key: key.trim() }));
+          localStorage.setItem(CLOUD_KEY, JSON.stringify({ url: normalizeSupaUrl(url), key: normalizeSupaKey(key) }));
         } catch (e) {}
       }
 
