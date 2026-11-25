@@ -931,7 +931,10 @@
                 <h3 class="font-bold text-base">Roteiros de ${escapeHtml(aluno.apelido)}</h3>
                 <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• Toque para alternar</span></p>
               </div>
-              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+              <div class="flex items-center gap-1.5">
+                <button id="btn-roteiros-dar-ips" type="button" class="glass-gold-btn text-[11px] font-extrabold px-2.5 py-1.5 rounded-xl flex items-center gap-1">${svgIcon('bolt', 'w-3.5 h-3.5')} <span>Dar ${escapeHtml(db.config.moedaPlural)}</span></button>
+                <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+              </div>
             </div>
             ${ultimaAcao ? `
               <div class="mb-2.5 glass-accent-purple rounded-2xl px-3 py-2 flex items-center justify-between gap-2 text-xs">
@@ -981,6 +984,8 @@
           if (box && prevScroll > 0) box.scrollTop = prevScroll;
 
           document.getElementById('btn-fechar-modal').onclick = () => { fecharModal(); render(); };
+          const btnDarIps = document.getElementById('btn-roteiros-dar-ips');
+          if (btnDarIps) btnDarIps.onclick = () => { fecharModal(); abrirModalLancar([aluno.id]); };
           document.getElementById('btn-tog-b1').onclick = () => {
             const curScroll = box ? box.scrollTop : 0;
             mostrarB1 = !mostrarB1;
@@ -3691,7 +3696,7 @@
                 else session.selecionados.add(id);
                 render();
               } else {
-                abrirModalLancar([id]);
+                abrirModalBrochesAluno(id);
               }
             };
           });
