@@ -274,10 +274,12 @@
         if (!cfg.url || !cfg.key) return null;
         const headers = {
           'apikey': cfg.key,
-          'Authorization': 'Bearer ' + cfg.key,
           'Content-Type': 'application/json',
           ...(opts.headers || {})
         };
+        if (!cfg.key.startsWith('sb_')) {
+          headers['Authorization'] = 'Bearer ' + cfg.key;
+        }
         const res = await fetch(`${cfg.url}/rest/v1/${path}`, { ...opts, headers });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const text = await res.text();
@@ -306,7 +308,7 @@
           if (!silencioso) toast('Sincronizado com a nuvem!', 'sucesso');
           return true;
         } catch (err) {
-          if (!silencioso) toast('Erro ao conectar ao Supabase. Usando modo offline.', 'erro');
+          if (!silencioso) toast(`Erro ao conectar ao Supabase (${err?.message || 'sem conexão'}). Usando modo offline.`, 'erro');
           return false;
         }
       }
