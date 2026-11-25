@@ -61,39 +61,46 @@
 
     /* Superfícies Liquid Glass */
     .glass-card {
-      background: linear-gradient(145deg, rgba(34, 30, 46, 0.58), rgba(16, 15, 22, 0.68));
-      backdrop-filter: blur(22px) saturate(180%);
-      -webkit-backdrop-filter: blur(22px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.13);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), 0 12px 32px rgba(0, 0, 0, 0.45);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(36, 30, 54, 0.36) 45%, rgba(16, 15, 24, 0.48) 100%);
+      backdrop-filter: blur(22px) saturate(190%);
+      -webkit-backdrop-filter: blur(22px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.06), 0 12px 32px rgba(0, 0, 0, 0.36);
     }
     .glass-header {
-      background: linear-gradient(180deg, rgba(28, 18, 44, 0.72), rgba(14, 12, 22, 0.62));
-      backdrop-filter: blur(24px) saturate(180%);
-      -webkit-backdrop-filter: blur(24px) saturate(180%);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+      background: linear-gradient(180deg, rgba(38, 26, 62, 0.50), rgba(16, 14, 26, 0.42));
+      backdrop-filter: blur(24px) saturate(190%);
+      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.16);
+      box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.07);
     }
     .glass-nav {
-      background: linear-gradient(180deg, rgba(22, 20, 30, 0.72), rgba(10, 10, 14, 0.86));
-      backdrop-filter: blur(26px) saturate(190%);
-      -webkit-backdrop-filter: blur(26px) saturate(190%);
-      border-top: 1px solid rgba(255, 255, 255, 0.13);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12);
+      background: linear-gradient(180deg, rgba(30, 26, 46, 0.52), rgba(12, 12, 18, 0.66));
+      backdrop-filter: blur(26px) saturate(195%);
+      -webkit-backdrop-filter: blur(26px) saturate(195%);
+      border-top: 1px solid rgba(255, 255, 255, 0.20);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
     }
     .glass-pill {
-      background: rgba(255, 255, 255, 0.07);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.14);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
+      backdrop-filter: blur(14px) saturate(170%);
+      -webkit-backdrop-filter: blur(14px) saturate(170%);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
     }
     .glass-accent-purple {
-      background: linear-gradient(135deg, rgba(126, 87, 194, 0.48), rgba(56, 0, 107, 0.62));
-      backdrop-filter: blur(22px) saturate(180%);
-      -webkit-backdrop-filter: blur(22px) saturate(180%);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.28), 0 16px 36px rgba(56, 0, 107, 0.45);
+      background: linear-gradient(135deg, rgba(145, 98, 220, 0.42), rgba(56, 0, 107, 0.52));
+      backdrop-filter: blur(22px) saturate(185%);
+      -webkit-backdrop-filter: blur(22px) saturate(185%);
+      border: 1px solid rgba(255, 255, 255, 0.26);
+      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.34), 0 16px 36px rgba(56, 0, 107, 0.38);
+    }
+    #modal-content {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(34, 28, 52, 0.46) 45%, rgba(18, 16, 28, 0.58) 100%) !important;
+      backdrop-filter: blur(28px) saturate(195%) !important;
+      -webkit-backdrop-filter: blur(28px) saturate(195%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.28) !important;
+      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.38), 0 24px 54px rgba(0, 0, 0, 0.48) !important;
     }
     .glass-gold-btn {
       background: linear-gradient(135deg, #FFE44D, #FFD600);
@@ -117,10 +124,15 @@
       background: radial-gradient(circle, rgba(255, 196, 0, 0.25) 0%, transparent 75%);
     }
     body.theme-light .glass-card {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.78), rgba(242, 238, 252, 0.85));
-      border-color: rgba(106, 27, 154, 0.16);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.9), 0 8px 24px rgba(56, 0, 107, 0.08);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.68), rgba(240, 234, 255, 0.52));
+      border-color: rgba(106, 27, 154, 0.20);
+      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.92), 0 8px 24px rgba(56, 0, 107, 0.10);
       color: #181622;
+    }
+    body.theme-light #modal-content {
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.66), rgba(242, 236, 255, 0.56)) !important;
+      border-color: rgba(106, 27, 154, 0.24) !important;
+      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.95), 0 24px 48px rgba(56, 0, 107, 0.18) !important;
     }
     body.theme-light .glass-header {
       background: linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(242, 238, 252, 0.78));
@@ -207,7 +219,7 @@
   <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none w-[90%] max-w-md flex flex-col gap-2"></div>
 
   <!-- Modal -->
-  <div id="modal-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 hidden items-center justify-center p-4">
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/25 backdrop-blur-[2px] z-50 hidden items-center justify-center p-4">
     <div id="modal-content" class="glass-card rounded-3xl w-full max-w-md max-h-[88vh] overflow-y-auto p-5 shadow-2xl"></div>
   </div>
 
@@ -2666,7 +2678,7 @@
       function renderAdmin() {
         const coords = (db.contas || []).filter(c => c.papel === 'coordenador');
         return `
-          <header class="glass-header px-4 py-3 flex items-center justify-between sticky top-0 z-30">
+          <header class="glass-header ${session.abaProfessor === 'turma' && !session.escolhendoTurma ? '!border-b-0' : ''} px-4 py-3 flex items-center justify-between sticky top-0 z-30">
             <span class="font-extrabold text-sm">Painel Admin</span>
             <div class="flex gap-2">
               <button id="btn-admin-nuvem" class="glass-pill text-xs font-bold px-3 py-1.5 rounded-xl text-amarelo">Nuvem</button>
@@ -2995,7 +3007,7 @@
               </button>
             </div>
           </div>
-          <div class="flex gap-2 mb-3 flex-wrap">
+          <div class="flex gap-2 pb-3.5 mb-3.5 border-b border-white/15 flex-wrap">
             <button id="btn-boletim-turma" class="glass-pill text-emerald-300 px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('clipboardCheck', 'w-3.5 h-3.5')} <span>Boletim</span></button>
             <button id="btn-avaliacoes-turma" class="glass-pill text-amarelo px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('award', 'w-3.5 h-3.5')} <span>Avaliações</span></button>
             <button id="btn-cargos-turma" class="glass-pill text-white px-3 py-1.5 rounded-xl text-[11px] font-bold flex items-center gap-1">${svgIcon('briefcase', 'w-3.5 h-3.5 text-amarelo')} <span>Cargos</span></button>
@@ -4713,114 +4725,175 @@
               ` : ''}
             </div>
 
-            ${jaResgatou ? `
-              <div class="glass-card !border-red-500/75 !bg-red-950/50 text-red-200 text-xs p-3.5 rounded-2xl font-bold flex items-center gap-2.5">
-                <span class="text-red-400 shrink-0">${svgIcon('alertTriangle', 'w-5 h-5')}</span>
-                <span>Você já fez seu resgate de hoje! Volte amanhã para comprar novamente.</span>
-              </div>
-            ` : ''}
-
-            <button id="btn-abrir-trilha-b2" class="w-full glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between text-left transition">
-              <div class="flex items-center gap-3">
-                <span class="w-10 h-10 rounded-2xl glass-accent-purple flex items-center justify-center text-amarelo">${svgIcon('compass', 'w-5 h-5')}</span>
-                <div>
-                  <div class="font-extrabold text-sm">MateMAGICA — Trilha Interativa</div>
-                  <div class="text-[11px] text-gray-400">Praticar conteúdos do Bloco I e II</div>
-                </div>
-              </div>
-              <span class="glass-pill text-xs font-bold px-3 py-1.5 rounded-xl text-amarelo">Abrir &rarr;</span>
-            </button>
-
             ${(() => {
-              const conquistados = new Set(getBrochesAluno(aluno));
-              const blk = detectarBlocoAluno(aluno);
-              const showB1 = blk !== 'b2';
-              const showB2 = blk !== 'b1';
-              const b1Done = BROCHES_BLOCO_1.filter(b => conquistados.has(b.id)).length;
-              const b2Done = BROCHES_BLOCO_2.filter(b => conquistados.has(b.id)).length;
-              const doneB = (showB1 ? b1Done : 0) + (showB2 ? b2Done : 0);
-              const totalB = (showB1 ? BROCHES_BLOCO_1.length : 0) + (showB2 ? BROCHES_BLOCO_2.length : 0);
+              const tela = session.alunoTela || 'menu';
+              const avalsTurma = (Array.isArray(db.avaliacoes) ? db.avaliacoes : []).filter(av => av.turmaId === aluno.turmaId);
+              const totalAv = calcularNotaAvaliacoesAluno(aluno.id, aluno.turmaId).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+              const ganhos = db.transacoes.filter(t => t.destinoId === aluno.id && t.valor > 0).slice(0, 6);
+              const trilhaDone = aluno.trilhaProgresso && aluno.trilhaProgresso.completedLessons ? Object.keys(aluno.trilhaProgresso.completedLessons).length : 0;
+
+              if (tela === 'menu') {
+                return `
+                  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <button id="btn-abrir-trilha-b2" class="glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between sm:flex-col sm:items-start gap-3 text-left transition">
+                      <span class="w-11 h-11 rounded-2xl glass-accent-purple flex items-center justify-center text-amarelo shrink-0">${svgIcon('compass', 'w-5 h-5')}</span>
+                      <div class="flex-1">
+                        <div class="font-extrabold text-sm">MateMAGICA</div>
+                        <div class="text-[11px] text-gray-400">Trilha interativa (${trilhaDone}/80)</div>
+                      </div>
+                      <span class="glass-pill text-xs font-bold px-3 py-1 rounded-xl text-amarelo">Abrir &rarr;</span>
+                    </button>
+
+                    <button id="btn-aluno-ir-nota" class="glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between sm:flex-col sm:items-start gap-3 text-left transition">
+                      <span class="w-11 h-11 rounded-2xl bg-cyan-500/20 border border-cyan-300/30 flex items-center justify-center text-cyan-300 shrink-0">${svgIcon('award', 'w-5 h-5')}</span>
+                      <div class="flex-1">
+                        <div class="font-extrabold text-sm">Nota</div>
+                        <div class="text-[11px] text-gray-400">Avaliações (${totalAv} pts)${isRoteirosVisiveis() ? ` · Roteiros ${calcularNotaRoteiros(aluno)}` : ''}</div>
+                      </div>
+                      <span class="glass-pill text-xs font-bold px-3 py-1 rounded-xl text-cyan-300">Ver &rarr;</span>
+                    </button>
+
+                    <button id="btn-aluno-ir-mercado" class="glass-card hover:border-[#FFD600]/60 rounded-3xl p-4 flex items-center justify-between sm:flex-col sm:items-start gap-3 text-left transition">
+                      <span class="w-11 h-11 rounded-2xl bg-amber-500/20 border border-amber-300/30 flex items-center justify-center text-amarelo shrink-0">${svgIcon('store', 'w-5 h-5')}</span>
+                      <div class="flex-1">
+                        <div class="font-extrabold text-sm">Mercado</div>
+                        <div class="text-[11px] text-gray-400">${itensAtivos.length} ${itensAtivos.length === 1 ? 'item disponível' : 'itens disponíveis'}</div>
+                      </div>
+                      <span class="glass-pill text-xs font-bold px-3 py-1 rounded-xl text-amarelo">Entrar &rarr;</span>
+                    </button>
+                  </div>
+                `;
+              }
+
+              if (tela === 'nota') {
+                const conquistados = new Set(getBrochesAluno(aluno));
+                const blk = detectarBlocoAluno(aluno);
+                const showB1 = blk !== 'b2';
+                const showB2 = blk !== 'b1';
+                const b1Done = BROCHES_BLOCO_1.filter(b => conquistados.has(b.id)).length;
+                const b2Done = BROCHES_BLOCO_2.filter(b => conquistados.has(b.id)).length;
+                return `
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <button id="btn-aluno-voltar-menu" class="glass-pill text-xs font-bold px-3 py-1.5 rounded-xl text-white flex items-center gap-1.5">${svgIcon('arrowLeft', 'w-3.5 h-3.5')} <span>Voltar</span></button>
+                      <span class="text-xs font-extrabold text-cyan-300">Minhas Notas</span>
+                    </div>
+
+                    <div class="glass-card rounded-3xl p-4 space-y-2.5">
+                      <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-sm flex items-center gap-1.5">${svgIcon('award', 'w-4 h-4 text-cyan-300')} <span>Avaliações da Turma</span></h3>
+                        <span class="glass-pill text-[11px] font-bold px-2.5 py-0.5 rounded-full text-cyan-300">Total: ${totalAv} pts</span>
+                      </div>
+                      ${avalsTurma.length === 0 ? `<p class="text-xs text-gray-400">Nenhuma avaliação lançada ainda.</p>` : `
+                        <div class="space-y-1.5">
+                          ${avalsTurma.map(av => {
+                            const n = (av.notas && av.notas[aluno.id] !== undefined) ? Number(av.notas[aluno.id]).toLocaleString('pt-BR') : '—';
+                            return `
+                              <div class="glass-pill rounded-xl px-3 py-2 flex items-center justify-between text-xs">
+                                <div>
+                                  <div class="font-bold">${escapeHtml(av.titulo)}</div>
+                                  <div class="text-[10px] text-gray-400">${escapeHtml(av.periodo || 'Geral')} · Máx. ${Number(av.valorMax).toLocaleString('pt-BR')} pts</div>
+                                </div>
+                                <span class="font-extrabold text-cyan-300">${n}</span>
+                              </div>
+                            `;
+                          }).join('')}
+                        </div>
+                      `}
+                    </div>
+
+                    ${isRoteirosVisiveis() ? `<div class="glass-card rounded-3xl p-4 space-y-3">
+                      <div class="flex items-center justify-between">
+                        <h3 class="font-extrabold text-sm flex items-center gap-1.5">${svgIcon('star', 'w-4 h-4 text-amarelo')} <span>Roteiros concluídos</span></h3>
+                        <span class="glass-pill text-[11px] font-bold px-2.5 py-0.5 rounded-full text-amarelo">Nota: ${calcularNotaRoteiros(aluno)}</span>
+                      </div>
+                      ${showB1 ? `
+                        <div>
+                          <div class="text-[11px] font-bold text-red-300 mb-1.5">Bloco I (${b1Done}/${BROCHES_BLOCO_1.length})</div>
+                          <div class="grid grid-cols-5 gap-2 place-items-center">
+                            ${BROCHES_BLOCO_1.map(b => `
+                              <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
+                                ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
+                              </button>
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+                      ${showB2 ? `
+                        <div>
+                          <div class="text-[11px] font-bold text-purple-300 mb-1.5">Bloco II (${b2Done}/${BROCHES_BLOCO_2.length})</div>
+                          <div class="grid grid-cols-5 gap-2 place-items-center">
+                            ${BROCHES_BLOCO_2.map(b => `
+                              <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
+                                ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
+                              </button>
+                            `).join('')}
+                          </div>
+                        </div>
+                      ` : ''}
+                    </div>` : ''}
+
+                    ${ganhos.length ? `
+                      <div>
+                        <h3 class="font-extrabold text-sm mb-2 flex items-center gap-1.5">${svgIcon('history', 'w-4 h-4 text-amarelo')} <span>Últimos ganhos</span></h3>
+                        <div class="space-y-1.5">
+                          ${ganhos.map(g => `
+                            <div class="glass-card rounded-2xl px-3.5 py-2 flex items-center justify-between text-xs">
+                              <div>
+                                <div class="font-semibold">${escapeHtml(g.motivo)}</div>
+                                <div class="text-[10px] text-gray-400">${formatarDataHora(g.criadoEm)}</div>
+                              </div>
+                              <span class="font-extrabold text-amarelo flex items-center gap-1">${iconeMoedaImg('w-3.5 h-3.5')} +${g.valor}</span>
+                            </div>
+                          `).join('')}
+                        </div>
+                      </div>
+                    ` : ''}
+                  </div>
+                `;
+              }
+
+              // tela === 'mercado'
               return `
-                ${isRoteirosVisiveis() ? `<div class="glass-card rounded-3xl p-4 space-y-3">
+                <div class="space-y-3">
                   <div class="flex items-center justify-between">
-                    <h3 class="font-extrabold text-sm flex items-center gap-1.5">${svgIcon('star', 'w-4 h-4 text-amarelo')} <span>Roteiros concluídos</span></h3>
-                    <span class="glass-pill text-[11px] font-bold px-2.5 py-0.5 rounded-full text-amarelo">Nota: ${calcularNotaRoteiros(aluno)}</span>
+                    <button id="btn-aluno-voltar-menu" class="glass-pill text-xs font-bold px-3 py-1.5 rounded-xl text-white flex items-center gap-1.5">${svgIcon('arrowLeft', 'w-3.5 h-3.5')} <span>Voltar</span></button>
+                    <span class="text-xs font-extrabold text-amarelo">Mercadinho</span>
                   </div>
-                  ${showB1 ? `
-                    <div>
-                      <div class="text-[11px] font-bold text-red-300 mb-1.5">Bloco I (${b1Done}/${BROCHES_BLOCO_1.length})</div>
-                      <div class="grid grid-cols-5 gap-2 place-items-center">
-                        ${BROCHES_BLOCO_1.map(b => `
-                          <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                            ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
-                          </button>
-                        `).join('')}
-                      </div>
-                    </div>
-                  ` : ''}
-                  ${showB2 ? `
-                    <div>
-                      <div class="text-[11px] font-bold text-purple-300 mb-1.5">Bloco II (${b2Done}/${BROCHES_BLOCO_2.length})</div>
-                      <div class="grid grid-cols-5 gap-2 place-items-center">
-                        ${BROCHES_BLOCO_2.map(b => `
-                          <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                            ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
-                          </button>
-                        `).join('')}
-                      </div>` : ''}
-                    </div>
-                  ` : ''}
-                </div>
-              `;
-            })()}
 
-            ${(() => {
-              const ganhos = db.transacoes.filter(t => t.destinoId === aluno.id && t.valor > 0).slice(0, 4);
-              if (!ganhos.length) return '';
-              return `
-                <div>
-                  <h3 class="font-extrabold text-sm mb-2 flex items-center gap-1.5">${svgIcon('history', 'w-4 h-4 text-amarelo')} <span>Últimos ganhos</span></h3>
-                  <div class="space-y-1.5">
-                    ${ganhos.map(g => `
-                      <div class="glass-card rounded-2xl px-3.5 py-2 flex items-center justify-between text-xs">
-                        <div>
-                          <div class="font-semibold">${escapeHtml(g.motivo)}</div>
-                          <div class="text-[10px] text-gray-400">${formatarDataHora(g.criadoEm)}</div>
+                  ${jaResgatou ? `
+                    <div class="glass-card !border-red-500/75 !bg-red-950/50 text-red-200 text-xs p-3.5 rounded-2xl font-bold flex items-center gap-2.5">
+                      <span class="text-red-400 shrink-0">${svgIcon('alertTriangle', 'w-5 h-5')}</span>
+                      <span>Você já fez seu resgate de hoje! Volte amanhã para comprar novamente.</span>
+                    </div>
+                  ` : ''}
+
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    ${itensAtivos.map(it => {
+                      const qtd = session.carrinho[it.id] || 0;
+                      return `
+                        <div class="glass-card rounded-3xl p-3.5 flex items-center justify-between gap-3">
+                          <div class="flex items-center gap-3">
+                            <span class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white/95">${renderRegraIcone(it.icone, 'w-5 h-5')}</span>
+                            <div>
+                              <div class="font-bold text-sm">${escapeHtml(it.nome)}</div>
+                              <div class="text-xs text-amarelo font-extrabold">${fmtMoeda(it.preco)}</div>
+                            </div>
+                          </div>
+                          <div class="flex items-center gap-2">
+                            ${qtd > 0 ? `<button data-rem="${it.id}" class="btn-rem-cart w-8 h-8 rounded-xl glass-pill font-bold">-</button><span class="text-sm font-bold w-4 text-center">${qtd}</span>` : ''}
+                            <button data-add="${it.id}" ${jaResgatou ? 'disabled' : ''} class="btn-add-cart w-8 h-8 rounded-xl glass-gold-btn font-extrabold disabled:opacity-40">+</button>
+                          </div>
                         </div>
-                        <span class="font-extrabold text-amarelo flex items-center gap-1">${iconeMoedaImg('w-3.5 h-3.5')} +${g.valor}</span>
-                      </div>
-                    `).join('')}
+                      `;
+                    }).join('')}
                   </div>
                 </div>
               `;
             })()}
-
-            <div>
-              <h3 class="font-extrabold text-base mb-2.5 flex items-center gap-2">${svgIcon('store', 'w-5 h-5 text-amarelo')} <span>Mercadinho</span></h3>
-              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                ${itensAtivos.map(it => {
-                  const qtd = session.carrinho[it.id] || 0;
-                  return `
-                    <div class="glass-card rounded-3xl p-3.5 flex items-center justify-between gap-3">
-                      <div class="flex items-center gap-3">
-                        <span class="w-11 h-11 rounded-2xl bg-white/10 flex items-center justify-center text-white/95">${renderRegraIcone(it.icone, 'w-5 h-5')}</span>
-                        <div>
-                          <div class="font-bold text-sm">${escapeHtml(it.nome)}</div>
-                          <div class="text-xs text-amarelo font-extrabold">${fmtMoeda(it.preco)}</div>
-                        </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        ${qtd > 0 ? `<button data-rem="${it.id}" class="btn-rem-cart w-8 h-8 rounded-xl glass-pill font-bold">-</button><span class="text-sm font-bold w-4 text-center">${qtd}</span>` : ''}
-                        <button data-add="${it.id}" ${jaResgatou ? 'disabled' : ''} class="btn-add-cart w-8 h-8 rounded-xl glass-gold-btn font-extrabold disabled:opacity-40">+</button>
-                      </div>
-                    </div>
-                  `;
-                }).join('')}
-              </div>
-            </div>
           </main>
 
-          ${totalCarrinho > 0 ? `
+          ${session.alunoTela === 'mercado' && totalCarrinho > 0 ? `
             <div class="fixed bottom-0 left-0 right-0 glass-nav p-4 z-40">
               <div class="max-w-5xl mx-auto flex items-center justify-between gap-3">
                 <div>
@@ -4876,6 +4949,7 @@
         document.querySelectorAll('.btn-escolher-aluno').forEach(b => {
           b.onclick = () => {
             session.alunoAtivoId = Number(b.dataset.escolherAluno);
+            session.alunoTela = 'menu';
             session.carrinho = {};
             render();
           };
@@ -4885,6 +4959,12 @@
         if (btnTrilhaAluno) {
           btnTrilhaAluno.onclick = () => abrirTrilhaBloco2(session.alunoAtivoId);
         }
+        const btnIrNota = document.getElementById('btn-aluno-ir-nota');
+        if (btnIrNota) btnIrNota.onclick = () => { session.alunoTela = 'nota'; render(); };
+        const btnIrMercado = document.getElementById('btn-aluno-ir-mercado');
+        if (btnIrMercado) btnIrMercado.onclick = () => { session.alunoTela = 'mercado'; render(); };
+        const btnVoltarMenuAluno = document.getElementById('btn-aluno-voltar-menu');
+        if (btnVoltarMenuAluno) btnVoltarMenuAluno.onclick = () => { session.alunoTela = 'menu'; render(); };
         document.querySelectorAll('.btn-aluno-broche').forEach(b => {
           b.onclick = () => {
             const ok = b.dataset.brocheOk === '1';
