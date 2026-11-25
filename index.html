@@ -281,7 +281,11 @@
           headers['Authorization'] = 'Bearer ' + cfg.key;
         }
         const res = await fetch(`${cfg.url}/rest/v1/${path}`, { ...opts, headers });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        if (!res.ok) {
+          let errDetail = '';
+          try { errDetail = (await res.json())?.message || ''; } catch (e) {}
+          throw new Error(`HTTP ${res.status}${errDetail ? ' - ' + errDetail : ''}`);
+        }
         const text = await res.text();
         return text ? JSON.parse(text) : null;
       }
