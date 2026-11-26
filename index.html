@@ -1681,6 +1681,7 @@
         }
       }
 
+      let _suprimirPopModalCount = 0;
       function fecharModal(fromPopState = false) {
         const backdrop = document.getElementById('modal-backdrop');
         const estavaAberto = !backdrop.classList.contains('hidden');
@@ -1690,7 +1691,10 @@
         if (!fromPopState && estavaAberto && modalHistoryPushed) {
           modalHistoryPushed = false;
           try {
-            if (history.state && history.state.modal) history.back();
+            if (history.state && history.state.modal) {
+              _suprimirPopModalCount++;
+              history.back();
+            }
           } catch (e) {}
         } else if (fromPopState) {
           modalHistoryPushed = false;
@@ -2130,15 +2134,26 @@
         if (!savedId) return false;
         const challenge = new Uint8Array(32);
         crypto.getRandomValues(challenge);
-        const assertion = await navigator.credentials.get({
-          publicKey: {
-            challenge,
-            allowCredentials: [{ type: 'public-key', id: base64ToBuffer(savedId) }],
-            userVerification: 'required',
-            timeout: 60000
-          }
-        });
-        return Boolean(assertion);
+        try {
+          const assertion = await navigator.credentials.get({
+            publicKey: {
+              challenge,
+              allowCredentials: [{ type: 'public-key', id: base64ToBuffer(savedId), transports: ['internal'] }],
+              userVerification: 'preferred',
+              timeout: 60000
+            }
+          });
+          return Boolean(assertion);
+        } catch (err) {
+          const assertion2 = await navigator.credentials.get({
+            publicKey: {
+              challenge,
+              userVerification: 'preferred',
+              timeout: 60000
+            }
+          });
+          return Boolean(assertion2);
+        }
       }
 
       function concluirEntradaProfessor(comDigital = false) {
@@ -2650,8 +2665,8 @@
               if (!conta) { toast('Conta não encontrada.', 'erro'); return; }
               session.contaAtiva = conta;
               trocarEscolaAtiva(conta.escola_id || db.escolas[0]?.id);
-              const tAtual = turmaDoHorarioAtual();
-              if (tAtual) { session.turmaAtualId = tAtual.id; session.escolhendoTurma = false; }
+              const h = encontrarHorarioAtivoAgora();
+              if (h) { session.turmaAtualId = h.turmaId; session.escolhendoTurma = false; }
               else { session.escolhendoTurma = true; }
               session.modo = 'professor';
               session.abaProfessor = 'turma';
@@ -5439,6 +5454,10 @@
       };
 
       window.addEventListener('popstate', () => {
+        if (_suprimirPopModalCount > 0) {
+          _suprimirPopModalCount--;
+          return;
+        }
         const backdrop = document.getElementById('modal-backdrop');
         if (backdrop && !backdrop.classList.contains('hidden')) {
           fecharModal(true);
