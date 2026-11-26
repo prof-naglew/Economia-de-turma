@@ -15,92 +15,106 @@
       color: #F5F5F7;
       -webkit-tap-highlight-color: transparent;
       overflow-x: hidden;
-      transition: background-color 500ms cubic-bezier(0.22, 1, 0.36, 1), color 500ms cubic-bezier(0.22, 1, 0.36, 1);
+      transition: background-color 180ms ease-out, color 180ms ease-out;
     }
-    .glass-card, .glass-header, .glass-nav, .glass-pill {
-      transition: background 500ms cubic-bezier(0.22, 1, 0.36, 1), border-color 500ms cubic-bezier(0.22, 1, 0.36, 1), color 500ms cubic-bezier(0.22, 1, 0.36, 1), box-shadow 500ms cubic-bezier(0.22, 1, 0.36, 1);
+    .glass-card, .glass-pill, .glass-accent-purple {
+      contain: layout style;
+      transition: transform 120ms cubic-bezier(0.22, 1, 0.36, 1), opacity 120ms ease-out;
     }
-    /* Orbes de luz ambiente para o efeito Liquid Glass */
+    /* Orbes de luz ambiente para o efeito Liquid Glass (GPU-leve, sem blur pesado) */
     .ambient-bg {
       position: fixed;
       inset: 0;
       z-index: 0;
       pointer-events: none;
       overflow: hidden;
+      contain: strict;
+      transform: translate3d(0, 0, 0);
     }
     .orb-purple {
       position: absolute;
-      width: 420px;
-      height: 420px;
-      top: -120px;
-      left: -100px;
+      width: 480px;
+      height: 480px;
+      top: -150px;
+      left: -130px;
       border-radius: 9999px;
-      background: radial-gradient(circle, rgba(138, 43, 226, 0.38) 0%, rgba(106, 27, 154, 0.08) 55%, transparent 75%);
-      filter: blur(28px);
+      background: radial-gradient(circle, rgba(138, 43, 226, 0.34) 0%, rgba(106, 27, 154, 0.10) 48%, transparent 72%);
     }
     .orb-gold {
       position: absolute;
-      width: 340px;
-      height: 340px;
-      bottom: 8%;
-      right: -110px;
+      width: 400px;
+      height: 400px;
+      bottom: 6%;
+      right: -130px;
       border-radius: 9999px;
-      background: radial-gradient(circle, rgba(255, 214, 0, 0.20) 0%, rgba(255, 214, 0, 0.04) 55%, transparent 75%);
-      filter: blur(32px);
+      background: radial-gradient(circle, rgba(255, 214, 0, 0.18) 0%, rgba(255, 214, 0, 0.04) 48%, transparent 72%);
     }
     .orb-deep {
       position: absolute;
-      width: 380px;
-      height: 380px;
-      top: 42%;
-      left: 25%;
+      width: 440px;
+      height: 440px;
+      top: 40%;
+      left: 22%;
       border-radius: 9999px;
-      background: radial-gradient(circle, rgba(88, 28, 135, 0.24) 0%, transparent 70%);
-      filter: blur(40px);
+      background: radial-gradient(circle, rgba(88, 28, 135, 0.22) 0%, transparent 68%);
     }
 
-    /* Superfícies Liquid Glass */
+    /* Superfícies Liquid Glass (otimizadas para 60–120 FPS) */
     .glass-card {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(36, 30, 54, 0.36) 45%, rgba(16, 15, 24, 0.48) 100%);
-      backdrop-filter: blur(22px) saturate(190%);
-      -webkit-backdrop-filter: blur(22px) saturate(190%);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.28), inset 0 -1px 0 rgba(255, 255, 255, 0.06), 0 12px 32px rgba(0, 0, 0, 0.36);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.10) 0%, rgba(36, 30, 54, 0.72) 45%, rgba(16, 15, 24, 0.86) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.24), 0 8px 22px rgba(0, 0, 0, 0.30);
     }
     .glass-header {
-      background: linear-gradient(180deg, rgba(38, 26, 62, 0.50), rgba(16, 14, 26, 0.42));
-      backdrop-filter: blur(24px) saturate(190%);
-      -webkit-backdrop-filter: blur(24px) saturate(190%);
+      background: linear-gradient(180deg, rgba(38, 26, 62, 0.72), rgba(16, 14, 26, 0.68));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-bottom: 1px solid rgba(255, 255, 255, 0.16);
       box-shadow: inset 0 -1px 0 rgba(255, 255, 255, 0.07);
+      transform: translate3d(0, 0, 0);
     }
     .glass-nav {
-      background: linear-gradient(180deg, rgba(30, 26, 46, 0.52), rgba(12, 12, 18, 0.66));
-      backdrop-filter: blur(26px) saturate(195%);
-      -webkit-backdrop-filter: blur(26px) saturate(195%);
+      background: linear-gradient(180deg, rgba(30, 26, 46, 0.76), rgba(12, 12, 18, 0.86));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       border-top: 1px solid rgba(255, 255, 255, 0.20);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.20);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      transform: translate3d(0, 0, 0);
     }
     .glass-pill {
-      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.05));
-      backdrop-filter: blur(14px) saturate(170%);
-      -webkit-backdrop-filter: blur(14px) saturate(170%);
-      border: 1px solid rgba(255, 255, 255, 0.22);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.25);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.06));
+      border: 1px solid rgba(255, 255, 255, 0.20);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
     }
     .glass-accent-purple {
-      background: linear-gradient(135deg, rgba(145, 98, 220, 0.42), rgba(56, 0, 107, 0.52));
-      backdrop-filter: blur(22px) saturate(185%);
-      -webkit-backdrop-filter: blur(22px) saturate(185%);
-      border: 1px solid rgba(255, 255, 255, 0.26);
-      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.34), 0 16px 36px rgba(56, 0, 107, 0.38);
+      background: linear-gradient(135deg, rgba(130, 78, 210, 0.68), rgba(56, 0, 107, 0.82));
+      border: 1px solid rgba(255, 255, 255, 0.24);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 10px 26px rgba(56, 0, 107, 0.34);
     }
     #modal-content {
-      background: linear-gradient(145deg, rgba(255, 255, 255, 0.15) 0%, rgba(34, 28, 52, 0.46) 45%, rgba(18, 16, 28, 0.58) 100%) !important;
-      backdrop-filter: blur(28px) saturate(195%) !important;
-      -webkit-backdrop-filter: blur(28px) saturate(195%) !important;
-      border: 1px solid rgba(255, 255, 255, 0.28) !important;
-      box-shadow: inset 0 1.5px 1px rgba(255, 255, 255, 0.38), 0 24px 54px rgba(0, 0, 0, 0.48) !important;
+      background: linear-gradient(145deg, rgba(255, 255, 255, 0.16) 0%, rgba(34, 28, 52, 0.64) 45%, rgba(18, 16, 28, 0.78) 100%) !important;
+      backdrop-filter: blur(18px) saturate(160%) !important;
+      -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+      border: 1px solid rgba(255, 255, 255, 0.26) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34), 0 18px 42px rgba(0, 0, 0, 0.44) !important;
+      will-change: transform, opacity;
+      transform: translate3d(0, 12px, 0) scale(0.97);
+      opacity: 0;
+      transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease-out;
+    }
+    #modal-backdrop.is-open #modal-content {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
+    }
+    .toast-gpu {
+      will-change: transform, opacity;
+      transform: translate3d(0, -10px, 0) scale(0.96);
+      opacity: 0;
+      transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), opacity 140ms ease-out;
+    }
+    .toast-gpu.is-visible {
+      transform: translate3d(0, 0, 0) scale(1);
+      opacity: 1;
     }
     .glass-gold-btn {
       background: linear-gradient(135deg, #FFE44D, #FFD600);
@@ -195,13 +209,15 @@
     body.theme-light .text-red-200 { color: #991B1B !important; }
   
     .broche-locked {
-      filter: grayscale(100%) brightness(0.65) opacity(0.5);
-      transition: filter 0.25s ease, transform 0.25s ease;
+      filter: grayscale(100%);
+      opacity: 0.36;
+      transform: translate3d(0, 0, 0) scale(0.96);
+      transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), opacity 140ms ease-out;
     }
     .broche-unlocked {
-      filter: drop-shadow(0 2px 6px rgba(255, 214, 0, 0.45));
-      transform: scale(1.03);
-      transition: filter 0.25s ease, transform 0.25s ease;
+      opacity: 1;
+      transform: translate3d(0, 0, 0) scale(1.03);
+      transition: transform 140ms cubic-bezier(0.22, 1, 0.36, 1), opacity 140ms ease-out;
     }
   </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -870,10 +886,15 @@
         } catch (e) {}
       }
 
+      let cloudSaveTimer = null;
       function salvarEstado() {
         salvarEstadoLocalOnly();
         if (session.escolaAtualId) {
-          enviarEstadoEscolaParaNuvem(session.escolaAtualId);
+          const alvoEscolaId = session.escolaAtualId;
+          clearTimeout(cloudSaveTimer);
+          cloudSaveTimer = setTimeout(() => {
+            enviarEstadoEscolaParaNuvem(alvoEscolaId);
+          }, 600);
         }
       }
 
@@ -1630,26 +1651,29 @@
         const ehPerigo = tipo === 'erro' || tipo === 'perigo';
         const cor = ehPerigo
           ? 'bg-red-700/95 border-red-300/70'
-          : (tipo === 'sucesso' ? 'bg-emerald-800/90 border-emerald-400/40' : 'bg-purple-900/90 border-purple-300/30');
-        div.className = `${cor} backdrop-blur-xl text-white px-4 py-3 rounded-2xl shadow-2xl text-sm font-bold flex items-center justify-center gap-2 border transition-opacity`;
+          : (tipo === 'sucesso' ? 'bg-emerald-800/95 border-emerald-400/40' : 'bg-purple-900/95 border-purple-300/30');
+        div.className = `${cor} toast-gpu text-white px-4 py-3 rounded-2xl shadow-xl text-sm font-bold flex items-center justify-center gap-2 border`;
         div.innerHTML = `${ehPerigo ? svgIcon('alertTriangle', 'w-5 h-5 text-white') : ''}<span>${escapeHtml(msg)}</span>`;
         container.appendChild(div);
+        requestAnimationFrame(() => div.classList.add('is-visible'));
         setTimeout(() => {
-          div.style.opacity = '0';
-          setTimeout(() => div.remove(), 250);
-        }, 2600);
+          div.classList.remove('is-visible');
+          setTimeout(() => div.remove(), 160);
+        }, 2200);
       }
 
       function abrirModal(html) {
         const backdrop = document.getElementById('modal-backdrop');
         const content = document.getElementById('modal-content');
         content.innerHTML = html;
-        backdrop.classList.remove('hidden');
+        backdrop.classList.remove('hidden', 'is-open');
         backdrop.classList.add('flex');
+        requestAnimationFrame(() => backdrop.classList.add('is-open'));
       }
 
       function fecharModal() {
         const backdrop = document.getElementById('modal-backdrop');
+        backdrop.classList.remove('is-open');
         backdrop.classList.add('hidden');
         backdrop.classList.remove('flex');
       }
@@ -3015,7 +3039,7 @@
         const mostrarFab = ['turma', 'mercadinho'].includes(session.abaProfessor) || (session.abaProfessor === 'config' && session.subConfig !== 'app');
         const fabHtml = mostrarFab ? `
           <div id="fab-speed-dial" class="fixed bottom-36 right-4 z-40 flex flex-col items-end gap-2 ${session.fabMenuAberto ? '' : 'hidden'}"></div>
-          <button id="btn-fab-adicionar" aria-label="Adicionar" style="transition: opacity 750ms cubic-bezier(0.22, 1, 0.36, 1), transform 750ms cubic-bezier(0.22, 1, 0.36, 1);" class="fixed bottom-20 right-4 z-40 glass-gold-btn w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-2xl font-extrabold leading-none ${session.fabMenuAberto ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'}">
+          <button id="btn-fab-adicionar" aria-label="Adicionar" style="will-change: opacity, transform; transition: opacity 200ms cubic-bezier(0.22, 1, 0.36, 1), transform 200ms cubic-bezier(0.22, 1, 0.36, 1);" class="fixed bottom-20 right-4 z-40 glass-gold-btn w-12 h-12 rounded-full shadow-2xl flex items-center justify-center text-2xl font-extrabold leading-none ${session.fabMenuAberto ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-90 pointer-events-none'}">
             ${session.fabMenuAberto ? '&times;' : '+'}
           </button>
         ` : '';
@@ -3498,8 +3522,8 @@
                 <h3 class="font-bold text-sm">Tema</h3>
                 <p id="lbl-tema-atual" class="text-[11px] text-gray-400">${db.config.tema === 'claro' ? 'Claro' : 'Escuro'}</p>
               </div>
-              <button id="btn-alternar-tema" role="switch" aria-checked="${db.config.tema === 'claro'}" style="transition: background-color 500ms cubic-bezier(0.22, 1, 0.36, 1), border-color 500ms cubic-bezier(0.22, 1, 0.36, 1);" class="relative w-14 h-8 rounded-full p-1 flex items-center ${db.config.tema === 'claro' ? 'bg-[#FFD600]' : 'bg-white/15 border border-white/20'}">
-                <span id="knob-tema" style="transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);" class="w-6 h-6 rounded-full bg-white shadow-md transform flex items-center justify-center text-[#181622] ${db.config.tema === 'claro' ? 'translate-x-6' : 'translate-x-0'}">
+              <button id="btn-alternar-tema" role="switch" aria-checked="${db.config.tema === 'claro'}" style="transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms cubic-bezier(0.22, 1, 0.36, 1);" class="relative w-14 h-8 rounded-full p-1 flex items-center ${db.config.tema === 'claro' ? 'bg-[#FFD600]' : 'bg-white/15 border border-white/20'}">
+                <span id="knob-tema" style="transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);" class="w-6 h-6 rounded-full bg-white shadow-md transform flex items-center justify-center text-[#181622] ${db.config.tema === 'claro' ? 'translate-x-6' : 'translate-x-0'}">
                   ${svgIcon(db.config.tema === 'claro' ? 'moon' : 'sun', 'w-3.5 h-3.5')}
                 </span>
               </button>
@@ -3510,8 +3534,8 @@
                 <h3 class="font-bold text-sm">Exibir Roteiros</h3>
                 <p id="lbl-roteiros-vis" class="text-[11px] text-gray-400">${isRoteirosVisiveis() ? 'Ativado (visível nos cards e boletim)' : 'Desativado (padrão)'}</p>
               </div>
-              <button id="btn-alternar-roteiros" role="switch" aria-checked="${isRoteirosVisiveis()}" style="transition: background-color 500ms cubic-bezier(0.22, 1, 0.36, 1), border-color 500ms cubic-bezier(0.22, 1, 0.36, 1);" class="relative w-14 h-8 rounded-full p-1 flex items-center ${isRoteirosVisiveis() ? 'bg-[#FFD600]' : 'bg-white/15 border border-white/20'}">
-                <span style="transition: transform 500ms cubic-bezier(0.22, 1, 0.36, 1);" class="w-6 h-6 rounded-full bg-white shadow-md transform flex items-center justify-center text-[#181622] ${isRoteirosVisiveis() ? 'translate-x-6' : 'translate-x-0'}">
+              <button id="btn-alternar-roteiros" role="switch" aria-checked="${isRoteirosVisiveis()}" style="transition: background-color 180ms cubic-bezier(0.22, 1, 0.36, 1), border-color 180ms cubic-bezier(0.22, 1, 0.36, 1);" class="relative w-14 h-8 rounded-full p-1 flex items-center ${isRoteirosVisiveis() ? 'bg-[#FFD600]' : 'bg-white/15 border border-white/20'}">
+                <span style="transition: transform 180ms cubic-bezier(0.22, 1, 0.36, 1);" class="w-6 h-6 rounded-full bg-white shadow-md transform flex items-center justify-center text-[#181622] ${isRoteirosVisiveis() ? 'translate-x-6' : 'translate-x-0'}">
                   ${svgIcon('star', 'w-3.5 h-3.5')}
                 </span>
               </button>
@@ -5188,7 +5212,122 @@
         }
       }
 
+      const SESSION_TAB_KEY = 'economia_turma_tab_session_v1';
+      const SESSION_IDLE_TIMEOUT_MS = 30 * 60 * 1000;
+      let lastActivityTs = Date.now();
+      let lastActivitySaveTs = 0;
+
+      function limparSessaoAba() {
+        try { sessionStorage.removeItem(SESSION_TAB_KEY); } catch (e) {}
+      }
+
+      function salvarSessaoAba(force = false) {
+        if (!session.contaAtiva || session.modo === 'login') {
+          limparSessaoAba();
+          return;
+        }
+        const now = Date.now();
+        if (!force && (now - lastActivitySaveTs < 10000)) return;
+        lastActivityTs = now;
+        lastActivitySaveTs = now;
+        try {
+          sessionStorage.setItem(SESSION_TAB_KEY, JSON.stringify({
+            contaAtiva: session.contaAtiva,
+            escolaAtualId: session.escolaAtualId,
+            modo: session.modo,
+            abaProfessor: session.abaProfessor,
+            turmaAtualId: session.turmaAtualId,
+            escolhendoTurma: session.escolhendoTurma,
+            alunoTurmaId: session.alunoTurmaId,
+            alunoAtivoId: session.alunoAtivoId,
+            lastActivity: now
+          }));
+        } catch (e) {}
+      }
+
+      function registrarAtividadeSessao() {
+        if (!session.contaAtiva || session.modo === 'login') return;
+        const now = Date.now();
+        lastActivityTs = now;
+        if (now - lastActivitySaveTs >= 10000) {
+          salvarSessaoAba(true);
+        }
+      }
+
+      function verificarInatividadeSessao() {
+        if (!session.contaAtiva || session.modo === 'login') return;
+        if (Date.now() - lastActivityTs >= SESSION_IDLE_TIMEOUT_MS) {
+          session.contaAtiva = null;
+          session.modo = 'login';
+          limparSessaoAba();
+          fecharModal();
+          render();
+          toast('Sessão encerrada após 30 min sem atividade.', 'roxo');
+        }
+      }
+
+      function restaurarSessaoAba() {
+        try {
+          const raw = sessionStorage.getItem(SESSION_TAB_KEY);
+          if (!raw) return false;
+          const saved = JSON.parse(raw);
+          if (!saved || !saved.contaAtiva || !saved.modo || saved.modo === 'login') {
+            limparSessaoAba();
+            return false;
+          }
+          const elapsed = Date.now() - Number(saved.lastActivity || 0);
+          if (elapsed >= SESSION_IDLE_TIMEOUT_MS) {
+            limparSessaoAba();
+            return false;
+          }
+          session.contaAtiva = saved.contaAtiva;
+          if (saved.escolaAtualId) {
+            session.escolaAtualId = saved.escolaAtualId;
+            if (saved.contaAtiva.papel !== 'admin') {
+              trocarEscolaAtiva(saved.escolaAtualId);
+            }
+          }
+          session.modo = saved.modo;
+          if (saved.abaProfessor) session.abaProfessor = saved.abaProfessor;
+          if (saved.turmaAtualId != null) session.turmaAtualId = saved.turmaAtualId;
+          if (typeof saved.escolhendoTurma === 'boolean') session.escolhendoTurma = saved.escolhendoTurma;
+          if (saved.alunoTurmaId != null) session.alunoTurmaId = saved.alunoTurmaId;
+          if (saved.alunoAtivoId != null) session.alunoAtivoId = saved.alunoAtivoId;
+          // Atualização da página conta como atividade (reinicia o contador de 30 min)
+          lastActivityTs = Date.now();
+          salvarSessaoAba(true);
+          return true;
+        } catch (e) {
+          limparSessaoAba();
+          return false;
+        }
+      }
+
+      const _origRender = render;
+      render = function () {
+        _origRender();
+        if (session.contaAtiva && session.modo !== 'login') {
+          salvarSessaoAba(true);
+        } else {
+          limparSessaoAba();
+        }
+      };
+
+      ['pointerdown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
+        window.addEventListener(evt, registrarAtividadeSessao, { passive: true });
+      });
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) verificarInatividadeSessao();
+      });
+      setInterval(verificarInatividadeSessao, 30000);
+
+      const sessaoRestaurada = restaurarSessaoAba();
       render();
+      if (sessaoRestaurada) {
+        sincronizarComNuvem(true).then(() => {
+          if (session.contaAtiva && session.modo !== 'login') render();
+        });
+      }
     })();
   </script>
 </body>
