@@ -1057,11 +1057,12 @@
       }
 
       function podeDobrarBroche(bid, ano) {
+        if (ano !== '7' && ano !== '9') return false;
         const m = String(bid).match(/^(b1|b2)_(\d+)$/);
         if (!m) return false;
         const num = Number(m[2]);
         if (num >= 41) return false;
-        if (m[1] === 'b1' && (ano === '8' || ano === '9')) return false;
+        if (m[1] === 'b1' && ano === '9') return false;
         return true;
       }
 
@@ -1337,7 +1338,7 @@
       function abrirModalBrochesAluno(alunoId) {
         const aluno = db.usuarios.find(u => u.id === alunoId);
         if (!aluno) return;
-        if (!Array.isArray(aluno.broches)) aluno.broches = []; aluno.brochesDobrados = []; ultimoIndiceMarcado = null;
+        if (!Array.isArray(aluno.broches)) aluno.broches = [];
         if (!Array.isArray(aluno.brochesDobrados)) aluno.brochesDobrados = [];
         const anoAluno = detectarAnoAluno(aluno);
         const blocoPrincipal = detectarBlocoAluno(aluno);
@@ -1345,6 +1346,9 @@
         let mostrarB2 = blocoPrincipal !== 'b1';
         let ultimaAcao = null;
         let ultimoIndiceMarcado = null;
+        let modoRemover = false;
+        let paraRemover = new Set();
+        let ultimoIndiceRemover = null;
 
         function drawModal(prevScroll = 0) {
           const set = new Set(aluno.broches);
@@ -1352,30 +1356,37 @@
           const allList = [...BROCHES_BLOCO_1, ...BROCHES_BLOCO_2];
           const b1Done = BROCHES_BLOCO_1.filter(b => set.has(b.id)).length;
           const b2Done = BROCHES_BLOCO_2.filter(b => set.has(b.id)).length;
-          const totalAtivo = blocoPrincipal === 'b1' ? BROCHES_BLOCO_1.length : blocoPrincipal === 'b2' ? BROCHES_BLOCO_2.length : allList.length;
-          const doneAtivo = blocoPrincipal === 'b1' ? b1Done : blocoPrincipal === 'b2' ? b2Done : set.size;
+          const podeDobrarAno = anoAluno === '7' || anoAluno === '9';
 
           abrirModal(`
             <div class="flex items-center justify-between mb-2">
               <div>
                 <h3 class="font-bold text-base">Roteiros de ${escapeHtml(aluno.apelido)}</h3>
-                <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• 2x dobra (X) · Shift seleciona sequência</span></p>
+                <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• ${podeDobrarAno ? '2x dobra (X) · ' : ''}Shift seleciona sequência</span></p>
               </div>
               <div class="flex items-center gap-1.5">
                 <button id="btn-roteiros-dar-ips" type="button" class="glass-gold-btn text-[11px] font-extrabold px-2.5 py-1.5 rounded-xl flex items-center gap-1">${svgIcon('bolt', 'w-3.5 h-3.5')} <span>Dar ${escapeHtml(db.config.moedaPlural)}</span></button>
                 <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
               </div>
             </div>
-            ${ultimaAcao ? `
+            ${modoRemover ? `
+              <div class="mb-2.5 rounded-2xl bg-red-950/60 border border-red-400/50 px-3 py-2.5 space-y-2">
+                <div class="text-xs font-bold text-red-200">Modo Remoção: toque nos roteiros conquistados que deseja remover (${paraRemover.size} selecionado(s))</div>
+                <div class="flex gap-2">
+                  <button id="btn-confirmar-remocao" type="button" ${paraRemover.size === 0 ? 'disabled' : ''} class="flex-1 bg-red-600 hover:bg-red-500 text-white text-[11px] font-extrabold py-1.5 rounded-xl disabled:opacity-40">Confirmar Remoção (${paraRemover.size})</button>
+                  <button id="btn-cancelar-remocao" type="button" class="glass-pill text-[11px] font-bold px-3 py-1.5 rounded-xl text-gray-200">Cancelar</button>
+                </div>
+              </div>
+            ` : (ultimaAcao ? `
               <div class="mb-2.5 glass-accent-purple rounded-2xl px-3 py-2 flex items-center justify-between gap-2 text-xs">
-                <span class="truncate"><strong>${ultimaAcao.newEstado === 2 ? 'Dobrado (2x):' : ultimaAcao.newEstado === 1 ? 'Concluído:' : 'Removido:'}</strong> ${escapeHtml(ultimaAcao.nome)}</span>
+                <span class="truncate"><strong>${ultimaAcao.newEstado === 2 ? 'Dobrado (2x):' : 'Concluído:'}</strong> ${escapeHtml(ultimaAcao.nome)}</span>
                 <button id="btn-desfazer-roteiro" type="button" class="shrink-0 glass-gold-btn text-[11px] font-extrabold px-2.5 py-1 rounded-xl">Desfazer</button>
               </div>
-            ` : ''}
+            ` : '')}
             <div class="flex flex-wrap gap-1.5 mb-3">
-              ${mostrarB1 ? `<button id="btn-b-all-1" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-amarelo">Tudo Bloco I</button>` : ''}
-              ${mostrarB2 ? `<button id="btn-b-all-2" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-purple-300">Tudo Bloco II</button>` : ''}
-              <button id="btn-b-clear" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-red-300">Limpar</button>
+              ${!modoRemover && mostrarB1 ? `<button id="btn-b-all-1" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-amarelo">Tudo Bloco I</button>` : ''}
+              ${!modoRemover && mostrarB2 ? `<button id="btn-b-all-2" class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-purple-300">Tudo Bloco II</button>` : ''}
+              ${!modoRemover ? `<button id="btn-b-remover" ${set.size === 0 ? 'disabled' : ''} class="glass-pill text-[11px] font-bold px-2.5 py-1 rounded-xl text-red-300 disabled:opacity-40">Remover</button>` : ''}
             </div>
             <div id="roteiros-scroll-box" class="max-h-[55vh] overflow-y-auto pr-1 space-y-3">
               <div>
@@ -1385,11 +1396,15 @@
                 </button>
                 ${mostrarB1 ? `
                   <div class="grid grid-cols-5 gap-2.5 mt-2">
-                    ${BROCHES_BLOCO_1.map(b => `
-                      <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                        ${renderBrocheImg(b, 1, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
-                      </button>
-                    `).join('')}
+                    ${BROCHES_BLOCO_1.map(b => {
+                      const marcado = set.has(b.id);
+                      const selRem = modoRemover && paraRemover.has(b.id);
+                      return `
+                        <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl transition ${selRem ? 'ring-2 ring-red-400 bg-red-500/25' : (modoRemover && !marcado ? 'opacity-35 cursor-not-allowed' : 'hover:bg-white/5')}">
+                          ${renderBrocheImg(b, 1, marcado, 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
+                        </button>
+                      `;
+                    }).join('')}
                   </div>
                 ` : ''}
               </div>
@@ -1400,11 +1415,15 @@
                 </button>
                 ${mostrarB2 ? `
                   <div class="grid grid-cols-5 gap-2.5 mt-2">
-                    ${BROCHES_BLOCO_2.map(b => `
-                      <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                        ${renderBrocheImg(b, 2, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
-                      </button>
-                    `).join('')}
+                    ${BROCHES_BLOCO_2.map(b => {
+                      const marcado = set.has(b.id);
+                      const selRem = modoRemover && paraRemover.has(b.id);
+                      return `
+                        <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl transition ${selRem ? 'ring-2 ring-red-400 bg-red-500/25' : (modoRemover && !marcado ? 'opacity-35 cursor-not-allowed' : 'hover:bg-white/5')}">
+                          ${renderBrocheImg(b, 2, marcado, 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
+                        </button>
+                      `;
+                    }).join('')}
                   </div>
                 ` : ''}
               </div>
@@ -1426,6 +1445,40 @@
             mostrarB2 = !mostrarB2;
             drawModal(curScroll);
           };
+
+          const btnRemMode = document.getElementById('btn-b-remover');
+          if (btnRemMode) btnRemMode.onclick = () => {
+            const curScroll = box ? box.scrollTop : 0;
+            modoRemover = true;
+            paraRemover = new Set();
+            ultimoIndiceRemover = null;
+            ultimaAcao = null;
+            drawModal(curScroll);
+          };
+          const btnCancelRem = document.getElementById('btn-cancelar-remocao');
+          if (btnCancelRem) btnCancelRem.onclick = () => {
+            const curScroll = box ? box.scrollTop : 0;
+            modoRemover = false;
+            paraRemover = new Set();
+            ultimoIndiceRemover = null;
+            drawModal(curScroll);
+          };
+          const btnConfirmRem = document.getElementById('btn-confirmar-remocao');
+          if (btnConfirmRem) btnConfirmRem.onclick = () => {
+            if (paraRemover.size === 0) return;
+            const curScroll = box ? box.scrollTop : 0;
+            const qtd = paraRemover.size;
+            aluno.broches = aluno.broches.filter(id => !paraRemover.has(id));
+            aluno.brochesDobrados = aluno.brochesDobrados.filter(id => !paraRemover.has(id));
+            modoRemover = false;
+            paraRemover = new Set();
+            ultimoIndiceRemover = null;
+            ultimoIndiceMarcado = null;
+            salvarEstado();
+            toast(`${qtd} roteiro(s) removido(s).`, 'info');
+            drawModal(curScroll);
+          };
+
           const btnDesf = document.getElementById('btn-desfazer-roteiro');
           if (btnDesf && ultimaAcao) {
             btnDesf.onclick = () => {
@@ -1439,9 +1492,6 @@
               } else if (ultimaAcao.prevEstado === 1) {
                 if (idx < 0) aluno.broches.push(bid);
                 if (dIdx >= 0) aluno.brochesDobrados.splice(dIdx, 1);
-              } else if (ultimaAcao.prevEstado === 2) {
-                if (idx < 0) aluno.broches.push(bid);
-                if (dIdx < 0) aluno.brochesDobrados.push(bid);
               }
               toast(`Desfeito: ${ultimaAcao.nome}`, 'info');
               ultimaAcao = null;
@@ -1449,12 +1499,30 @@
               drawModal(curScroll);
             };
           }
+
           document.querySelectorAll('.btn-toggle-broche').forEach(btn => {
             btn.onclick = (ev) => {
               const curScroll = box ? box.scrollTop : 0;
               const bid = btn.dataset.toggleBroche;
               const item = allList.find(x => x.id === bid);
               const curGlobalIdx = allList.findIndex(x => x.id === bid);
+
+              if (modoRemover) {
+                if (!set.has(bid)) return;
+                if (ev.shiftKey && ultimoIndiceRemover !== null && curGlobalIdx >= 0) {
+                  const start = Math.min(ultimoIndiceRemover, curGlobalIdx);
+                  const end = Math.max(ultimoIndiceRemover, curGlobalIdx);
+                  for (let k = start; k <= end; k++) {
+                    if (set.has(allList[k].id)) paraRemover.add(allList[k].id);
+                  }
+                } else {
+                  if (paraRemover.has(bid)) paraRemover.delete(bid);
+                  else paraRemover.add(bid);
+                }
+                if (curGlobalIdx >= 0) ultimoIndiceRemover = curGlobalIdx;
+                drawModal(curScroll);
+                return;
+              }
 
               if (ev.shiftKey && ultimoIndiceMarcado !== null && curGlobalIdx >= 0) {
                 const start = Math.min(ultimoIndiceMarcado, curGlobalIdx);
@@ -1473,26 +1541,30 @@
               const idx = aluno.broches.indexOf(bid);
               const dIdx = aluno.brochesDobrados.indexOf(bid);
               const prevEstado = idx < 0 ? 0 : (dIdx >= 0 ? 2 : 1);
-              let newEstado = 0;
 
               if (prevEstado === 0) {
                 aluno.broches.push(bid);
-                newEstado = 1;
                 if (curGlobalIdx >= 0) ultimoIndiceMarcado = curGlobalIdx;
+                ultimaAcao = { id: bid, nome: item ? item.nome : bid, prevEstado: 0, newEstado: 1 };
+                salvarEstado();
+                drawModal(curScroll);
               } else if (prevEstado === 1 && podeDobrarBroche(bid, anoAluno)) {
                 aluno.brochesDobrados.push(bid);
-                newEstado = 2;
                 if (curGlobalIdx >= 0) ultimoIndiceMarcado = curGlobalIdx;
-              } else {
-                if (idx >= 0) aluno.broches.splice(idx, 1);
+                ultimaAcao = { id: bid, nome: item ? item.nome : bid, prevEstado: 1, newEstado: 2 };
+                salvarEstado();
+                drawModal(curScroll);
+              } else if (prevEstado === 2) {
+                // Desativa apenas o 2x voltando para 1x; remoção total só pelo botão Remover
                 if (dIdx >= 0) aluno.brochesDobrados.splice(dIdx, 1);
-                newEstado = 0;
+                salvarEstado();
+                drawModal(curScroll);
+              } else {
+                toast('Para remover um roteiro concluído, use o botão Remover.', 'info');
               }
-              ultimaAcao = { id: bid, nome: item ? item.nome : bid, prevEstado, newEstado };
-              salvarEstado();
-              drawModal(curScroll);
             };
           });
+
           const bAll1 = document.getElementById('btn-b-all-1');
           if (bAll1) bAll1.onclick = () => {
             const curScroll = box ? box.scrollTop : 0;
@@ -1509,13 +1581,6 @@
             const s = new Set(aluno.broches);
             BROCHES_BLOCO_2.forEach(b => s.add(b.id));
             aluno.broches = Array.from(s);
-            ultimaAcao = null;
-            salvarEstado();
-            drawModal(curScroll);
-          };
-          document.getElementById('btn-b-clear').onclick = () => {
-            const curScroll = box ? box.scrollTop : 0;
-            aluno.broches = [];
             ultimaAcao = null;
             salvarEstado();
             drawModal(curScroll);
@@ -4308,7 +4373,7 @@
                 render();
               } else {
                 if (isRoteirosVisiveis()) abrirModalBrochesAluno(id);
-                else abrirModalAcoesAluno(id);
+                else abrirModalLancar([id]);
               }
             };
           });
