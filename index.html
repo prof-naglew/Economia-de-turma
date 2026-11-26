@@ -1662,20 +1662,37 @@
         }, 2200);
       }
 
+      let modalHistoryPushed = false;
       function abrirModal(html) {
         const backdrop = document.getElementById('modal-backdrop');
         const content = document.getElementById('modal-content');
+        const estavaFechado = backdrop.classList.contains('hidden');
         content.innerHTML = html;
         backdrop.classList.remove('hidden', 'is-open');
         backdrop.classList.add('flex');
         requestAnimationFrame(() => backdrop.classList.add('is-open'));
+        if (estavaFechado && typeof history !== 'undefined' && history.pushState) {
+          try {
+            history.pushState({ appNav: true, modal: true }, '');
+            modalHistoryPushed = true;
+          } catch (e) {}
+        }
       }
 
-      function fecharModal() {
+      function fecharModal(fromPopState = false) {
         const backdrop = document.getElementById('modal-backdrop');
+        const estavaAberto = !backdrop.classList.contains('hidden');
         backdrop.classList.remove('is-open');
         backdrop.classList.add('hidden');
         backdrop.classList.remove('flex');
+        if (!fromPopState && estavaAberto && modalHistoryPushed) {
+          modalHistoryPushed = false;
+          try {
+            if (history.state && history.state.modal) history.back();
+          } catch (e) {}
+        } else if (fromPopState) {
+          modalHistoryPushed = false;
+        }
       }
 
       document.getElementById('modal-backdrop').addEventListener('click', (e) => {
@@ -5303,15 +5320,118 @@
         }
       }
 
+      const navHistoryStack = [];
+      let isHandlingPopState = false;
+
+      function getNavSnapshot() {
+        return {
+          modo: session.modo,
+          abaProfessor: session.abaProfessor,
+          turmaAtualId: session.turmaAtualId,
+          escolhendoTurma: !!session.escolhendoTurma,
+          subConfig: session.subConfig || null,
+          alunoTurmaId: session.alunoTurmaId || null,
+          alunoAtivoId: session.alunoAtivoId || null,
+          alunoTela: session.alunoTela || null,
+          selecaoMultipla: !!session.selecaoMultipla
+        };
+      }
+
+      function getNavKey(snap) {
+        return [
+          snap.modo, snap.abaProfessor, snap.turmaAtualId, snap.escolhendoTurma,
+          snap.subConfig, snap.alunoTurmaId, snap.alunoAtivoId, snap.alunoTela, snap.selecaoMultipla
+        ].join('|');
+      }
+
+      function aplicarNavSnapshot(snap) {
+        if (!snap) return;
+        session.modo = snap.modo;
+        session.abaProfessor = snap.abaProfessor;
+        session.turmaAtualId = snap.turmaAtualId;
+        session.escolhendoTurma = snap.escolhendoTurma;
+        session.subConfig = snap.subConfig;
+        session.alunoTurmaId = snap.alunoTurmaId;
+        session.alunoAtivoId = snap.alunoAtivoId;
+        if ('alunoTela' in session || snap.alunoTela !== null) session.alunoTela = snap.alunoTela;
+        session.selecaoMultipla = snap.selecaoMultipla;
+        if (!snap.selecaoMultipla && session.selecionados) session.selecionados.clear();
+        session.fabMenuAberto = false;
+      }
+
+      function voltarPassoLogico() {
+        if (session.modo === 'aluno') {
+          if (session.alunoTela) { session.alunoTela = null; return true; }
+          if (session.alunoAtivoId) { session.alunoAtivoId = null; return true; }
+          if (session.alunoTurmaId) { session.alunoTurmaId = null; return true; }
+          return false;
+        }
+        if (session.modo === 'professor') {
+          if (session.selecaoMultipla) { session.selecaoMultipla = false; session.selecionados.clear(); return true; }
+          if (session.abaProfessor === 'config' && session.subConfig !== null) { session.subConfig = null; return true; }
+          if (session.abaProfessor !== 'turma') { session.abaProfessor = 'turma'; return true; }
+          if (!session.escolhendoTurma) { session.escolhendoTurma = true; return true; }
+          return false;
+        }
+        return false;
+      }
+
       const _origRender = render;
       render = function () {
         _origRender();
+        if (!isHandlingPopState) {
+          const snap = getNavSnapshot();
+          const key = getNavKey(snap);
+          const last = navHistoryStack[navHistoryStack.length - 1];
+          if (!last) {
+            navHistoryStack.push({ key, snap });
+            try { history.replaceState({ appNav: true, idx: 0 }, ''); } catch (e) {}
+          } else if (last.key !== key) {
+            if (snap.modo === 'login') {
+              navHistoryStack.length = 0;
+              navHistoryStack.push({ key, snap });
+              try { history.replaceState({ appNav: true, idx: 0 }, ''); } catch (e) {}
+            } else {
+              navHistoryStack.push({ key, snap });
+              if (navHistoryStack.length > 40) navHistoryStack.shift();
+              try { history.pushState({ appNav: true, idx: navHistoryStack.length - 1 }, ''); } catch (e) {}
+            }
+          }
+        }
         if (session.contaAtiva && session.modo !== 'login') {
           salvarSessaoAba(true);
         } else {
           limparSessaoAba();
         }
       };
+
+      window.addEventListener('popstate', () => {
+        const backdrop = document.getElementById('modal-backdrop');
+        if (backdrop && !backdrop.classList.contains('hidden')) {
+          fecharModal(true);
+          return;
+        }
+        isHandlingPopState = true;
+        try {
+          if (navHistoryStack.length > 1) {
+            navHistoryStack.pop();
+            const prev = navHistoryStack[navHistoryStack.length - 1];
+            aplicarNavSnapshot(prev.snap);
+            _origRender();
+            if (session.contaAtiva && session.modo !== 'login') salvarSessaoAba(true);
+          } else if (voltarPassoLogico()) {
+            const snap = getNavSnapshot();
+            navHistoryStack[0] = { key: getNavKey(snap), snap };
+            _origRender();
+            try { history.pushState({ appNav: true, idx: 0 }, ''); } catch (e) {}
+            if (session.contaAtiva && session.modo !== 'login') salvarSessaoAba(true);
+          } else if (session.modo !== 'login') {
+            try { history.pushState({ appNav: true, idx: 0 }, ''); } catch (e) {}
+          }
+        } finally {
+          isHandlingPopState = false;
+        }
+      });
 
       ['pointerdown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evt => {
         window.addEventListener(evt, registrarAtividadeSessao, { passive: true });
