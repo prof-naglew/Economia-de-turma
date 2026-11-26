@@ -397,14 +397,16 @@
         const cfg = getCloudCfg();
         if (!cfg.url || !cfg.key) return false;
         try {
-          const escolasRem = await supaFetch('escolas?select=*&order=id.asc');
-          const contasRem = await supaFetch('contas?select=*&order=id.asc');
+          const escolaId = session.contaAtiva?.escola_id || db.escolas[0]?.id;
+          const [escolasRem, contasRem, est] = await Promise.all([
+            (!db.escolas || db.escolas.length < 10) ? supaFetch('escolas?select=*&order=id.asc') : Promise.resolve(null),
+            supaFetch('contas?select=*&order=id.asc'),
+            escolaId ? supaFetch(`escola_estado?escola_id=eq.${escolaId}&select=*`) : Promise.resolve(null)
+          ]);
           if (Array.isArray(escolasRem) && escolasRem.length) db.escolas = escolasRem;
           if (Array.isArray(contasRem) && contasRem.length) db.contas = contasRem;
 
-          const escolaId = session.contaAtiva?.escola_id || db.escolas[0]?.id;
           if (escolaId) {
-            const est = await supaFetch(`escola_estado?escola_id=eq.${escolaId}&select=*`);
             if (Array.isArray(est) && est.length && est[0].dados) {
               aplicarEstadoEscola(est[0].dados);
               const novosAlunos = sincronizarNomesFaltantesCEDVB();
@@ -2635,12 +2637,19 @@
             try {
               const ok = await verificarBiometriaWeb();
               if (!ok) { toast('Digital não confirmada.', 'erro'); return; }
-              await sincronizarComNuvem(true);
-              const conta = (db.contas || []).find(c => c.login.toLowerCase() === loginSalvo);
+              let conta = (db.contas || []).find(c => c.login.toLowerCase() === loginSalvo);
+              if (!conta) {
+                try {
+                  const rem = await supaFetch(`contas?login=eq.${encodeURIComponent(loginSalvo)}&select=*`);
+                  if (Array.isArray(rem) && rem[0]) {
+                    conta = rem[0];
+                    db.contas.push(conta);
+                  }
+                } catch (e) {}
+              }
               if (!conta) { toast('Conta não encontrada.', 'erro'); return; }
               session.contaAtiva = conta;
-              session.escolaAtualId = conta.escola_id;
-              await carregarEstadoDaNuvem(conta.escola_id);
+              trocarEscolaAtiva(conta.escola_id || db.escolas[0]?.id);
               const tAtual = turmaDoHorarioAtual();
               if (tAtual) { session.turmaAtualId = tAtual.id; session.escolhendoTurma = false; }
               else { session.escolhendoTurma = true; }
@@ -2648,6 +2657,7 @@
               session.abaProfessor = 'turma';
               toast('Digital confirmada!', 'sucesso');
               render();
+              sincronizarComNuvem(true).then(ok => { if (ok) render(); }).catch(() => {});
             } catch (err) {
               toast('Não foi possível validar a digital neste navegador.', 'erro');
             }
@@ -2738,35 +2748,58 @@
           };
         };
         document.getElementById('btn-entrar-login').onclick = async () => {
+          const btn = document.getElementById('btn-entrar-login');
           const login = document.getElementById('inp-login-user').value.trim().toLowerCase();
           const senha = document.getElementById('inp-login-pass').value;
           if (!login || !senha) { toast('Informe login e senha.', 'erro'); return; }
-          const hash = await sha256Hex(senha);
-          await sincronizarComNuvem(true);
-          const conta = (db.contas || []).find(c =>
-            c.login.toLowerCase() === login && (c.senha_hash === hash || c.senha_hash === senha)
-          );
-          if (!conta) {
-            toast('Login ou senha incorretos.', 'erro');
-            return;
+          const txtOrig = btn ? btn.textContent : 'Entrar';
+          if (btn) { btn.disabled = true; btn.textContent = 'Entrando...'; }
+          try {
+            const hash = await sha256Hex(senha);
+            let conta = (db.contas || []).find(c =>
+              c.login.toLowerCase() === login && (c.senha_hash === hash || c.senha_hash === senha)
+            );
+            if (!conta) {
+              try {
+                const rem = await supaFetch(`contas?login=eq.${encodeURIComponent(login)}&select=*`);
+                if (Array.isArray(rem) && rem[0]) {
+                  const cand = rem[0];
+                  if (cand.senha_hash === hash || cand.senha_hash === senha) {
+                    conta = cand;
+                    db.contas.push(cand);
+                  }
+                }
+              } catch (e) {}
+            }
+            if (!conta) {
+              toast('Login ou senha incorretos.', 'erro');
+              return;
+            }
+            session.contaAtiva = conta;
+            if (conta.papel !== 'admin') {
+              try { localStorage.setItem(BIO_LOGIN_KEY, conta.login.toLowerCase()); } catch (e) {}
+            }
+            if (conta.papel === 'admin') {
+              session.modo = 'admin';
+            } else {
+              trocarEscolaAtiva(conta.escola_id || db.escolas[0]?.id);
+              session.modo = 'professor';
+              session.abaProfessor = 'turma';
+              const h = encontrarHorarioAtivoAgora();
+              if (h) { session.turmaAtualId = h.turmaId; session.escolhendoTurma = false; }
+              else { session.escolhendoTurma = true; }
+            }
+            toast(`Bem-vindo, ${conta.nome}!`, 'sucesso');
+            render();
+            sincronizarComNuvem(true).then(ok => {
+              if (ok && session.contaAtiva && session.modo !== 'login') render();
+            }).catch(() => {});
+          } finally {
+            if (btn && document.body.contains(btn)) {
+              btn.disabled = false;
+              btn.textContent = txtOrig;
+            }
           }
-          session.contaAtiva = conta;
-          if (conta.papel !== 'admin') {
-            try { localStorage.setItem(BIO_LOGIN_KEY, conta.login.toLowerCase()); } catch (e) {}
-          }
-          if (conta.papel === 'admin') {
-            session.modo = 'admin';
-          } else {
-            trocarEscolaAtiva(conta.escola_id || db.escolas[0]?.id);
-            await sincronizarComNuvem(true);
-            session.modo = 'professor';
-            session.abaProfessor = 'turma';
-            const h = encontrarHorarioAtivoAgora();
-            if (h) { session.turmaAtualId = h.turmaId; session.escolhendoTurma = false; }
-            else { session.escolhendoTurma = true; }
-          }
-          toast(`Bem-vindo, ${conta.nome}!`, 'sucesso');
-          render();
         };
       }
 
