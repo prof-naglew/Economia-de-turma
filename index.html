@@ -718,8 +718,19 @@
       function encontrarHorarioAtivoAgora() {
         const agora = new Date();
         const dia = agora.getDay();
-        const hhmm = `${String(agora.getHours()).padStart(2, '0')}:${String(agora.getMinutes()).padStart(2, '0')}`;
-        return (db.horariosAula || []).find(h => h.diaSemana === dia && hhmm >= h.inicio && hhmm <= h.fim) || null;
+        const curMins = agora.getHours() * 60 + agora.getMinutes();
+        const toMins = (str) => {
+          const m = String(str || '').trim().match(/^(\d{1,2}):(\d{2})$/);
+          return m ? Number(m[1]) * 60 + Number(m[2]) : -1;
+        };
+        return (db.horariosAula || []).find(h => {
+          if (Number(h.diaSemana) !== dia) return false;
+          const ini = toMins(h.inicio);
+          const fim = toMins(h.fim);
+          if (ini < 0 || fim < 0) return false;
+          if (curMins < ini || curMins > fim) return false;
+          return (db.turmas || []).some(t => Number(t.id) === Number(h.turmaId));
+        }) || null;
       }
 
       const ESCOLAS_DF_SEED = [{"codigo": "53009649", "nome": "CAIC ALBERT SABIN"}, {"codigo": "53005953", "nome": "CAIC ASSIS CHATEAUBRIAND"}, {"codigo": "53008944", "nome": "CAIC AYRTON SENNA"}, {"codigo": "53007255", "nome": "CAIC BERNARDO SAYAO"}, {"codigo": "53002458", "nome": "CAIC CARLOS CASTELLO BRANCO"}, {"codigo": "53008952", "nome": "CAIC HELENA REIS"}, {"codigo": "53005309", "nome": "CAIC JULIA KUBITSCHEK DE OLIVEIRA"}, {"codigo": "53007034", "nome": "CAIC JUSCELINO KUBITSCHEK"}, {"codigo": "53007263", "nome": "CAIC PROF ANISIO TEIXEIRA"}, {"codigo": "53004973", "nome": "CAIC PROF BENEDITO CARLOS DE OLIVEIRA"}, {"codigo": "53003381", "nome": "CAIC PROF WALTER JOSE DE MOURA"}, {"codigo": "53009657", "nome": "CAIC SANTA MARIA"}, {"codigo": "53006712", "nome": "CAIC SANTA PAULINA"}, {"codigo": "53009720", "nome": "CAIC UNESCO"}, {"codigo": "53009150", "nome": "CCMCEF 407 DE SAMAMBAIA"}, {"codigo": "53048008", "nome": "CED 01 DA ESTRUTURAL"}, {"codigo": "53008456", "nome": "CED 01 DO GUARA"}, {"codigo": "53016378", "nome": "CED 01 DO ITAPOA"}, {"codigo": "53068092", "nome": "CED 01 DO RIACHO FUNDO II"}, {"codigo": "53008804", "nome": "CED 02 DO CRUZEIRO"}, {"codigo": "53006283", "nome": "CED 03 DE PLANALTINA"}, {"codigo": "53005341", "nome": "CED 03 DE SOBRADINHO"}, {"codigo": "53008472", "nome": "CED 03 DO GUARA"}, {"codigo": "53005171", "nome": "CED 04 DE BRAZLANDIA"}, {"codigo": "53003594", "nome": "CED 04 DE TAGUATINGA"}, {"codigo": "53008480", "nome": "CED 04 DO GUARA"}, {"codigo": "53007530", "nome": "CED 06 DE CEILANDIA"}, {"codigo": "53003616", "nome": "CED 06 DE TAGUATINGA"}, {"codigo": "53002610", "nome": "CED 06 DO GAMA"}, {"codigo": "53007549", "nome": "CED 07 DE CEILANDIA"}, {"codigo": "53002482", "nome": "CED 08 DO GAMA"}, {"codigo": "53011066", "nome": "CED 104 DO RECANTO DAS EMAS"}, {"codigo": "53007921", "nome": "CED 11 DE CEILANDIA"}, {"codigo": "53012097", "nome": "CED 123 DE SAMAMBAIA"}, {"codigo": "53007360", "nome": "CED 14 DE CEILANDIA"}, {"codigo": "53007387", "nome": "CED 15 DE CEILANDIA"}, {"codigo": "53012100", "nome": "CED 16 DE CEILANDIA"}, {"codigo": "53012119", "nome": "CED 308 DO RECANTO DAS EMAS"}, {"codigo": "53068181", "nome": "CED 310 DE SANTA MARIA"}, {"codigo": "53010000", "nome": "CED 416 DE SANTA MARIA"}, {"codigo": "53010019", "nome": "CED 619 DE SAMAMBAIA"}, {"codigo": "53006968", "nome": "CED AGROURBANO IPE RIACHO FUNDO"}, {"codigo": "53009380", "nome": "CED CASA GRANDE"}, {"codigo": "53011520", "nome": "CED DARCY RIBEIRO"}, {"codigo": "53009479", "nome": "CED DO LAGO"}, {"codigo": "53012356", "nome": "CED DO LAGO NORTE"}, {"codigo": "53006720", "nome": "CED DO PAD-DF"}, {"codigo": "53068068", "nome": "CED DONA AMERICA GUIMARAES"}, {"codigo": "53003047", "nome": "CED ENGENHO DAS LAJES"}, {"codigo": "53012011", "nome": "CED ESTANCIA III"}, {"codigo": "53002474", "nome": "CED GESNER TEIXEIRA"}, {"codigo": "53001044", "nome": "CED GISNO"}, {"codigo": "53004981", "nome": "CED INCRA 08"}, {"codigo": "53008146", "nome": "CED INCRA 09"}, {"codigo": "53005210", "nome": "CED IRMA MARIA REGINA VELANES REGIS"}, {"codigo": "53008979", "nome": "CED MYRIAM ERVILHA"}, {"codigo": "53006496", "nome": "CED OSORIO BACCHIN"}, {"codigo": "53005988", "nome": "CED PIPIRIPAU II"}, {"codigo": "53014308", "nome": "CED POMPILIO MARQUES DE SOUZA"}, {"codigo": "53005740", "nome": "CED PROF CARLOS RAMOS MOTA"}, {"codigo": "53019806", "nome": "CED SAO FRANCISCO"}, {"codigo": "53011988", "nome": "CED SAO JOSE"}, {"codigo": "53013840", "nome": "CED STELLA DOS CHERUBINS GUIMARAES TROIS"}, {"codigo": "53006046", "nome": "CED TAQUARA"}, {"codigo": "53014316", "nome": "CED VALE DO AMANHECER"}, {"codigo": "53009460", "nome": "CED VARGEM BONITA"}, {"codigo": "53006054", "nome": "CED VARZEAS"}, {"codigo": "53005007", "nome": "CED VENDINHA"}, {"codigo": "53005333", "nome": "CEF 01 DE SOBRADINHO"}, {"codigo": "53008774", "nome": "CEF 01 DO CRUZEIRO"}, {"codigo": "53008391", "nome": "CEF 01 DO GUARA"}, {"codigo": "53009410", "nome": "CEF 01 DO LAGO NORTE"}, {"codigo": "53012429", "nome": "CEF 01 DO PARANOA"}, {"codigo": "53000854", "nome": "CEF 01 DO PLANALTO"}, {"codigo": "53013034", "nome": "CEF 01 DO RIACHO FUNDO II"}, {"codigo": "53009436", "nome": "CEF 01 DO VARJAO"}, {"codigo": "53068157", "nome": "CEF 02 DA ESTRUTURAL"}, {"codigo": "53005090", "nome": "CEF 02 DE BRAZLANDIA"}, {"codigo": "53006003", "nome": "CEF 02 DE PLANALTINA"}, {"codigo": "53068076", "nome": "CEF 02 DO ARAPOANGA"}, {"codigo": "53017080", "nome": "CEF 03 DA ESTRUTURAL"}, {"codigo": "53014553", "nome": "CEF 03 DE BRAZLANDIA"}, {"codigo": "53003446", "nome": "CEF 03 DE TAGUATINGA"}, {"codigo": "53014227", "nome": "CEF 03 DO PARANOA"}, {"codigo": "53005368", "nome": "CEF 04 DE SOBRADINHO"}, {"codigo": "53008405", "nome": "CEF 04 DO GUARA"}, {"codigo": "53002504", "nome": "CEF 05 DO GAMA"}, {"codigo": "53008413", "nome": "CEF 05 DO GUARA"}, {"codigo": "53009584", "nome": "CEF 06 DE BRASILIA"}, {"codigo": "53006240", "nome": "CEF 08 DE PLANALTINA"}, {"codigo": "53013522", "nome": "CEF 08 DE SOBRADINHO"}, {"codigo": "53008430", "nome": "CEF 08 DO GUARA"}, {"codigo": "53017412", "nome": "CEF 09 DE SOBRADINHO"}, {"codigo": "53003489", "nome": "CEF 09 DE TAGUATINGA"}, {"codigo": "53012046", "nome": "CEF 10 DO GUARA"}, {"codigo": "53012186", "nome": "CEF 101 DO RECANTO DAS EMAS"}, {"codigo": "53019610", "nome": "CEF 103 DO RECANTO DAS EMAS"}, {"codigo": "53009355", "nome": "CEF 106 DO RECANTO DAS EMAS"}, {"codigo": "53018605", "nome": "CEF 113 DO RECANTO DAS EMAS"}, {"codigo": "53009363", "nome": "CEF 115 DO RECANTO DAS EMAS"}, {"codigo": "53004221", "nome": "CEF 19 DE TAGUATINGA"}, {"codigo": "53011600", "nome": "CEF 206 DO RECANTO DAS EMAS"}, {"codigo": "53009851", "nome": "CEF 213 DE SANTA MARIA"}, {"codigo": "53068122", "nome": "CEF 28 DE CEILANDIA"}, {"codigo": "53011589", "nome": "CEF 30 DE CEILANDIA"}, {"codigo": "53013530", "nome": "CEF 301 DO RECANTO DAS EMAS"}, {"codigo": "53009860", "nome": "CEF 306 DO RECANTO DAS EMAS"}, {"codigo": "53001613", "nome": "CEF 306 NORTE"}, {"codigo": "53009665", "nome": "CEF 308 DE SANTA MARIA"}, {"codigo": "53008049", "nome": "CEF 31 DE CEILANDIA"}, {"codigo": "53068149", "nome": "CEF 32 DE CEILANDIA"}, {"codigo": "53007972", "nome": "CEF 33 DE CEILANDIA"}, {"codigo": "53007689", "nome": "CEF 35 DE CEILANDIA"}, {"codigo": "53009878", "nome": "CEF 403 DE SANTA MARIA"}, {"codigo": "53012127", "nome": "CEF 405 DO RECANTO DAS EMAS"}, {"codigo": "53009177", "nome": "CEF 412 DE SAMAMBAIA"}, {"codigo": "53014294", "nome": "CEF 418 DE SANTA MARIA"}, {"codigo": "53011597", "nome": "CEF 427 DE SAMAMBAIA"}, {"codigo": "53014260", "nome": "CEF 602 DO RECANTO DAS EMAS"}, {"codigo": "53012828", "nome": "CEF 801 DO RECANTO DAS EMAS"}, {"codigo": "53013239", "nome": "CEF 802 DO RECANTO DAS EMAS"}, {"codigo": "53012747", "nome": "CEF ARAPOANGA"}, {"codigo": "53008111", "nome": "CEF BOA ESPERANCA"}, {"codigo": "53012666", "nome": "CEF BONSUCESSO"}, {"codigo": "53006364", "nome": "CEF CERAMICAS REUNIDAS DOM BOSCO"}, {"codigo": "53011040", "nome": "CEF DO BOSQUE"}, {"codigo": "53005198", "nome": "CEF INCRA 07"}, {"codigo": "53006860", "nome": "CEF JARDIM II"}, {"codigo": "53009797", "nome": "CEF JATAI"}, {"codigo": "53005970", "nome": "CEF JUSCELINO KUBITSCHEK"}, {"codigo": "53068106", "nome": "CEF LOBO GUARA"}, {"codigo": "53007069", "nome": "CEF METROPOLITANA"}, {"codigo": "53068211", "nome": "CEF MIGUEL ARCANJO"}, {"codigo": "53011490", "nome": "CEF NOSSA SENHORA FATIMA"}, {"codigo": "53009746", "nome": "CEF NOVA BETANIA"}, {"codigo": "53002466", "nome": "CEF PONTE ALTA DO BAIXO"}, {"codigo": "53003063", "nome": "CEF PONTE ALTA NORTE"}, {"codigo": "53007450", "nome": "CEF PROF MARIA DO ROSARIO GONDIM DA SILVA"}, {"codigo": "53006020", "nome": "CEF RIO PRETO"}, {"codigo": "53012054", "nome": "CEF SANTOS DUMONT"}, {"codigo": "53006038", "nome": "CEF SAO JOSE"}, {"codigo": "53009711", "nome": "CEF SARGENTO LIMA"}, {"codigo": "53009347", "nome": "CEF TAMANDUA"}, {"codigo": "53006976", "nome": "CEF TELEBRASILIA"}, {"codigo": "53004167", "nome": "CEI 05 DE TAGUATINGA"}, {"codigo": "53004302", "nome": "CEI 06 DE TAGUATINGA"}, {"codigo": "53005015", "nome": "CEM 01 DE BRAZLANDIA"}, {"codigo": "53006062", "nome": "CEM 01 DE PLANALTINA"}, {"codigo": "53011031", "nome": "CEM 01 DE SAO SEBASTIAO"}, {"codigo": "53005465", "nome": "CEM 01 DE SOBRADINHO"}, {"codigo": "53002580", "nome": "CEM 01 DO GAMA"}, {"codigo": "53008464", "nome": "CEM 01 DO GUARA"}, {"codigo": "53006739", "nome": "CEM 01 DO PARANOA"}, {"codigo": "53006984", "nome": "CEM 01 DO RIACHO FUNDO"}, {"codigo": "53012720", "nome": "CEM 02 DE BRAZLANDIA"}, {"codigo": "53007492", "nome": "CEM 02 DE CEILANDIA"}, {"codigo": "53006070", "nome": "CEM 02 DE PLANALTINA"}, {"codigo": "53005473", "nome": "CEM 02 DE SOBRADINHO"}, {"codigo": "53002598", "nome": "CEM 02 DO GAMA"}, {"codigo": "53007506", "nome": "CEM 03 DE CEILANDIA"}, {"codigo": "53003586", "nome": "CEM 03 DE TAGUATINGA"}, {"codigo": "53002601", "nome": "CEM 03 DO GAMA"}, {"codigo": "53007514", "nome": "CEM 04 DE CEILANDIA"}, {"codigo": "53012542", "nome": "CEM 04 DE SOBRADINHO"}, {"codigo": "53003608", "nome": "CEM 05 DE TAGUATINGA"}, {"codigo": "53007557", "nome": "CEM 09 DE CEILANDIA"}, {"codigo": "53007565", "nome": "CEM 10 DE CEILANDIA"}, {"codigo": "53012194", "nome": "CEM 111 DO RECANTO DAS EMAS"}, {"codigo": "53007425", "nome": "CEM 12 DE CEILANDIA"}, {"codigo": "53009029", "nome": "CEM 304 DE SAMAMBAIA"}, {"codigo": "53012623", "nome": "CEM 404 DE SANTA MARIA"}, {"codigo": "53011996", "nome": "CEM 414 DE SAMAMBAIA"}, {"codigo": "53012607", "nome": "CEM 417 DE SANTA MARIA"}, {"codigo": "53019407", "nome": "CEM 804 DO RECANTO DAS EMAS"}, {"codigo": "53001010", "nome": "CEM ASA NORTE - CEAN"}, {"codigo": "53003632", "nome": "CEM AVE BRANCA"}, {"codigo": "53001036", "nome": "CEM ELEFANTE BRANCO"}, {"codigo": "53051009", "nome": "CEM JULIA KUBITSCHEK"}, {"codigo": "53000986", "nome": "CEM PAULO FREIRE"}, {"codigo": "53001206", "nome": "CEM SETOR LESTE"}, {"codigo": "53001214", "nome": "CEM SETOR OESTE"}, {"codigo": "53003683", "nome": "CEM TAGUATINGA NORTE"}, {"codigo": "53007077", "nome": "CEM URSO BRANCO"}, {"codigo": "53014812", "nome": "CEMI EP DO GAMA"}, {"codigo": "53005406", "nome": "CENTRO DE ENSINO FUNDAMENTAL QUEIMA LENCOL"}, {"codigo": "53003691", "nome": "CENTRO DE ENSINO MEDIO EIT"}, {"codigo": "53003624", "nome": "CENTRO DE ENSINO MEDIO INTEGRADO A EDUCACAO PROFISSIONAL DE TAGUATINGA"}, {"codigo": "53008790", "nome": "CENTRO DE ENSINO MEDIO INTEGRADO DO CRUZEIRO"}, {"codigo": "53019369", "nome": "CENTRO EDUCACIONAL AGUAS DO CERRADO - CEDAC"}, {"codigo": "53005392", "nome": "CENTRO EDUCACIONAL FERCAL"}, {"codigo": "53004140", "nome": "EBLP DE TAGUATINGA"}, {"codigo": "53009320", "nome": "EC 01 DA CANDANGOLANDIA"}, {"codigo": "53005074", "nome": "EC 01 DE BRAZLANDIA"}, {"codigo": "53007646", "nome": "EC 01 DE CEILANDIA"}, {"codigo": "53014871", "nome": "EC 01 DE ITAPOA"}, {"codigo": "53006186", "nome": "EC 01 DE PLANALTINA"}, {"codigo": "53005627", "nome": "EC 01 DE SOBRADINHO"}, {"codigo": "53004027", "nome": "EC 01 DE TAGUATINGA"}, {"codigo": "53047028", "nome": "EC 01 DO ARAPOANGA"}, {"codigo": "53002814", "nome": "EC 01 DO GAMA"}, {"codigo": "53008561", "nome": "EC 01 DO GUARA"}, {"codigo": "53006747", "nome": "EC 01 DO PARANOA"}, {"codigo": "53068190", "nome": "EC 01 DO PORTO RICO"}, {"codigo": "53013557", "nome": "EC 01 DO RIACHO FUNDO II"}, {"codigo": "53014545", "nome": "EC 01 INCRA 08"}, {"codigo": "53009525", "nome": "EC 01 SHI-SUL"}, {"codigo": "53009339", "nome": "EC 02 DA CANDANGOLANDIA"}, {"codigo": "53068165", "nome": "EC 02 DA ESTRUTURAL"}, {"codigo": "53007654", "nome": "EC 02 DE CEILANDIA"}, {"codigo": "53068017", "nome": "EC 02 DE VICENTE PIRES"}, {"codigo": "53002822", "nome": "EC 02 DO GAMA"}, {"codigo": "53008570", "nome": "EC 02 DO GUARA"}, {"codigo": "53068203", "nome": "EC 02 DO ITAPOA"}, {"codigo": "53006755", "nome": "EC 02 DO PARANOA"}, {"codigo": "53012089", "nome": "EC 02 DO RIACHO FUNDO"}, {"codigo": "53014863", "nome": "EC 02 DO RIACHO FUNDO II"}, {"codigo": "53019377", "nome": "EC 03 DA ESTRUTURAL"}, {"codigo": "53005082", "nome": "EC 03 DE BRAZLANDIA"}, {"codigo": "53007662", "nome": "EC 03 DE CEILANDIA"}, {"codigo": "53006194", "nome": "EC 03 DE PLANALTINA"}, {"codigo": "53002830", "nome": "EC 03 DO GAMA"}, {"codigo": "53008588", "nome": "EC 03 DO GUARA"}, {"codigo": "53007123", "nome": "EC 03 DO NUCLEO BANDEIRANTE"}, {"codigo": "53006763", "nome": "EC 03 DO PARANOA"}, {"codigo": "53006208", "nome": "EC 04 DE PLANALTINA"}, {"codigo": "53008820", "nome": "EC 04 DO CRUZEIRO"}, {"codigo": "53007131", "nome": "EC 04 DO NUCLEO BANDEIRANTE"}, {"codigo": "53006771", "nome": "EC 04 DO PARANOA"}, {"codigo": "53005104", "nome": "EC 05 DE BRAZLANDIA"}, {"codigo": "53006216", "nome": "EC 05 DE PLANALTINA"}, {"codigo": "53005635", "nome": "EC 05 DE SOBRADINHO"}, {"codigo": "53008839", "nome": "EC 05 DO CRUZEIRO"}, {"codigo": "53008596", "nome": "EC 05 DO GUARA"}, {"codigo": "53007140", "nome": "EC 05 DO NUCLEO BANDEIRANTE"}, {"codigo": "53006780", "nome": "EC 05 DO PARANOA"}, {"codigo": "53005112", "nome": "EC 06 DE BRAZLANDIA"}, {"codigo": "53007670", "nome": "EC 06 DE CEILANDIA"}, {"codigo": "53006224", "nome": "EC 06 DE PLANALTINA"}, {"codigo": "53004035", "nome": "EC 06 DE TAGUATINGA"}, {"codigo": "53008847", "nome": "EC 06 DO CRUZEIRO"}, {"codigo": "53002857", "nome": "EC 06 DO GAMA"}, {"codigo": "53008600", "nome": "EC 06 DO GUARA"}, {"codigo": "53017005", "nome": "EC 06 DO PARANOA"}, {"codigo": "53005120", "nome": "EC 07 DE BRAZLANDIA"}, {"codigo": "53006232", "nome": "EC 07 DE PLANALTINA"}, {"codigo": "53002865", "nome": "EC 07 DO GAMA"}, {"codigo": "53008618", "nome": "EC 07 DO GUARA"}, {"codigo": "53005139", "nome": "EC 08 DE BRAZLANDIA"}, {"codigo": "53007697", "nome": "EC 08 DE CEILANDIA"}, {"codigo": "53004043", "nome": "EC 08 DE TAGUATINGA"}, {"codigo": "53008855", "nome": "EC 08 DO CRUZEIRO"}, {"codigo": "53008421", "nome": "EC 08 DO GUARA"}, {"codigo": "53006259", "nome": "EC 09 DE PLANALTINA"}, {"codigo": "53002873", "nome": "EC 09 DO GAMA"}, {"codigo": "53007700", "nome": "EC 10 DE CEILANDIA"}, {"codigo": "53006267", "nome": "EC 10 DE PLANALTINA"}, {"codigo": "53005651", "nome": "EC 10 DE SOBRADINHO"}, {"codigo": "53004051", "nome": "EC 10 DE TAGUATINGA"}, {"codigo": "53002881", "nome": "EC 10 DO GAMA"}, {"codigo": "53014235", "nome": "EC 100 DE SANTA MARIA"}, {"codigo": "53009401", "nome": "EC 102 DO RECANTO DAS EMAS"}, {"codigo": "53001451", "nome": "EC 102 SUL"}, {"codigo": "53013484", "nome": "EC 104 DE SAO SEBASTIAO"}, {"codigo": "53001478", "nome": "EC 106 NORTE"}, {"codigo": "53009053", "nome": "EC 108 DE SAMAMBAIA"}, {"codigo": "53001486", "nome": "EC 108 SUL"}, {"codigo": "53007719", "nome": "EC 11 DE CEILANDIA"}, {"codigo": "53005660", "nome": "EC 11 DE SOBRADINHO"}, {"codigo": "53004060", "nome": "EC 11 DE TAGUATINGA"}, {"codigo": "53009061", "nome": "EC 111 DE SAMAMBAIA"}, {"codigo": "53001494", "nome": "EC 111 SUL"}, {"codigo": "53001508", "nome": "EC 113 NORTE"}, {"codigo": "53001516", "nome": "EC 114 SUL"}, {"codigo": "53001524", "nome": "EC 115 NORTE"}, {"codigo": "53009681", "nome": "EC 116 DE SANTA MARIA"}, {"codigo": "53007727", "nome": "EC 12 DE CEILANDIA"}, {"codigo": "53005678", "nome": "EC 12 DE SOBRADINHO"}, {"codigo": "53004078", "nome": "EC 12 DE TAGUATINGA"}, {"codigo": "53002890", "nome": "EC 12 DO GAMA"}, {"codigo": "53009088", "nome": "EC 121 DE SAMAMBAIA"}, {"codigo": "53007735", "nome": "EC 13 DE CEILANDIA"}, {"codigo": "53006291", "nome": "EC 13 DE PLANALTINA"}, {"codigo": "53005686", "nome": "EC 13 DE SOBRADINHO"}, {"codigo": "53004086", "nome": "EC 13 DE TAGUATINGA"}, {"codigo": "53006305", "nome": "EC 14 DE PLANALTINA"}, {"codigo": "53013514", "nome": "EC 14 DE SOBRADINHO"}, {"codigo": "53002911", "nome": "EC 14 DO GAMA"}, {"codigo": "53007743", "nome": "EC 15 DE CEILANDIA"}, {"codigo": "53068084", "nome": "EC 15 DE PLANALTINA"}, {"codigo": "53005384", "nome": "EC 15 DE SOBRADINHO"}, {"codigo": "53004094", "nome": "EC 15 DE TAGUATINGA"}, {"codigo": "53002920", "nome": "EC 15 DO GAMA"}, {"codigo": "53007751", "nome": "EC 16 DE CEILANDIA"}, {"codigo": "53047010", "nome": "EC 16 DE PLANALTINA"}, {"codigo": "53068050", "nome": "EC 16 DE SOBRADINHO"}, {"codigo": "53004108", "nome": "EC 16 DE TAGUATINGA"}, {"codigo": "53002938", "nome": "EC 16 DO GAMA"}, {"codigo": "53007760", "nome": "EC 17 DE CEILANDIA"}, {"codigo": "53068041", "nome": "EC 17 DE SOBRADINHO"}, {"codigo": "53004116", "nome": "EC 17 DE TAGUATINGA"}, {"codigo": "53002946", "nome": "EC 17 DO GAMA"}, {"codigo": "53007778", "nome": "EC 18 DE CEILANDIA"}, {"codigo": "53004124", "nome": "EC 18 DE TAGUATINGA"}, {"codigo": "53002954", "nome": "EC 18 DO GAMA"}, {"codigo": "53007786", "nome": "EC 19 DE CEILANDIA"}, {"codigo": "53004132", "nome": "EC 19 DE TAGUATINGA"}, {"codigo": "53002962", "nome": "EC 19 DO GAMA"}, {"codigo": "53007794", "nome": "EC 20 DE CEILANDIA"}, {"codigo": "53009703", "nome": "EC 203 DE SANTA MARIA"}, {"codigo": "53016793", "nome": "EC 203 DO RECANTO DAS EMAS"}, {"codigo": "53001532", "nome": "EC 204 SUL"}, {"codigo": "53009673", "nome": "EC 206 DE SANTA MARIA"}, {"codigo": "53001540", "nome": "EC 206 SUL"}, {"codigo": "53001559", "nome": "EC 209 SUL"}, {"codigo": "53007808", "nome": "EC 21 DE CEILANDIA"}, {"codigo": "53002989", "nome": "EC 21 DO GAMA"}, {"codigo": "53013565", "nome": "EC 215 DE SANTA MARIA"}, {"codigo": "53011511", "nome": "EC 218 DE SANTA MARIA"}, {"codigo": "53007816", "nome": "EC 22 DE CEILANDIA"}, {"codigo": "53002997", "nome": "EC 22 DO GAMA"}, {"codigo": "53007824", "nome": "EC 24 DE CEILANDIA"}, {"codigo": "53007840", "nome": "EC 26 DE CEILANDIA"}, {"codigo": "53019652", "nome": "EC 26 DE SETEMBRO"}, {"codigo": "53007859", "nome": "EC 27 DE CEILANDIA"}, {"codigo": "53004175", "nome": "EC 27 DE TAGUATINGA"}, {"codigo": "53007867", "nome": "EC 28 DE CEILANDIA"}, {"codigo": "53003020", "nome": "EC 28 DO GAMA"}, {"codigo": "53007875", "nome": "EC 29 DE CEILANDIA"}, {"codigo": "53004191", "nome": "EC 29 DE TAGUATINGA"}, {"codigo": "53002520", "nome": "EC 29 DO GAMA"}, {"codigo": "53001575", "nome": "EC 302 NORTE"}, {"codigo": "53009096", "nome": "EC 303 DE SAMAMBAIA"}, {"codigo": "53014286", "nome": "EC 303 DE SAO SEBASTIAO"}, {"codigo": "53001583", "nome": "EC 304 NORTE"}, {"codigo": "53001591", "nome": "EC 304 SUL"}, {"codigo": "53001605", "nome": "EC 305 SUL"}, {"codigo": "53001621", "nome": "EC 308 SUL"}, {"codigo": "53008332", "nome": "EC 31 DE CEILANDIA"}, {"codigo": "53001630", "nome": "EC 312 NORTE"}, {"codigo": "53001648", "nome": "EC 314 SUL"}, {"codigo": "53001672", "nome": "EC 316 SUL"}, {"codigo": "53009118", "nome": "EC 317 DE SAMAMBAIA"}, {"codigo": "53009126", "nome": "EC 318 DE SAMAMBAIA"}, {"codigo": "53009134", "nome": "EC 325 DE SAMAMBAIA"}, {"codigo": "53007891", "nome": "EC 33 DE CEILANDIA"}, {"codigo": "53007905", "nome": "EC 34 DE CEILANDIA"}, {"codigo": "53008340", "nome": "EC 35 DE CEILANDIA"}, {"codigo": "53007913", "nome": "EC 36 DE CEILANDIA"}, {"codigo": "53007930", "nome": "EC 38 DE CEILANDIA"}, {"codigo": "53007948", "nome": "EC 39 DE CEILANDIA"}, {"codigo": "53004213", "nome": "EC 39 DE TAGUATINGA"}, {"codigo": "53007956", "nome": "EC 40 DE CEILANDIA"}, {"codigo": "53012887", "nome": "EC 401 DO RECANTO DAS EMAS"}, {"codigo": "53009142", "nome": "EC 403 DE SAMAMBAIA"}, {"codigo": "53001680", "nome": "EC 403 NORTE"}, {"codigo": "53014600", "nome": "EC 404 DO RECANTO DAS EMAS"}, {"codigo": "53001699", "nome": "EC 405 NORTE"}, {"codigo": "53001710", "nome": "EC 407 NORTE"}, {"codigo": "53004230", "nome": "EC 41 DE TAGUATINGA"}, {"codigo": "53009169", "nome": "EC 410 DE SAMAMBAIA"}, {"codigo": "53001737", "nome": "EC 410 SUL"}, {"codigo": "53001745", "nome": "EC 411 NORTE"}, {"codigo": "53001753", "nome": "EC 413 SUL"}, {"codigo": "53009185", "nome": "EC 415 DE SAMAMBAIA"}, {"codigo": "53001761", "nome": "EC 415 NORTE"}, {"codigo": "53001770", "nome": "EC 416 SUL"}, {"codigo": "53009193", "nome": "EC 419 DE SAMAMBAIA"}, {"codigo": "53004248", "nome": "EC 42 DE TAGUATINGA"}, {"codigo": "53009207", "nome": "EC 425 DE SAMAMBAIA"}, {"codigo": "53007964", "nome": "EC 43 DE CEILANDIA"}, {"codigo": "53009215", "nome": "EC 431 DE SAMAMBAIA"}, {"codigo": "53007980", "nome": "EC 45 DE CEILANDIA"}, {"codigo": "53004264", "nome": "EC 45 DE TAGUATINGA"}, {"codigo": "53007999", "nome": "EC 46 DE CEILANDIA"}, {"codigo": "53004272", "nome": "EC 46 DE TAGUATINGA"}, {"codigo": "53008006", "nome": "EC 47 DE CEILANDIA"}, {"codigo": "53008014", "nome": "EC 48 DE CEILANDIA"}, {"codigo": "53008022", "nome": "EC 50 DE CEILANDIA"}, {"codigo": "53004310", "nome": "EC 50 DE TAGUATINGA"}, {"codigo": "53009223", "nome": "EC 501 DE SAMAMBAIA"}, {"codigo": "53017064", "nome": "EC 502 DE SAMAMBAIA"}, {"codigo": "53013247", "nome": "EC 510 DO RECANTO DAS EMAS"}, {"codigo": "53009240", "nome": "EC 511 DE SAMAMBAIA"}, {"codigo": "53010060", "nome": "EC 512 DE SAMAMBAIA"}, {"codigo": "53008030", "nome": "EC 52 DE CEILANDIA"}, {"codigo": "53004337", "nome": "EC 52 DE TAGUATINGA"}, {"codigo": "53004345", "nome": "EC 53 DE TAGUATINGA"}, {"codigo": "53004396", "nome": "EC 54 DE TAGUATINGA"}, {"codigo": "53004353", "nome": "EC 55 DE CEILANDIA"}, {"codigo": "53004299", "nome": "EC 55 DE TAGUATINGA"}, {"codigo": "53008057", "nome": "EC 56 DE CEILANDIA"}, {"codigo": "53008065", "nome": "EC 57 DE CEILANDIA"}, {"codigo": "53008073", "nome": "EC 59 DE CEILANDIA"}, {"codigo": "53013867", "nome": "EC 604 DE SAMAMBAIA"}, {"codigo": "53008090", "nome": "EC 61 DE CEILANDIA"}, {"codigo": "53009258", "nome": "EC 614 DE SAMAMBAIA"}, {"codigo": "53008103", "nome": "EC 62 DE CEILANDIA"}, {"codigo": "53008170", "nome": "EC 64 DE CEILANDIA"}, {"codigo": "53014855", "nome": "EC 65 DE CEILANDIA"}, {"codigo": "53068130", "nome": "EC 66 DE CEILANDIA"}, {"codigo": "53001788", "nome": "EC 708 NORTE"}, {"codigo": "53014618", "nome": "EC 803 DO RECANTO DAS EMAS"}, {"codigo": "53068173", "nome": "EC 831 DE SAMAMBAIA"}, {"codigo": "53006992", "nome": "EC AGROVILA II"}, {"codigo": "53009754", "nome": "EC AGROVILA SAO SEBASTIAO"}, {"codigo": "53012070", "nome": "EC AGUILHADA"}, {"codigo": "53005147", "nome": "EC ALMECEGAS"}, {"codigo": "53006313", "nome": "EC ALTA-MIR"}, {"codigo": "53006798", "nome": "EC ALTO INTERLAGOS"}, {"codigo": "53006321", "nome": "EC APRODARMAS"}, {"codigo": "53004361", "nome": "EC ARNIQUEIRA"}, {"codigo": "53012798", "nome": "EC ASPALHA"}, {"codigo": "53013492", "nome": "EC BASEVI"}, {"codigo": "53001664", "nome": "EC BEIJA-FLOR"}, {"codigo": "53014588", "nome": "EC BELA VISTA"}, {"codigo": "53005694", "nome": "EC BOA VISTA"}, {"codigo": "53006801", "nome": "EC BOQUEIRAO"}, {"codigo": "53006356", "nome": "EC BROCHADO DA ROCHA"}, {"codigo": "53005155", "nome": "EC BUCANHAO"}, {"codigo": "53009762", "nome": "EC CACHOEIRINHA"}, {"codigo": "53006828", "nome": "EC CAFE SEM TROCO"}, {"codigo": "53006836", "nome": "EC CAPAO SECO"}, {"codigo": "53006844", "nome": "EC CARIRU"}, {"codigo": "53005708", "nome": "EC CATINGUEIRO"}, {"codigo": "53009770", "nome": "EC CERAMICA DA BENCAO"}, {"codigo": "53005163", "nome": "EC CHAPADINHA"}, {"codigo": "53004370", "nome": "EC COLONIA AGRICOLA VICENTE PIRES"}, {"codigo": "53017544", "nome": "EC COMUNIDADE DE APRENDIZAGEM DO PARANOA - EC CAP"}, {"codigo": "53006372", "nome": "EC COPERBRAS"}, {"codigo": "53005716", "nome": "EC CORA CORALINA"}, {"codigo": "53009398", "nome": "EC CORREGO BARREIRO"}, {"codigo": "53008120", "nome": "EC CORREGO DAS CORUJAS"}, {"codigo": "53013506", "nome": "EC CORREGO DO ARROZAL"}, {"codigo": "53006380", "nome": "EC CORREGO DO MEIO"}, {"codigo": "53001435", "nome": "EC DA VILA DO RCG"}, {"codigo": "53008138", "nome": "EC DO SETOR P NORTE"}, {"codigo": "53001800", "nome": "EC DO SMU"}, {"codigo": "53008626", "nome": "EC DO SRIA"}, {"codigo": "53068220", "nome": "EC DOM BOSCO"}, {"codigo": "53005732", "nome": "EC ENGENHO VELHO"}, {"codigo": "53006410", "nome": "EC ESTANCIA DE PLANALTINA"}, {"codigo": "53006429", "nome": "EC ETA 44"}, {"codigo": "53006437", "nome": "EC FRIGORIFICO INDUSTRIAL"}, {"codigo": "53001818", "nome": "EC GRANJA DO TORTO"}, {"codigo": "53009266", "nome": "EC GUARIROBA"}, {"codigo": "53005180", "nome": "EC INCRA 06"}, {"codigo": "53007000", "nome": "EC IPE"}, {"codigo": "53006852", "nome": "EC ITAPETI"}, {"codigo": "53009533", "nome": "EC JARDIM BOTANICO"}, {"codigo": "53007018", "nome": "EC KANEGAE"}, {"codigo": "53008162", "nome": "EC LAJES DA JIBOIA"}, {"codigo": "53006879", "nome": "EC LAMARAO"}, {"codigo": "53012550", "nome": "EC LOBEIRAL"}, {"codigo": "53006011", "nome": "EC MESTRE DARMAS"}, {"codigo": "53006461", "nome": "EC MONJOLO"}, {"codigo": "53005759", "nome": "EC MORRO DO SANSAO"}, {"codigo": "53006887", "nome": "EC NATUREZA"}, {"codigo": "53006488", "nome": "EC NUCLEO RURAL CORREGO DO ATOLEIRO"}, {"codigo": "53009444", "nome": "EC OLHOS DAGUA"}, {"codigo": "53006518", "nome": "EC PARANA"}, {"codigo": "53006526", "nome": "EC PEDRA FUNDAMENTAL"}, {"codigo": "53005201", "nome": "EC POLO AGRICOLA DA TORRE"}, {"codigo": "53003055", "nome": "EC PONTE ALTA DE CIMA"}, {"codigo": "53006895", "nome": "EC QUEBRADA DOS NERIS"}, {"codigo": "53006534", "nome": "EC RAJADINHA"}, {"codigo": "53012739", "nome": "EC REINO DAS FLORES"}, {"codigo": "53011015", "nome": "EC RIACHO FUNDO"}, {"codigo": "53005767", "nome": "EC RIBEIRAO"}, {"codigo": "53005775", "nome": "EC RUA DO MATO"}, {"codigo": "53005783", "nome": "EC SANTA HELENA"}, {"codigo": "53006550", "nome": "EC SANTOS DUMONT"}, {"codigo": "53012178", "nome": "EC SAO BARTOLOMEU"}, {"codigo": "53005791", "nome": "EC SITIO DAS ARAUCARIAS"}, {"codigo": "53006917", "nome": "EC SOBRADINHO DOS MELOS"}, {"codigo": "53005805", "nome": "EC SONHEM DE CIMA"}, {"codigo": "53013280", "nome": "EC VALE DO SOL"}, {"codigo": "53014278", "nome": "EC VALE VERDE"}, {"codigo": "53007026", "nome": "EC VERDE DO RIACHO FUNDO I"}, {"codigo": "53068238", "nome": "EC VILA BURITIS"}, {"codigo": "53012496", "nome": "EC VILA DO BOA"}, {"codigo": "53014570", "nome": "EC VILA NOVA"}, {"codigo": "53001869", "nome": "EPAR 303-304 NORTE"}, {"codigo": "53001893", "nome": "ESC DO PARQUE DA CIDADE - PROEM"}, {"codigo": "53068025", "nome": "ESCOLA CLASSE 09 DE BRAZLANDIA"}, {"codigo": "53007832", "nome": "ESCOLA CLASSE 25 DE CEILANDIA"}, {"codigo": "53019695", "nome": "ESCOLA CLASSE 502 DO ITAPOA"}, {"codigo": "53018362", "nome": "ESCOLA CLASSE JUSCELINO KUBITSCHEK - SOL NASCENTE"}];
@@ -1045,12 +1056,24 @@
         </svg>`;
       }
 
-      function renderBrocheImg(broche, bloco, unlocked, sizeClass = 'w-11 h-11') {
+      function podeDobrarBroche(bid, ano) {
+        const m = String(bid).match(/^(b1|b2)_(\d+)$/);
+        if (!m) return false;
+        const num = Number(m[2]);
+        if (num >= 41) return false;
+        if (m[1] === 'b1' && (ano === '8' || ano === '9')) return false;
+        return true;
+      }
+
+      function renderBrocheImg(broche, bloco, unlocked, sizeClass = 'w-11 h-11', doubled = false) {
         const cls = unlocked ? 'broche-unlocked' : 'broche-locked';
-        if (bloco === 1) {
-          return `<img src="${broche.img}" alt="${escapeHtml(broche.nome)}" class="${sizeClass} rounded-full object-cover ${cls}" />`;
+        const inner = bloco === 1
+          ? `<img src="${broche.img}" alt="${escapeHtml(broche.nome)}" class="${sizeClass} rounded-full object-cover ${cls}" />`
+          : `<div class="${cls} inline-flex items-center justify-center">${svgBrocheBloco2(broche, sizeClass)}</div>`;
+        if (unlocked && doubled) {
+          return `<div class="relative inline-flex items-center justify-center">${inner}<svg viewBox="0 0 24 24" aria-label="Pontuação dobrada (2x)" class="pointer-events-none absolute inset-0 m-auto w-7 h-7 drop-shadow-[0_0_3px_rgba(255,255,255,0.95)]"><path d="M5 5L19 19M19 5L5 19" stroke="#09090D" stroke-width="4" stroke-linecap="round"/></svg></div>`;
         }
-        return `<div class="${cls} inline-flex items-center justify-center">${svgBrocheBloco2(broche, sizeClass)}</div>`;
+        return inner;
       }
 
       function getBrochesAluno(aluno) {
@@ -1286,40 +1309,46 @@
       function calcularNotaRoteiros(aluno) {
         const ano = detectarAnoAluno(aluno);
         const set = new Set(getBrochesAluno(aluno));
-        let b1 = 0, b2 = 0, extras = 0;
-        set.forEach(id => {
-          const s = String(id);
-          const m = s.match(/^(b1|b2)_(\d+)$/);
-          if (!m) return;
-          const num = Number(m[2]);
-          if (num >= 41) {
-            extras++;
-          } else if (m[1] === 'b1') {
-            b1++;
-          } else {
-            b2++;
-          }
-        });
+        const doubledSet = new Set(Array.isArray(aluno && aluno.brochesDobrados) ? aluno.brochesDobrados : []);
         let p1 = 1.2, p2 = 1.2;
         if (ano === '6') { p1 = 1.2; p2 = 2.4; }
         else if (ano === '7') { p1 = 0.6; p2 = 2.4; }
         else if (ano === '8') { p1 = 0.6; p2 = 1.2; }
         else if (ano === '9') { p1 = 0.6; p2 = 0.6; }
-        const nota = +(b1 * p1 + b2 * p2 + extras * 1.0).toFixed(2);
+        let total = 0;
+        set.forEach(id => {
+          const s = String(id);
+          const m = s.match(/^(b1|b2)_(\d+)$/);
+          if (!m) return;
+          const num = Number(m[2]);
+          const mult = (podeDobrarBroche(s, ano) && doubledSet.has(s)) ? 2 : 1;
+          if (num >= 41) {
+            total += 1.0;
+          } else if (m[1] === 'b1') {
+            total += p1 * mult;
+          } else {
+            total += p2 * mult;
+          }
+        });
+        const nota = +total.toFixed(2);
         return nota.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
       }
 
       function abrirModalBrochesAluno(alunoId) {
         const aluno = db.usuarios.find(u => u.id === alunoId);
         if (!aluno) return;
-        if (!Array.isArray(aluno.broches)) aluno.broches = [];
+        if (!Array.isArray(aluno.broches)) aluno.broches = []; aluno.brochesDobrados = []; ultimoIndiceMarcado = null;
+        if (!Array.isArray(aluno.brochesDobrados)) aluno.brochesDobrados = [];
+        const anoAluno = detectarAnoAluno(aluno);
         const blocoPrincipal = detectarBlocoAluno(aluno);
         let mostrarB1 = blocoPrincipal !== 'b2';
         let mostrarB2 = blocoPrincipal !== 'b1';
         let ultimaAcao = null;
+        let ultimoIndiceMarcado = null;
 
         function drawModal(prevScroll = 0) {
           const set = new Set(aluno.broches);
+          const doubledSet = new Set(aluno.brochesDobrados);
           const allList = [...BROCHES_BLOCO_1, ...BROCHES_BLOCO_2];
           const b1Done = BROCHES_BLOCO_1.filter(b => set.has(b.id)).length;
           const b2Done = BROCHES_BLOCO_2.filter(b => set.has(b.id)).length;
@@ -1330,7 +1359,7 @@
             <div class="flex items-center justify-between mb-2">
               <div>
                 <h3 class="font-bold text-base">Roteiros de ${escapeHtml(aluno.apelido)}</h3>
-                <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• Toque para alternar</span></p>
+                <p class="text-[11px] text-amarelo font-bold">Nota: ${calcularNotaRoteiros(aluno)} <span class="text-gray-400 font-normal">• 2x dobra (X) · Shift seleciona sequência</span></p>
               </div>
               <div class="flex items-center gap-1.5">
                 <button id="btn-roteiros-dar-ips" type="button" class="glass-gold-btn text-[11px] font-extrabold px-2.5 py-1.5 rounded-xl flex items-center gap-1">${svgIcon('bolt', 'w-3.5 h-3.5')} <span>Dar ${escapeHtml(db.config.moedaPlural)}</span></button>
@@ -1339,7 +1368,7 @@
             </div>
             ${ultimaAcao ? `
               <div class="mb-2.5 glass-accent-purple rounded-2xl px-3 py-2 flex items-center justify-between gap-2 text-xs">
-                <span class="truncate"><strong>${ultimaAcao.adicionado ? 'Concluído:' : 'Removido:'}</strong> ${escapeHtml(ultimaAcao.nome)}</span>
+                <span class="truncate"><strong>${ultimaAcao.newEstado === 2 ? 'Dobrado (2x):' : ultimaAcao.newEstado === 1 ? 'Concluído:' : 'Removido:'}</strong> ${escapeHtml(ultimaAcao.nome)}</span>
                 <button id="btn-desfazer-roteiro" type="button" class="shrink-0 glass-gold-btn text-[11px] font-extrabold px-2.5 py-1 rounded-xl">Desfazer</button>
               </div>
             ` : ''}
@@ -1358,7 +1387,7 @@
                   <div class="grid grid-cols-5 gap-2.5 mt-2">
                     ${BROCHES_BLOCO_1.map(b => `
                       <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                        ${renderBrocheImg(b, 1, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14')}
+                        ${renderBrocheImg(b, 1, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
                       </button>
                     `).join('')}
                   </div>
@@ -1373,7 +1402,7 @@
                   <div class="grid grid-cols-5 gap-2.5 mt-2">
                     ${BROCHES_BLOCO_2.map(b => `
                       <button type="button" data-toggle-broche="${b.id}" title="${escapeHtml(b.nome)}" class="btn-toggle-broche flex flex-col items-center p-1 rounded-xl hover:bg-white/5">
-                        ${renderBrocheImg(b, 2, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14')}
+                        ${renderBrocheImg(b, 2, set.has(b.id), 'w-12 h-12 sm:w-14 sm:h-14', doubledSet.has(b.id) && podeDobrarBroche(b.id, anoAluno))}
                       </button>
                     `).join('')}
                   </div>
@@ -1401,9 +1430,19 @@
           if (btnDesf && ultimaAcao) {
             btnDesf.onclick = () => {
               const curScroll = box ? box.scrollTop : 0;
-              const idx = aluno.broches.indexOf(ultimaAcao.id);
-              if (ultimaAcao.adicionado && idx >= 0) aluno.broches.splice(idx, 1);
-              else if (!ultimaAcao.adicionado && idx < 0) aluno.broches.push(ultimaAcao.id);
+              const bid = ultimaAcao.id;
+              const idx = aluno.broches.indexOf(bid);
+              const dIdx = aluno.brochesDobrados.indexOf(bid);
+              if (ultimaAcao.prevEstado === 0) {
+                if (idx >= 0) aluno.broches.splice(idx, 1);
+                if (dIdx >= 0) aluno.brochesDobrados.splice(dIdx, 1);
+              } else if (ultimaAcao.prevEstado === 1) {
+                if (idx < 0) aluno.broches.push(bid);
+                if (dIdx >= 0) aluno.brochesDobrados.splice(dIdx, 1);
+              } else if (ultimaAcao.prevEstado === 2) {
+                if (idx < 0) aluno.broches.push(bid);
+                if (dIdx < 0) aluno.brochesDobrados.push(bid);
+              }
               toast(`Desfeito: ${ultimaAcao.nome}`, 'info');
               ultimaAcao = null;
               salvarEstado();
@@ -1411,15 +1450,45 @@
             };
           }
           document.querySelectorAll('.btn-toggle-broche').forEach(btn => {
-            btn.onclick = () => {
+            btn.onclick = (ev) => {
               const curScroll = box ? box.scrollTop : 0;
               const bid = btn.dataset.toggleBroche;
               const item = allList.find(x => x.id === bid);
+              const curGlobalIdx = allList.findIndex(x => x.id === bid);
+
+              if (ev.shiftKey && ultimoIndiceMarcado !== null && curGlobalIdx >= 0) {
+                const start = Math.min(ultimoIndiceMarcado, curGlobalIdx);
+                const end = Math.max(ultimoIndiceMarcado, curGlobalIdx);
+                const s = new Set(aluno.broches);
+                for (let k = start; k <= end; k++) s.add(allList[k].id);
+                aluno.broches = Array.from(s);
+                ultimoIndiceMarcado = curGlobalIdx;
+                ultimaAcao = null;
+                toast(`${end - start + 1} roteiro(s) marcados na sequência!`, 'sucesso');
+                salvarEstado();
+                drawModal(curScroll);
+                return;
+              }
+
               const idx = aluno.broches.indexOf(bid);
-              const adicionado = idx < 0;
-              if (adicionado) aluno.broches.push(bid);
-              else aluno.broches.splice(idx, 1);
-              ultimaAcao = { id: bid, nome: item ? item.nome : bid, adicionado };
+              const dIdx = aluno.brochesDobrados.indexOf(bid);
+              const prevEstado = idx < 0 ? 0 : (dIdx >= 0 ? 2 : 1);
+              let newEstado = 0;
+
+              if (prevEstado === 0) {
+                aluno.broches.push(bid);
+                newEstado = 1;
+                if (curGlobalIdx >= 0) ultimoIndiceMarcado = curGlobalIdx;
+              } else if (prevEstado === 1 && podeDobrarBroche(bid, anoAluno)) {
+                aluno.brochesDobrados.push(bid);
+                newEstado = 2;
+                if (curGlobalIdx >= 0) ultimoIndiceMarcado = curGlobalIdx;
+              } else {
+                if (idx >= 0) aluno.broches.splice(idx, 1);
+                if (dIdx >= 0) aluno.brochesDobrados.splice(dIdx, 1);
+                newEstado = 0;
+              }
+              ultimaAcao = { id: bid, nome: item ? item.nome : bid, prevEstado, newEstado };
               salvarEstado();
               drawModal(curScroll);
             };
@@ -1564,7 +1633,7 @@
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/10">
-                ${linhas.length === 0 ? `<tr><td colspan="4" class="px-3 py-4 text-center text-gray-400">Nenhum aluno nesta turma.</td></tr>` : linhas.map(l => `
+                ${linhas.length === 0 ? `<tr><td colspan="${isRoteirosVisiveis() ? 5 : 4}" class="px-3 py-4 text-center text-gray-400">Nenhum aluno nesta turma.</td></tr>` : linhas.map(l => `
                   <tr>
                     <td class="px-3 py-2 font-semibold">${escapeHtml(l.nome)}</td>
                     <td class="px-2 py-2 text-right text-amarelo font-bold">${l.saldo}</td>
@@ -1579,7 +1648,9 @@
         `);
         document.getElementById('btn-fechar-modal').onclick = fecharModal;
         document.getElementById('btn-copiar-boletim').onclick = async () => {
-          const tsv = ['Estudante\tSaldo\tNota\tMateMAGICA', ...linhas.map(l => `${l.nome}\t${l.saldo}\t${l.nota}\t${l.trilha}`)].join('\n');
+          const showRot = isRoteirosVisiveis();
+          const hdr = showRot ? 'Estudante\tSaldo\tAvaliações\tRoteiros\tMateMAGICA' : 'Estudante\tSaldo\tAvaliações\tMateMAGICA';
+          const tsv = [hdr, ...linhas.map(l => showRot ? `${l.nome}\t${l.saldo}\t${l.avaliacoes}\t${l.nota}\t${l.trilha}` : `${l.nome}\t${l.saldo}\t${l.avaliacoes}\t${l.trilha}`)].join('\n');
           try {
             await navigator.clipboard.writeText(tsv);
             toast('Boletim copiado! Cole direto na planilha.', 'sucesso');
@@ -1588,7 +1659,9 @@
           }
         };
         document.getElementById('btn-csv-boletim').onclick = () => {
-          const csv = ['Estudante;Saldo;Nota;MateMAGICA', ...linhas.map(l => `"${l.nome.replace(/"/g,'""')}";${l.saldo};"${l.nota}";"${l.trilha}"`)].join('\n');
+          const showRot = isRoteirosVisiveis();
+          const hdr = showRot ? 'Estudante;Saldo;Avaliações;Roteiros;MateMAGICA' : 'Estudante;Saldo;Avaliações;MateMAGICA';
+          const csv = [hdr, ...linhas.map(l => showRot ? `"${l.nome.replace(/"/g,'""')}";${l.saldo};"${l.avaliacoes}";"${l.nota}";"${l.trilha}"` : `"${l.nome.replace(/"/g,'""')}";${l.saldo};"${l.avaliacoes}";"${l.trilha}"`)].join('\n');
           const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
@@ -2672,7 +2745,15 @@
               session.abaProfessor = 'turma';
               toast('Digital confirmada!', 'sucesso');
               render();
-              sincronizarComNuvem(true).then(ok => { if (ok) render(); }).catch(() => {});
+              sincronizarComNuvem(true).then(ok => {
+                if (ok && session.contaAtiva && session.modo === 'professor') {
+                  if (session.abaProfessor === 'turma' && session.escolhendoTurma) {
+                    const hSync = encontrarHorarioAtivoAgora();
+                    if (hSync) { session.turmaAtualId = Number(hSync.turmaId); session.escolhendoTurma = false; }
+                  }
+                  render();
+                }
+              }).catch(() => {});
             } catch (err) {
               toast('Não foi possível validar a digital neste navegador.', 'erro');
             }
@@ -2807,7 +2888,13 @@
             toast(`Bem-vindo, ${conta.nome}!`, 'sucesso');
             render();
             sincronizarComNuvem(true).then(ok => {
-              if (ok && session.contaAtiva && session.modo !== 'login') render();
+              if (ok && session.contaAtiva && session.modo !== 'login') {
+                if (session.modo === 'professor' && session.abaProfessor === 'turma' && session.escolhendoTurma) {
+                  const hSync = encontrarHorarioAtivoAgora();
+                  if (hSync) { session.turmaAtualId = Number(hSync.turmaId); session.escolhendoTurma = false; }
+                }
+                render();
+              }
             }).catch(() => {});
           } finally {
             if (btn && document.body.contains(btn)) {
@@ -4981,7 +5068,7 @@
                           <div class="grid grid-cols-5 gap-2 place-items-center">
                             ${BROCHES_BLOCO_1.map(b => `
                               <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                                ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
+                                ${renderBrocheImg(b, 1, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12', Array.isArray(aluno.brochesDobrados) && aluno.brochesDobrados.includes(b.id) && podeDobrarBroche(b.id, detectarAnoAluno(aluno)))}
                               </button>
                             `).join('')}
                           </div>
@@ -4993,7 +5080,7 @@
                           <div class="grid grid-cols-5 gap-2 place-items-center">
                             ${BROCHES_BLOCO_2.map(b => `
                               <button type="button" data-broche-info="${escapeHtml(b.nome)}" data-broche-ok="${conquistados.has(b.id) ? '1' : '0'}" class="btn-aluno-broche rounded-full p-0.5">
-                                ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12')}
+                                ${renderBrocheImg(b, 2, conquistados.has(b.id), 'w-11 h-11 sm:w-12 sm:h-12', Array.isArray(aluno.brochesDobrados) && aluno.brochesDobrados.includes(b.id) && podeDobrarBroche(b.id, detectarAnoAluno(aluno)))}
                               </button>
                             `).join('')}
                           </div>
