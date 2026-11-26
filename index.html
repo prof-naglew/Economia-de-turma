@@ -391,7 +391,13 @@
             const est = await supaFetch(`escola_estado?escola_id=eq.${escolaId}&select=*`);
             if (Array.isArray(est) && est.length && est[0].dados) {
               aplicarEstadoEscola(est[0].dados);
+              const novosAlunos = sincronizarNomesFaltantesCEDVB();
+              if (novosAlunos > 0) {
+                await enviarEstadoEscolaParaNuvem(escolaId);
+                toast(`${novosAlunos} estudante(s) faltante(s) adicionado(s) às turmas!`, 'sucesso');
+              }
             } else {
+              sincronizarNomesFaltantesCEDVB();
               await enviarEstadoEscolaParaNuvem(escolaId);
             }
           }
@@ -734,6 +740,76 @@
         db.estadosPorEscola = {};
       }
 
+      const ELENCO_CED_VB_2026 = {
+        '6A': ['Ana Karolayne', 'Ana Laura', 'Cauã Pereira', 'Daniel Ramos', 'Davi Lucas', 'Eduardo Pereira', 'Emanuelle Santos', 'Emille Carolayne', 'Francisco Kassio', 'Gabriella Candido', 'Isaac Gabriel', 'João Lucas Morais', 'João Luccas Santos', 'José Pedro Roque', 'Luiza Guimarães', 'Maria Carolina', 'Nicolle Tyoko', 'Pedro Antonio', 'Sofia Santos', 'Thaeme Vitoria'],
+        '6B': ['Alexya Orrana', 'Alice Rodrigues Coutinho', 'Cecília Valério', 'Davi Gabriel', 'Elisa Vitória', 'Gabriel Hayato', 'Gabriel Silva', 'Júlia Rodrigues de Lima', 'Kalebe Chagas', 'Kauan Kayo', 'Luis Felipe', 'M Laura Nunes', 'M Manuella silva', 'Maxwel Paixão', 'Mickaelly Karolayne', 'Rafael Cardoso', 'Stefany Cruz', 'Thallyson Silva', 'Thaís de oliveira', 'Thaysa do Amor D', 'Valentina da silva'],
+        '7A': ['Alice Vaile', 'Anabelly Fernandes', 'Arthur Gomes', 'Bambu S', 'Caio Shoiti', 'Davi Sousa', 'Elen Cristhine', 'Gabriel S', 'Gustavo V', 'Isabelly C', 'Italo dos Santos', 'José Augusto', 'Júlia', 'Matheus Cardoso', 'Saymon Alves', 'Vitor Gabriel Pereira', 'Yan da S'],
+        '7B': ['Antônio Guilherme', 'Cauan Fernandes', 'Davi Lucas', 'Dayvisson Fabiano', 'Fabiano C', 'João Pedro', 'João Victor', 'Lucas E', 'Luiz Miguel', 'Pedro N', 'Riberry B', 'Vitor Gabriel da Conceição'],
+        '8A': ['Arthur Veríssimo', 'Eloany de moraes', 'Hadassa Lethícia', 'Júlia Cavalcante', 'Júlia de Oliveira N', 'Ketlen Eduarda', 'Lívia Míriam', 'Marcela Junker', 'Mariana Santos', 'Melyssa Junker', 'Mikaelli A', 'Natalay Rodrigues', 'Nycolas Gustavo', 'Samyra Santos', 'Sofia Makiko', 'Yasmin Vitória']
+      };
+
+      function normNomeSimples(s) {
+        return String(s || '')
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '')
+          .toLowerCase()
+          .replace(/[^a-z0-9\s]/g, ' ')
+          .replace(/\s+/g, ' ')
+          .trim();
+      }
+
+      function normCodigoTurmaCEDVB(nome) {
+        const m = String(nome || '').toUpperCase().match(/([6789])\s*(?:º|°|O)?\s*(?:ANO)?\s*([A-Z])/);
+        return m ? `${m[1]}${m[2]}` : String(nome || '').trim().toUpperCase();
+      }
+
+      function sincronizarNomesFaltantesCEDVB() {
+        const escAtiva = (db.escolas || []).find(e => e.id === session.escolaAtualId || e.id === session.contaAtiva?.escola_id);
+        const ehCedVb = !escAtiva || String(escAtiva.codigo) === '53009460' || /VARGEM BONITA/i.test(String(escAtiva.nome || ''));
+        if (!ehCedVb) return 0;
+
+        const avatarIds = ['fox', 'owl', 'rocket', 'dino', 'star', 'cat', 'lion', 'panda'];
+        let adicionados = 0;
+
+        Object.entries(ELENCO_CED_VB_2026).forEach(([codigo, nomes]) => {
+          let turma = (db.turmas || []).find(t => normCodigoTurmaCEDVB(t.nome) === codigo);
+          if (!turma) {
+            turma = { id: genId(), nome: codigo, ano: codigo[0], ativa: true };
+            db.turmas.push(turma);
+          }
+          const existentes = (db.usuarios || []).filter(u => u.turmaId === turma.id && (u.papel === 'aluno' || u.papel === 'monitor'));
+          nomes.forEach((nome, idx) => {
+            const nt = normNomeSimples(nome);
+            const tWords = nt.split(' ');
+            const jaExiste = existentes.some(u => {
+              const nu = normNomeSimples(u.apelido);
+              if (nu === nt) return true;
+              const uWords = nu.split(' ');
+              if (tWords.length >= 2 && uWords.length >= 2 && tWords[0] === uWords[0] && tWords[1] === uWords[1]) return true;
+              if (nu.length >= 4 && nt.length >= 4 && (nu.startsWith(nt) || nt.startsWith(nu))) return true;
+              return false;
+            });
+            if (!jaExiste) {
+              const novo = {
+                id: genId(),
+                turmaId: turma.id,
+                apelido: nome,
+                avatarId: avatarIds[(existentes.length + idx) % avatarIds.length],
+                papel: 'aluno',
+                pin: '',
+                saldo: 0,
+                broches: []
+              };
+              db.usuarios.push(novo);
+              existentes.push(novo);
+              adicionados++;
+            }
+          });
+        });
+
+        return adicionados;
+      }
+
       function extrairEstadoEscola() {
         return {
           config: db.config,
@@ -747,6 +823,7 @@
           transacoes: db.transacoes,
           pedidos: db.pedidos,
           avaliacoes: db.avaliacoes || [],
+          ...(db.flashcardsState ? { flashcardsState: db.flashcardsState } : {}),
           nextId: db.nextId,
           presencaMigrada: true
         };
@@ -765,6 +842,7 @@
         db.transacoes = est.transacoes || [];
         db.pedidos = est.pedidos || [];
         db.avaliacoes = est.avaliacoes || [];
+        db.flashcardsState = est.flashcardsState || null;
         db.nextId = est.nextId || 100;
       }
 
@@ -779,6 +857,7 @@
           aplicarEstadoEscola(base);
           db.estadosPorEscola[escolaId] = base;
         }
+        sincronizarNomesFaltantesCEDVB();
         session.turmaAtualId = turmasOrdenadas()[0]?.id || 1;
       }
 
@@ -1198,11 +1277,11 @@
             b2++;
           }
         });
-        let p1 = 1.0, p2 = 1.0;
-        if (ano === '6') { p1 = 1.0; p2 = 2.0; }
-        else if (ano === '7') { p1 = 0.5; p2 = 2.0; }
-        else if (ano === '8') { p1 = 0.3; p2 = 1.0; }
-        else if (ano === '9') { p1 = 0.3; p2 = 0.5; }
+        let p1 = 1.2, p2 = 1.2;
+        if (ano === '6') { p1 = 1.2; p2 = 2.4; }
+        else if (ano === '7') { p1 = 0.6; p2 = 2.4; }
+        else if (ano === '8') { p1 = 0.6; p2 = 1.2; }
+        else if (ano === '9') { p1 = 0.6; p2 = 0.6; }
         const nota = +(b1 * p1 + b2 * p2 + extras * 1.0).toFixed(2);
         return nota.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
       }
