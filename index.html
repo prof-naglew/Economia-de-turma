@@ -839,10 +839,17 @@
             turma = { id: genId(), nome: codigo, ano: codigo[0], ativa: true };
             db.turmas.push(turma);
           }
-          const existentes = (db.usuarios || []).filter(u => u.turmaId === turma.id && (u.papel === 'aluno' || u.papel === 'monitor'));
+          const excluidos = new Set(Array.isArray(db.alunosExcluidosCEDVB) ? db.alunosExcluidosCEDVB : []);
+          const existentes = (db.usuarios || []).filter(u => u.papel === 'aluno' || u.papel === 'monitor');
           nomes.forEach((nome, idx) => {
             const nt = normNomeSimples(nome);
             const tWords = nt.split(' ');
+            const foiExcluido = excluidos.has(nt) || Array.from(excluidos).some(ex => {
+              const eWords = ex.split(' ');
+              if (tWords.length >= 2 && eWords.length >= 2 && tWords[0] === eWords[0] && tWords[1] === eWords[1]) return true;
+              return ex.length >= 4 && nt.length >= 4 && (ex.startsWith(nt) || nt.startsWith(ex));
+            });
+            if (foiExcluido) return;
             const jaExiste = existentes.some(u => {
               const nu = normNomeSimples(u.apelido);
               if (nu === nt) return true;
@@ -885,6 +892,7 @@
           transacoes: db.transacoes,
           pedidos: db.pedidos,
           avaliacoes: db.avaliacoes || [],
+          alunosExcluidosCEDVB: db.alunosExcluidosCEDVB || [],
           ...(db.flashcardsState ? { flashcardsState: db.flashcardsState } : {}),
           nextId: db.nextId,
           presencaMigrada: true
@@ -904,6 +912,7 @@
         db.transacoes = est.transacoes || [];
         db.pedidos = est.pedidos || [];
         db.avaliacoes = est.avaliacoes || [];
+        db.alunosExcluidosCEDVB = est.alunosExcluidosCEDVB || [];
         db.flashcardsState = est.flashcardsState || null;
         db.nextId = est.nextId || 100;
       }
@@ -2135,6 +2144,11 @@
             render();
           };
           document.getElementById('btn-del-ed-alu').onclick = () => {
+            if (!Array.isArray(db.alunosExcluidosCEDVB)) db.alunosExcluidosCEDVB = [];
+            const nomeNormDel = normNomeSimples(aluno.apelido);
+            if (nomeNormDel && !db.alunosExcluidosCEDVB.includes(nomeNormDel)) {
+              db.alunosExcluidosCEDVB.push(nomeNormDel);
+            }
             db.usuarios = db.usuarios.filter(u => u.id !== aluno.id);
             cargosTurma.forEach(c => {
               if (getOcupanteCargo(c, aluno.turmaId) === aluno.id) setOcupanteCargo(c, aluno.turmaId, null);
