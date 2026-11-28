@@ -235,7 +235,7 @@
   <div id="toast-container" class="fixed bottom-20 left-1/2 -translate-x-1/2 z-50 pointer-events-none w-[90%] max-w-md flex flex-col gap-2"></div>
 
   <!-- Modal -->
-  <div id="modal-backdrop" class="fixed inset-0 bg-black/25 backdrop-blur-[2px] z-50 hidden items-center justify-center p-4">
+  <div id="modal-backdrop" class="fixed inset-0 bg-black/25 backdrop-blur-[2px] z-50 hidden items-center justify-center p-4 overscroll-contain">
     <div id="modal-content" class="glass-card rounded-3xl w-full max-w-md max-h-[88vh] overflow-y-auto p-5 shadow-2xl"></div>
   </div>
 
@@ -1160,6 +1160,37 @@
           window.innerWidth < 768;
       }
 
+      function calcularNotaRoteirosNum(aluno) {
+        const ano = detectarAnoAluno(aluno);
+        const set = new Set(getBrochesAluno(aluno));
+        const doubledSet = new Set(Array.isArray(aluno && aluno.brochesDobrados) ? aluno.brochesDobrados : []);
+        let p1 = 1.2, p2 = 1.2;
+        if (ano === '6') { p1 = 1.2; p2 = 2.4; }
+        else if (ano === '7') { p1 = 0.6; p2 = 2.4; }
+        else if (ano === '8') { p1 = 0.6; p2 = 1.2; }
+        else if (ano === '9') { p1 = 0.6; p2 = 0.6; }
+        let total = 0;
+        set.forEach(id => {
+          const s = String(id);
+          const m = s.match(/^(b1|b2)_(\d+)$/);
+          if (!m) return;
+          const num = Number(m[2]);
+          const mult = (podeDobrarBroche(s, ano) && doubledSet.has(s)) ? 2 : 1;
+          if (num >= 41) total += 1.0;
+          else if (m[1] === 'b1') total += p1 * mult;
+          else total += p2 * mult;
+        });
+        return +total.toFixed(2);
+      }
+
+      function abreviarAvaliacao(av) {
+        if (av && av.abreviacao && String(av.abreviacao).trim()) return String(av.abreviacao).trim();
+        const words = String((av && av.titulo) || '').trim().split(/\s+/).filter(Boolean);
+        if (words.length === 0) return 'Av';
+        if (words.length === 1) return words[0].slice(0, 5);
+        return (words[0].slice(0, 3) + words[1].slice(0, 2)).slice(0, 6);
+      }
+
       function calcularNotaAvaliacoesAluno(alunoId, turmaId) {
         if (!Array.isArray(db.avaliacoes)) return 0;
         return +(db.avaliacoes
@@ -1214,7 +1245,10 @@
 
             <div class="glass-card rounded-2xl p-3 mb-3 space-y-2">
               <div class="text-xs font-bold text-amarelo">+ Nova Avaliação</div>
-              <input id="inp-av-titulo" type="text" placeholder="Ex.: Prova 1, Trabalho em grupo..." class="w-full glass-pill rounded-xl px-3 py-2 text-xs text-white outline-none" />
+              <div class="grid grid-cols-3 gap-2">
+                <input id="inp-av-titulo" type="text" placeholder="Nome (ex: Prova 1)" class="col-span-2 w-full glass-pill rounded-xl px-3 py-2 text-xs text-white outline-none" />
+                <input id="inp-av-abrev" type="text" maxlength="8" placeholder="Abrev. (P1)" class="w-full glass-pill rounded-xl px-3 py-2 text-xs text-white outline-none" />
+              </div>
               <div class="grid ${info.periodos.length > 1 ? 'grid-cols-2' : 'grid-cols-1'} gap-2">
                 ${info.periodos.length > 1 ? `
                   <select id="sel-av-periodo" class="w-full glass-pill rounded-xl px-3 py-2 text-xs text-white outline-none">
@@ -1232,7 +1266,7 @@
                 return `
                   <div class="glass-card rounded-2xl p-3 flex items-center justify-between gap-2">
                     <div class="min-w-0">
-                      <div class="font-bold text-xs truncate">${escapeHtml(av.titulo)}</div>
+                      <div class="font-bold text-xs truncate">${escapeHtml(av.titulo)} <span class="text-cyan-300 font-extrabold">[${escapeHtml(abreviarAvaliacao(av))}]</span></div>
                       <div class="text-[10px] text-gray-400">${escapeHtml(av.periodo)} • Vale <span class="text-amarelo font-bold">${Number(av.valorMax).toLocaleString('pt-BR')} pts</span> • ${lancados}/${alunos.length} notas</div>
                     </div>
                     <div class="flex gap-1.5 shrink-0">
@@ -1253,6 +1287,7 @@
           };
           document.getElementById('btn-criar-av').onclick = () => {
             const titulo = (document.getElementById('inp-av-titulo').value || '').trim();
+            const abreviacao = (document.getElementById('inp-av-abrev').value || '').trim();
             const periodo = document.getElementById('sel-av-periodo').value || 'Geral';
             const valor = Number(String(document.getElementById('inp-av-valor').value || '').replace(',', '.'));
             if (!titulo) { toast('Digite o nome da avaliação.', 'erro'); return; }
@@ -1267,6 +1302,7 @@
               id: db.nextId++,
               turmaId: turma.id,
               titulo,
+              abreviacao,
               regime,
               periodo,
               valorMax: +valor.toFixed(2),
@@ -1707,79 +1743,165 @@
 
       function abrirModalBoletim(turma) {
         const alunos = alunosDaTurmaOrdenados(turma.id);
-        const linhas = alunos.map(a => {
-          const licoes = a.trilhaProgresso && a.trilhaProgresso.completedLessons
-            ? Object.keys(a.trilhaProgresso.completedLessons).length
-            : 0;
-          return {
-            nome: a.apelido,
-            saldo: a.saldo,
-            avaliacoes: calcularNotaAvaliacoesAluno(a.id, turma.id).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 }),
-            nota: calcularNotaRoteiros(a),
-            trilha: `${licoes}/80`
-          };
+        const todasAvals = (Array.isArray(db.avaliacoes) ? db.avaliacoes : []).filter(a => a.turmaId === turma.id);
+        const showRot = isRoteirosVisiveis();
+        const fmtNum = (n) => Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
+
+        // Descobrir períodos disponíveis (bimestres ou trimestres com avaliações, ou cadastrados no regime)
+        const periodosPresentes = [];
+        todasAvals.forEach(a => {
+          const p = a.periodo || 'Geral';
+          if (p !== 'Geral' && !periodosPresentes.includes(p)) periodosPresentes.push(p);
         });
-        abrirModal(`
-          <div class="flex items-center justify-between mb-2">
-            <div>
-              <h3 class="font-bold text-lg">Boletim — ${escapeHtml(turma.nome)}</h3>
-              <p class="text-[11px] text-gray-400">${alunos.length} estudante(s) em ordem alfabética</p>
-            </div>
-            <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
-          </div>
-          <div class="flex gap-2 mb-3">
-            <button id="btn-copiar-boletim" class="flex-1 glass-gold-btn text-xs font-bold py-2 rounded-xl">Copiar Tabela</button>
-            <button id="btn-csv-boletim" class="flex-1 glass-pill text-xs font-bold py-2 rounded-xl text-white">Baixar CSV</button>
-          </div>
-          <div class="max-h-[55vh] overflow-y-auto rounded-2xl border border-white/10">
-            <table class="w-full text-left text-xs">
-              <thead class="bg-white/10 text-gray-300 sticky top-0">
-                <tr>
-                  <th class="px-3 py-2">Estudante</th>
-                  <th class="px-2 py-2 text-right">${escapeHtml(db.config.moedaPlural)}</th>
-                  <th class="px-2 py-2 text-right">Avaliações</th>
-                  ${isRoteirosVisiveis() ? '<th class="px-2 py-2 text-right">Roteiros</th>' : ''}
-                  <th class="px-2 py-2 text-right">Trilha</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-white/10">
-                ${linhas.length === 0 ? `<tr><td colspan="${isRoteirosVisiveis() ? 5 : 4}" class="px-3 py-4 text-center text-gray-400">Nenhum aluno nesta turma.</td></tr>` : linhas.map(l => `
-                  <tr>
-                    <td class="px-3 py-2 font-semibold">${escapeHtml(l.nome)}</td>
-                    <td class="px-2 py-2 text-right text-amarelo font-bold">${l.saldo}</td>
-                    <td class="px-2 py-2 text-right font-bold text-cyan-300">${l.avaliacoes}</td>
-                    ${isRoteirosVisiveis() ? `<td class="px-2 py-2 text-right font-extrabold text-emerald-300">${l.nota}</td>` : ''}
-                    <td class="px-2 py-2 text-right text-purple-300">${l.trilha}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-          </div>
-        `);
-        document.getElementById('btn-fechar-modal').onclick = fecharModal;
-        document.getElementById('btn-copiar-boletim').onclick = async () => {
-          const showRot = isRoteirosVisiveis();
-          const hdr = showRot ? 'Estudante\tSaldo\tAvaliações\tRoteiros\tMateMAGICA' : 'Estudante\tSaldo\tAvaliações\tMateMAGICA';
-          const tsv = [hdr, ...linhas.map(l => showRot ? `${l.nome}\t${l.saldo}\t${l.avaliacoes}\t${l.nota}\t${l.trilha}` : `${l.nome}\t${l.saldo}\t${l.avaliacoes}\t${l.trilha}`)].join('\n');
-          try {
-            await navigator.clipboard.writeText(tsv);
-            toast('Boletim copiado! Cole direto na planilha.', 'sucesso');
-          } catch (e) {
-            toast('Use Baixar CSV para exportar.', 'info');
+        periodosPresentes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+        const temPeriodos = periodosPresentes.length > 0;
+        let filtroPeriodo = temPeriodos ? periodosPresentes[0] : 'geral';
+
+        function drawBoletim() {
+          const ehFinal = temPeriodos && filtroPeriodo === 'final';
+          const avalsFiltradas = ehFinal
+            ? todasAvals
+            : (temPeriodos ? todasAvals.filter(a => (a.periodo || 'Geral') === filtroPeriodo) : todasAvals);
+          const temAvalsNaVisao = avalsFiltradas.length > 0;
+
+          let colunas = [];
+          let linhas = [];
+
+          if (ehFinal) {
+            // Boletim Final: mostra média aritmética (MF) dos períodos
+            colunas = periodosPresentes.map(p => ({ key: p, label: p.replace(/\s*(Bimestre|Trimestre)/i, m => m[0].toUpperCase()) }));
+            linhas = alunos.map(a => {
+              const rotNum = showRot ? calcularNotaRoteirosNum(a) : 0;
+              const valsPorPeriodo = periodosPresentes.map(p => {
+                const somaAv = todasAvals
+                  .filter(av => (av.periodo || 'Geral') === p)
+                  .reduce((s, av) => s + Number((av.notas && av.notas[a.id]) || 0), 0);
+                return +(somaAv + rotNum).toFixed(2);
+              });
+              const mf = valsPorPeriodo.length > 0
+                ? +(valsPorPeriodo.reduce((s, v) => s + v, 0) / valsPorPeriodo.length).toFixed(2)
+                : 0;
+              return {
+                nome: a.apelido,
+                saldo: a.saldo,
+                cells: valsPorPeriodo.map(fmtNum),
+                rot: fmtNum(rotNum),
+                totalLabel: fmtNum(mf)
+              };
+            });
+          } else {
+            // Período específico (ou geral sem bimestre)
+            colunas = avalsFiltradas.map(av => ({ key: String(av.id), label: abreviarAvaliacao(av), title: av.titulo }));
+            linhas = alunos.map(a => {
+              const rotNum = showRot ? calcularNotaRoteirosNum(a) : 0;
+              const avNums = avalsFiltradas.map(av => Number((av.notas && av.notas[a.id]) || 0));
+              const somaAv = avNums.reduce((s, v) => s + v, 0);
+              const total = +(somaAv + rotNum).toFixed(2);
+              return {
+                nome: a.apelido,
+                saldo: a.saldo,
+                cells: avNums.map(fmtNum),
+                rot: fmtNum(rotNum),
+                totalLabel: fmtNum(total)
+              };
+            });
           }
-        };
-        document.getElementById('btn-csv-boletim').onclick = () => {
-          const showRot = isRoteirosVisiveis();
-          const hdr = showRot ? 'Estudante;Saldo;Avaliações;Roteiros;MateMAGICA' : 'Estudante;Saldo;Avaliações;MateMAGICA';
-          const csv = [hdr, ...linhas.map(l => showRot ? `"${l.nome.replace(/"/g,'""')}";${l.saldo};"${l.avaliacoes}";"${l.nota}";"${l.trilha}"` : `"${l.nome.replace(/"/g,'""')}";${l.saldo};"${l.avaliacoes}";"${l.trilha}"`)].join('\n');
-          const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `boletim_${turma.nome.replace(/\s+/g, '_')}.csv`;
-          a.click();
-          URL.revokeObjectURL(url);
-        };
+
+          const totalColHeader = ehFinal ? 'MF' : 'Total';
+          const colCount = 2 + (temAvalsNaVisao ? colunas.length : 0) + (showRot ? 1 : 0) + 1;
+
+          abrirModal(`
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <h3 class="font-bold text-lg">Boletim — ${escapeHtml(turma.nome)}</h3>
+                <p class="text-[11px] text-gray-400">${alunos.length} estudante(s)${ehFinal ? ' · MF = média aritmética dos períodos' : ''}</p>
+              </div>
+              <button id="btn-fechar-modal" class="text-gray-400 text-xl px-2">&times;</button>
+            </div>
+
+            ${temPeriodos ? `
+              <div class="flex flex-wrap gap-1.5 mb-2.5">
+                ${periodosPresentes.map(p => `
+                  <button type="button" data-bol-per="${escapeHtml(p)}" class="btn-bol-per px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${filtroPeriodo === p ? 'glass-gold-btn' : 'glass-pill text-gray-200'}">${escapeHtml(p)}</button>
+                `).join('')}
+                <button type="button" data-bol-per="final" class="btn-bol-per px-2.5 py-1 rounded-xl text-[11px] font-bold transition ${ehFinal ? 'glass-gold-btn' : 'glass-pill text-cyan-300'}">Final (MF)</button>
+              </div>
+            ` : ''}
+
+            <div class="flex gap-2 mb-3">
+              <button id="btn-copiar-boletim" class="flex-1 glass-gold-btn text-xs font-bold py-2 rounded-xl">Copiar Tabela</button>
+              <button id="btn-csv-boletim" class="flex-1 glass-pill text-xs font-bold py-2 rounded-xl text-white">Baixar CSV</button>
+            </div>
+            <div class="max-h-[52vh] overflow-auto rounded-2xl border border-white/10">
+              <table class="w-full text-left text-xs">
+                <thead class="bg-white/10 text-gray-300 sticky top-0">
+                  <tr>
+                    <th class="px-3 py-2">Estudante</th>
+                    <th class="px-2 py-2 text-right">${escapeHtml(db.config.moedaPlural)}</th>
+                    ${temAvalsNaVisao ? colunas.map(c => `<th class="px-2 py-2 text-right" title="${escapeHtml(c.title || c.label)}">${escapeHtml(c.label)}</th>`).join('') : ''}
+                    ${showRot ? '<th class="px-2 py-2 text-right">Rot.</th>' : ''}
+                    <th class="px-2 py-2 text-right text-emerald-300">${totalColHeader}</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-white/10">
+                  ${linhas.length === 0 ? `<tr><td colspan="${colCount}" class="px-3 py-4 text-center text-gray-400">Nenhum aluno nesta turma.</td></tr>` : linhas.map(l => `
+                    <tr>
+                      <td class="px-3 py-2 font-semibold whitespace-nowrap">${escapeHtml(l.nome)}</td>
+                      <td class="px-2 py-2 text-right text-amarelo font-bold">${l.saldo}</td>
+                      ${temAvalsNaVisao ? l.cells.map(v => `<td class="px-2 py-2 text-right text-cyan-300 font-semibold">${v}</td>`).join('') : ''}
+                      ${showRot ? `<td class="px-2 py-2 text-right font-bold text-purple-200">${l.rot}</td>` : ''}
+                      <td class="px-2 py-2 text-right font-extrabold text-emerald-300">${l.totalLabel}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          `);
+
+          document.getElementById('btn-fechar-modal').onclick = fecharModal;
+          document.querySelectorAll('.btn-bol-per').forEach(b => {
+            b.onclick = () => {
+              filtroPeriodo = b.dataset.bolPer;
+              drawBoletim();
+            };
+          });
+
+          const buildExportRows = (sep) => {
+            const headers = ['Estudante', db.config.moedaPlural];
+            if (temAvalsNaVisao) colunas.forEach(c => headers.push(c.label));
+            if (showRot) headers.push('Roteiros');
+            headers.push(totalColHeader);
+            const rows = linhas.map(l => {
+              const arr = [l.nome, l.saldo];
+              if (temAvalsNaVisao) l.cells.forEach(v => arr.push(v));
+              if (showRot) arr.push(l.rot);
+              arr.push(l.totalLabel);
+              return sep === ';'
+                ? arr.map(v => typeof v === 'number' ? String(v) : `"${String(v).replace(/"/g, '""')}"`).join(';')
+                : arr.join('\t');
+            });
+            return [sep === ';' ? headers.map(h => `"${String(h).replace(/"/g, '""')}"`).join(';') : headers.join('\t'), ...rows].join('\n');
+          };
+
+          document.getElementById('btn-copiar-boletim').onclick = async () => {
+            try {
+              await navigator.clipboard.writeText(buildExportRows('\t'));
+              toast('Boletim copiado! Cole direto na planilha.', 'sucesso');
+            } catch (e) {
+              toast('Use Baixar CSV para exportar.', 'info');
+            }
+          };
+          document.getElementById('btn-csv-boletim').onclick = () => {
+            const blob = new Blob(['﻿' + buildExportRows(';')], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `boletim_${turma.nome.replace(/\s+/g, '_')}_${filtroPeriodo}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+          };
+        }
+        drawBoletim();
       }
 
       function iconeMoedaImg(sizeClass = 'w-4 h-4') {
@@ -1855,6 +1977,8 @@
         content.innerHTML = html;
         backdrop.classList.remove('hidden', 'is-open');
         backdrop.classList.add('flex');
+        document.documentElement.style.overflow = 'hidden';
+        document.body.style.overflow = 'hidden';
         requestAnimationFrame(() => backdrop.classList.add('is-open'));
         if (estavaFechado && typeof history !== 'undefined' && history.pushState) {
           try {
@@ -1871,6 +1995,8 @@
         backdrop.classList.remove('is-open');
         backdrop.classList.add('hidden');
         backdrop.classList.remove('flex');
+        document.documentElement.style.overflow = '';
+        document.body.style.overflow = '';
         if (!fromPopState && estavaAberto && modalHistoryPushed) {
           modalHistoryPushed = false;
           try {
